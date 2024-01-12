@@ -12,7 +12,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.familyplanner.MainActivity
+import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.SignInViewModel
 import com.familyplanner.databinding.FragmentSignInBinding
 import kotlinx.coroutines.Dispatchers
@@ -40,14 +42,18 @@ class SignInFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isLoggedIn().collect {
                     if (it) {
-                        TODO()
+                        activity?.runOnUiThread {
+                            findNavController().navigate(R.id.action_signInFragment_to_noFamilyFragment)
+                        }
                     } else {
-                        binding.bEnter.isEnabled = true
-                        Toast.makeText(
-                            activity,
-                            "Ошибка. Проверьте данные и подключение к интернету и повторите попытку",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        activity?.runOnUiThread {
+                            binding.bEnter.isEnabled = true
+                            Toast.makeText(
+                                activity,
+                                "Ошибка. Проверьте данные и подключение к интернету и повторите попытку",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }

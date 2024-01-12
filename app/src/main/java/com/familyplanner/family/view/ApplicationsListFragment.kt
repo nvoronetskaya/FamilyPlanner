@@ -65,7 +65,7 @@ class ApplicationsListFragment : Fragment() {
                             .setCancelable(false)
                             .setNeutralButton("Ок") { _, _ ->
                                 parentFragmentManager.popBackStack()
-                                TODO()
+                                parentFragmentManager.popBackStack()
                             }.create().show()
                     } else {
                         binding.tvFamily.text = it.name
@@ -103,7 +103,7 @@ class ApplicationsListFragment : Fragment() {
 
         binding.ivBack.setOnClickListener {
             parentFragmentManager.popBackStack()
-            TODO()
+            parentFragmentManager.popBackStack()
         }
     }
 

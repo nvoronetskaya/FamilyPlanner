@@ -18,6 +18,7 @@ import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNoFamilyBinding
 import com.familyplanner.family.viewmodel.NoFamilyViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class NoFamilyFragment : Fragment() {
@@ -40,6 +41,13 @@ class NoFamilyFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getUser().collect {
+                    if (it.hasFamily) {
+                        parentFragmentManager.popBackStack()
+                        findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment)
+                    }
+                }
+
                 viewModel.getErrors().collect {
                     Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
                 }

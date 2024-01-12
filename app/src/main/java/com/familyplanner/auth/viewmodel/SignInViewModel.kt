@@ -2,6 +2,7 @@ package com.familyplanner.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.auth.network.AuthQueries
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -10,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 
 class SignInViewModel : ViewModel() {
     private val auth = AuthQueries()
+    private val userRepo = UserRepository()
     private val loggedIn = MutableSharedFlow<Boolean>()
 
     fun isLoggedIn() = loggedIn

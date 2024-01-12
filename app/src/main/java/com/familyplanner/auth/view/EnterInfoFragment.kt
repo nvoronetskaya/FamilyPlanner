@@ -47,7 +47,7 @@ class EnterInfoFragment : Fragment() {
                     if (it) {
                         activity?.runOnUiThread {
                             findNavController().navigate(
-                                R.id.action_enterEmailFragment_to_confirmEmailFragment
+                                R.id.action_enterInfoFragment_to_noFamilyFragment
                             )
                         }
                     } else {
@@ -104,7 +104,7 @@ class EnterInfoFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (!binding.etPassword.text!!.equals(binding.etRepeatPassword.text)) {
+            if (!binding.etPassword.text!!.toString().equals(binding.etRepeatPassword.text.toString())) {
                 binding.etRepeatPassword.error = "Пароли не совпадают"
                 it.isEnabled = true
                 return@setOnClickListener

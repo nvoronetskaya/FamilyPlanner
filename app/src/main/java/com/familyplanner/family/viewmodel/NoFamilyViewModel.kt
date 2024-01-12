@@ -8,6 +8,7 @@ import com.familyplanner.family.data.FamilyRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
@@ -28,6 +29,8 @@ class NoFamilyViewModel : ViewModel() {
     }
 
     fun getErrors() = errors
+
+    fun getUser(): Flow<User> = user
 
     fun createFamily(name: String) {
         viewModelScope.launch(Dispatchers.IO) {

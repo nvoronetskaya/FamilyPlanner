@@ -110,7 +110,7 @@ class ProfileFragment : Fragment() {
         binding.tvChangeEmail.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.changeEmail().collect {
+                    viewModel.changeEmail("", "").collect {
                         if (it) {
                             Toast.makeText(
                                 activity,

@@ -56,6 +56,9 @@
         <action
             android:id="@+id/action_noFamilyFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_noFamilyFragment_to_tasksListFragment"
+            app:destination="@id/tasksListFragment" />
     </fragment>
     <fragment
         android:id="@+id/membersListFragment"
@@ -75,6 +78,9 @@
         <action
             android:id="@+id/action_tasksListFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_tasksListFragment_to_noFamilyFragment2"
+            app:destination="@id/noFamilyFragment" />
     </fragment>
     <fragment
         android:id="@+id/applicationsListFragment"

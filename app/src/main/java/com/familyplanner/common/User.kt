@@ -7,4 +7,9 @@ data class User(
     var hasFamily: Boolean,
     var familyId: String?,
     var email: String
-)
+) {
+    constructor() : this(
+        "", "",
+        "", false, "", ""
+    )
+}
