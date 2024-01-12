@@ -43,13 +43,19 @@ class NoFamilyFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {
                     if (it.hasFamily) {
-                        parentFragmentManager.popBackStack()
-                        findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment)
+                        activity?.runOnUiThread {
+                            TODO("Во-первых, сначала прогрузить инфу о пользователе, а потом что-то показыввать ")
+                            TODO("Во-вторых, таким образом на нужный экран не перейти, надо что-то другое придумывать ")
+                            parentFragmentManager.popBackStack()
+                            findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment)
+                        }
                     }
                 }
 
                 viewModel.getErrors().collect {
-                    Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                    activity?.runOnUiThread {
+                        Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

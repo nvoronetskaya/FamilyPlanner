@@ -1,6 +1,7 @@
 <resources xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Base application theme. -->
     <style name="Theme.FamilyPlanner" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="colorPrimary">@color/white</item>
         <item name="colorPrimaryVariant">@color/light_orange</item>
         <item name="colorOnTertiary">@color/dark_orange_text</item>
@@ -66,5 +67,18 @@
         <item name="boxStrokeColor">#C38052</item>
         <item name="hintTextColor">#1D1B20</item>
         <item name="android:textColor">#1D1B20</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

@@ -20,7 +20,7 @@ class ProfileViewModel : ViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
             userRepo.getUserByEmail(auth.currentUser!!.email!!).collect {
-                user.emit(it[0])
+                user.emit(it)
             }
         }
     }

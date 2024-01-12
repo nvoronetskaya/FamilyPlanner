@@ -6,6 +6,8 @@ import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.dataObjects
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class NoFamilyViewModel : ViewModel() {
     private val auth = Firebase.auth
-    private val user = MutableSharedFlow<User>()
+    private val user = MutableSharedFlow<User>(replay = 1)
     private val userRepo = UserRepository()
     private val familyRepo = FamilyRepository()
     private val errors = MutableSharedFlow<String>()
@@ -23,7 +25,7 @@ class NoFamilyViewModel : ViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
             userRepo.getUserByEmail(auth.currentUser!!.email!!).collect {
-                user.emit(it[0])
+                user.emit(it)
             }
         }
     }
@@ -34,7 +36,8 @@ class NoFamilyViewModel : ViewModel() {
 
     fun createFamily(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val userId = user.last().id
+            val userDoc = user.replayCache[0]
+            val userId = userDoc.id
             familyRepo.createFamily(name, userId).addOnCompleteListener {
                 if (it.isSuccessful) {
                     familyRepo.setUserToAdmin(userId, it.result.id)
