@@ -1,0 +1,70 @@
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Base application theme. -->
+    <style name="Theme.FamilyPlanner" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/light_orange</item>
+        <item name="colorOnTertiary">@color/dark_orange_text</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/orange</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorOutline">@color/dark_orange</item>
+        <item name="colorError">@color/red</item>
+    </style>
+
+    <style name="button" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">100dp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="filledButton" parent="button">
+        <item name="android:backgroundTint">?attr/colorSecondary</item>
+        <item name="android:color">?attr/colorSecondary</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <style name="outlinedButton" parent="button">
+        <item name="android:backgroundTint">?attr/colorPrimary</item>
+        <item name="android:color">?attr/colorOutline</item>
+        <item name="android:textColor">?attr/colorOnTertiary</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+    </style>
+
+    <style name="textTitle">
+        <item name="android:textSize">35sp</item>
+        <item name="android:fontFamily">@font/tenor_sans</item>
+    </style>
+
+    <style name="textBar">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="textBody">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="subText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="inputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/edit_text</item>
+        <item name="hintTextColor">?attr/colorOutline</item>
+    </style>
+
+    <style name="editText">
+        <item name="android:layout_width">300dp</item>
+    </style>
+
+    <style name="editTextDisabled" parent="inputLayout">
+        <item name="boxStrokeColor">#C38052</item>
+        <item name="hintTextColor">#1D1B20</item>
+        <item name="android:textColor">#1D1B20</item>
+    </style>
+</resources>

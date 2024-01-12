@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059880753221",
+    "project_id": "family-planner-8d2a6",
+    "storage_bucket": "family-planner-8d2a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059880753221:android:85369a16b1be26d30b2b2c",
+        "android_client_info": {
+          "package_name": "com.familyplanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkqzMuAikYBVW0tR1g8g_EPtUZwD1pohs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

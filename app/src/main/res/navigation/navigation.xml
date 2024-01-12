@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation"
+    app:startDestination="@id/welcomeFragment">
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.familyplanner.auth.view.WelcomeFragment"
+        android:label="WelcomeFragment" >
+        <action
+            android:id="@+id/action_welcomeFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_enterEmailFragment"
+            app:destination="@id/enterEmailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.familyplanner.auth.view.SignInFragment"
+        android:label="SignInFragment" >
+        <action
+            android:id="@+id/action_signInFragment_to_noFamilyFragment"
+            app:destination="@id/noFamilyFragment" />
+        <action
+            android:id="@+id/action_signInFragment_to_tasksListFragment"
+            app:destination="@id/tasksListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/enterInfoFragment"
+        android:name="com.familyplanner.auth.view.EnterInfoFragment"
+        android:label="EnterInfoFragment" >
+        <action
+            android:id="@+id/action_enterInfoFragment_to_noFamilyFragment"
+            app:destination="@id/noFamilyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/enterEmailFragment"
+        android:name="com.familyplanner.auth.view.EnterEmailFragment"
+        android:label="EnterEmailFragment" >
+        <action
+            android:id="@+id/action_enterEmailFragment_to_confirmEmailFragment"
+            app:destination="@id/confirmEmailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/confirmEmailFragment"
+        android:name="com.familyplanner.auth.view.ConfirmEmailFragment"
+        android:label="ConfirmEmailFragment" >
+        <action
+            android:id="@+id/action_confirmEmailFragment_to_enterInfoFragment"
+            app:destination="@id/enterInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/noFamilyFragment"
+        android:name="com.familyplanner.family.view.NoFamilyFragment"
+        android:label="NoFamilyFragment" >
+        <action
+            android:id="@+id/action_noFamilyFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/membersListFragment"
+        android:name="com.familyplanner.family.view.MembersListFragment"
+        android:label="MembersListFragment" >
+        <action
+            android:id="@+id/action_membersListFragment_to_applicationsListFragment"
+            app:destination="@id/applicationsListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tasksListFragment"
+        android:name="com.familyplanner.tasks.TasksListFragment"
+        android:label="TasksListFragment" >
+        <action
+            android:id="@+id/action_tasksListFragment_to_membersListFragment"
+            app:destination="@id/membersListFragment" />
+        <action
+            android:id="@+id/action_tasksListFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/applicationsListFragment"
+        android:name="com.familyplanner.tasks.ApplicationsListFragment"
+        android:label="ApplicationsListFragment" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.familyplanner.auth.view.ProfileFragment"
+        android:label="ProfileFragment" >
+        <action
+            android:id="@+id/action_profileFragment_to_welcomeFragment"
+            app:destination="@id/welcomeFragment" />
+    </fragment>
+</navigation>
