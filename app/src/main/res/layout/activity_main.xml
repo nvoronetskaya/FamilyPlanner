@@ -17,6 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:navGraph="@navigation/navigation"
+        android:visibility="gone"
         tools:context=".MainActivity" />
 
 

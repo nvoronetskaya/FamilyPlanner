@@ -40,30 +40,6 @@ class EnterInfoFragment : Fragment() {
 
         viewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
 
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isLoggedIn().collect {
-                    if (it) {
-                        activity?.runOnUiThread {
-                            findNavController().navigate(
-                                R.id.action_enterInfoFragment_to_noFamilyFragment
-                            )
-                        }
-                    } else {
-                        activity?.runOnUiThread {
-                            binding.bReady.isEnabled = true
-                            Toast.makeText(
-                                activity,
-                                "Ошибка. Проверьте подключение к интернету и повторите попытку",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                }
-            }
-        }
-
         binding.etBirthday.setOnClickListener {
             val dialog = DatePickerDialog(
                 activity as MainActivity,

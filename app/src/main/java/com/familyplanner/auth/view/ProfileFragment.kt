@@ -45,9 +45,11 @@ class ProfileFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {
-                    binding.etName.setText(it.name)
-                    binding.etEmail.setText(it.email)
-                    binding.etBirthday.setText(it.birthday)
+                    activity?.runOnUiThread {
+                        binding.etName.setText(it.name)
+                        binding.etEmail.setText(it.email)
+                        binding.etBirthday.setText(it.birthday)
+                    }
                 }
             }
         }
@@ -56,7 +58,6 @@ class ProfileFragment : Fragment() {
             binding.ivEdit.visibility = View.GONE
             binding.ivDone.visibility = View.VISIBLE
             binding.etName.isEnabled = true
-
             binding.etBirthday.isClickable = true
         }
 

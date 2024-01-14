@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_welcomeFragment_to_enterEmailFragment"
             app:destination="@id/enterEmailFragment" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_noFamilyFragment"
+            app:destination="@id/noFamilyFragment" />
     </fragment>
     <fragment
         android:id="@+id/signInFragment"
@@ -20,10 +23,9 @@
         android:label="SignInFragment" >
         <action
             android:id="@+id/action_signInFragment_to_noFamilyFragment"
+            app:popUpTo="@id/navigation"
+            app:popUpToInclusive="true"
             app:destination="@id/noFamilyFragment" />
-        <action
-            android:id="@+id/action_signInFragment_to_tasksListFragment"
-            app:destination="@id/tasksListFragment" />
     </fragment>
     <fragment
         android:id="@+id/enterInfoFragment"
@@ -31,6 +33,8 @@
         android:label="EnterInfoFragment" >
         <action
             android:id="@+id/action_enterInfoFragment_to_noFamilyFragment"
+            app:popUpTo="@id/navigation"
+            app:popUpToInclusive="true"
             app:destination="@id/noFamilyFragment" />
     </fragment>
     <fragment
@@ -58,7 +62,9 @@
             app:destination="@id/profileFragment" />
         <action
             android:id="@+id/action_noFamilyFragment_to_tasksListFragment"
-            app:destination="@id/tasksListFragment" />
+            app:popUpTo="@id/navigation"
+            app:destination="@id/tasksListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/membersListFragment"
@@ -92,6 +98,8 @@
         android:label="ProfileFragment" >
         <action
             android:id="@+id/action_profileFragment_to_welcomeFragment"
+            app:popUpTo="@id/navigation"
+            app:popUpToInclusive="true"
             app:destination="@id/welcomeFragment" />
     </fragment>
 </navigation>

@@ -37,16 +37,16 @@ class NoFamilyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[NoFamilyViewModel::class.java]
-
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {
                     if (it.hasFamily) {
                         activity?.runOnUiThread {
-                            TODO("Во-первых, сначала прогрузить инфу о пользователе, а потом что-то показыввать ")
-                            TODO("Во-вторых, таким образом на нужный экран не перейти, надо что-то другое придумывать ")
-                            parentFragmentManager.popBackStack()
-                            findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment)
+                            //TODO("Во-первых, сначала прогрузить инфу о пользователе, а потом что-то показыввать ")
+                            //TODO("Во-вторых, таким образом на нужный экран не перейти, надо что-то другое придумывать ")
+                            val bundle = Bundle()
+                            bundle.putString("userId", it.id)
+                            findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment, bundle)
                         }
                     }
                 }
