@@ -67,7 +67,20 @@ class MembersListViewModel : ViewModel() {
         remove(userId)
     }
 
-    fun deleteFamily() {
-        TODO()
+    fun deleteFamily(): Flow<Boolean> {
+        val isSuccessful = MutableSharedFlow<Boolean>()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteFamily(family.last()!!.id).addOnCompleteListener {
+                viewModelScope.launch (Dispatchers.IO) {
+                    if (it.isSuccessful) {
+                        isSuccessful.emit(true)
+                    } else {
+                        isSuccessful.emit(false)
+                    }
+                }
+            }
+        }
+        return isSuccessful
     }
 }

@@ -124,7 +124,21 @@ class MembersListFragment : Fragment() {
             AlertDialog.Builder(activity as MainActivity).setTitle("Удаление семьи")
                 .setMessage("Вы уверены, что хотите удалить семью?")
                 .setPositiveButton("Да") { _, _ ->
-                    viewModel.deleteFamily()
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                            viewModel.deleteFamily().collect {
+                                if (it) {
+                                    findNavController().popBackStack()
+                                } else {
+                                    Toast.makeText(
+                                        activity,
+                                        "Ошибка. Проверьте подключение к сети и попробуйте позднее",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
                 }
                 .setNegativeButton("Отмена") { dialog, _ ->
                     dialog.cancel()

@@ -18,7 +18,6 @@ import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNoFamilyBinding
 import com.familyplanner.family.viewmodel.NoFamilyViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class NoFamilyFragment : Fragment() {

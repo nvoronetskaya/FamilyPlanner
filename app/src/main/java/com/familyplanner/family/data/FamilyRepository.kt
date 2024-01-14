@@ -97,4 +97,27 @@ class FamilyRepository {
     fun setUserToAdmin(userId: String, familyId: String) {
         firestore.collection("users").document(userId).update(mapOf("hasFamily" to true, "familyId" to familyId, "isAdmin" to true))
     }
+
+    fun deleteFamily(familyId: String): Task<Void> {
+        val task = firestore.collection("families").document(familyId).delete()
+        task.addOnSuccessListener {
+            firestore.collection("users").whereEqualTo("familyId", familyId).get().addOnCompleteListener {
+                if (!it.result.isEmpty) {
+                    for (doc in it.result) {
+                        doc.reference.update(mapOf("hasFamily" to false, "familyId" to "", "isAdmin" to false))
+                    }
+                }
+            }
+
+            firestore.collection("applications").whereEqualTo("familyId", familyId).get().addOnCompleteListener {
+                if (!it.result.isEmpty) {
+                    for (doc in it.result) {
+                        doc.reference.delete()
+                    }
+                }
+            }
+        }
+
+        return task
+    }
 }

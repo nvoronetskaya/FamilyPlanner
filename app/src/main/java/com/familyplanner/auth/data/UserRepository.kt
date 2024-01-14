@@ -8,7 +8,6 @@ import com.google.firebase.firestore.snapshots
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.tasks.await
 
 class UserRepository {
     private val firestore = Firebase.firestore
