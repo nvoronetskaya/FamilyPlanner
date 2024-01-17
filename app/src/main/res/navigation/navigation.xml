@@ -76,7 +76,7 @@
     </fragment>
     <fragment
         android:id="@+id/tasksListFragment"
-        android:name="com.familyplanner.tasks.TasksListFragment"
+        android:name="com.familyplanner.tasks.view.TasksListFragment"
         android:label="TasksListFragment" >
         <action
             android:id="@+id/action_tasksListFragment_to_membersListFragment"

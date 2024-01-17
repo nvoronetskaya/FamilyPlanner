@@ -48,7 +48,29 @@
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_tasks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="..." />
+        tools:listitem="@layout/viewholder_task" />
+
+    <ImageView
+        android:id="@+id/iv_no_tasks"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="180dp"
+        android:visibility="gone"
+        app:srcCompat="@drawable/no_tasks" />
+
+    <TextView
+        android:id="@+id/tv_no_tasks"
+        style="@style/textBody"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:text="@string/no_tasks"
+        android:visibility="gone" />
 </LinearLayout>

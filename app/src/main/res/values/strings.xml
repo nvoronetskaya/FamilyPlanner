@@ -39,4 +39,5 @@
     <string name="change_email"><u>Сменить почту</u></string>
     <string name="change_password"><u>Сменить пароль</u></string>
     <string name="exit">Выйти</string>
+    <string name="no_tasks">Все задачи выполнены! Теперь можно насладиться заслуженным отдыхом </string>
 </resources>

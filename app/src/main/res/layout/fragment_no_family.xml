@@ -44,6 +44,7 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
+        android:visibility="gone"
         app:lottie_rawRes="@raw/nothing_found" />
 
     <TextView
@@ -52,6 +53,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:visibility="gone"
         android:gravity="center_horizontal"
         android:text="@string/no_family"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,6 +65,7 @@
         style="@style/filledButton"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_marginHorizontal="75dp"
         android:layout_marginTop="20dp"
         android:text="@string/join"
@@ -74,6 +77,7 @@
         android:id="@+id/b_create"
         style="@style/outlinedButton"
         android:layout_width="250dp"
+        android:visibility="gone"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="75dp"
         android:layout_marginTop="10dp"
@@ -81,4 +85,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/b_join" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

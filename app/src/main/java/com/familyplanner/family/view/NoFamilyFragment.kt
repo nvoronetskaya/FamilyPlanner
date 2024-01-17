@@ -42,11 +42,18 @@ class NoFamilyFragment : Fragment() {
                 viewModel.getUser().collect {
                     if (it.hasFamily) {
                         activity?.runOnUiThread {
-                            //TODO("Во-первых, сначала прогрузить инфу о пользователе, а потом что-то показыввать ")
-                            //TODO("Во-вторых, таким образом на нужный экран не перейти, надо что-то другое придумывать ")
+                            binding.pbLoading.visibility = View.GONE
                             val bundle = Bundle()
                             bundle.putString("userId", it.id)
                             findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment, bundle)
+                        }
+                    } else {
+                        activity?.runOnUiThread {
+                            binding.pbLoading.visibility = View.GONE
+                            binding.animNothingFound.visibility = View.VISIBLE
+                            binding.tvNoFamily.visibility = View.VISIBLE
+                            binding.bJoin.visibility = View.VISIBLE
+                            binding.bCreate.visibility = View.VISIBLE
                         }
                     }
                 }
