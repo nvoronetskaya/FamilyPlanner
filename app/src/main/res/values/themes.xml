@@ -46,6 +46,7 @@
 
     <style name="textBody">
         <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:fontFamily">@font/roboto_serif</item>
     </style>
 

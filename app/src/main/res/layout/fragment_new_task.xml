@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="?attr/colorSecondary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/back" />
+
+        <TextView
+            android:id="@+id/tv_family"
+            style="@style/textBar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="30dp"
+            android:gravity="center_vertical"
+            android:text="@string/new_task" />
+
+        <ImageView
+            android:id="@+id/iv_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="15dp"
+            app:srcCompat="@drawable/navigate_next" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tf_name"
+                style="@style/inputLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginHorizontal="30dp"
+                android:layout_marginTop="20dp"
+                android:hint="@string/task_title"
+                app:endIconMode="clear_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_name"
+                    style="@style/editText"
+                    android:layout_width="350dp"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tv_has_deadline"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/deadline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tf_name" />
+
+            <TextView
+                android:id="@+id/tv_deadline"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/tv_has_deadline"
+                app:layout_constraintTop_toBottomOf="@id/tv_has_deadline" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/sw_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tf_name" />
+
+            <CheckBox
+                android:id="@+id/cb_continuous_task"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/continuous_task"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_deadline" />
+
+            <TextView
+                android:id="@+id/tv_start_time"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start_time"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cb_continuous_task" />
+
+            <TextView
+                android:id="@+id/tv_start_value"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/tv_start_time"
+                app:layout_constraintTop_toTopOf="@id/tv_start_time" />
+
+            <TextView
+                android:id="@+id/tv_finish_time"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/finish_time"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_start_time" />
+
+            <TextView
+                android:id="@+id/tv_finish_value"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/tv_finish_time"
+                app:layout_constraintTop_toTopOf="@id/tv_finish_time" />
+
+            <TextView
+                android:id="@+id/tv_repeat"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/repeat_task"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_finish_time" />
+
+            <RadioGroup
+                android:id="@+id/rg_repeat_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_repeat">
+
+                <RadioButton
+                    android:id="@+id/rb_once"
+                    style="@style/textBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:text="@string/once" />
+
+                <RadioButton
+                    android:id="@+id/rb_every_day"
+                    style="@style/textBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:text="@string/every_day" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rb_each_n_days"
+                        style="@style/textBody"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="@string/every" />
+
+                    <EditText
+                        android:id="@+id/et_number_of_days"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:hint="20"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/tv_days"
+                        style="@style/textBody"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="@string/days" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rb_days_of_week"
+                        style="@style/textBody"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="@string/certain_days_of_week" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:orientation="horizontal">
+
+                        <CheckBox
+                            android:id="@+id/cb_monday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/monday" />
+
+                        <CheckBox
+                            android:id="@+id/cb_tuesday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/tuesday" />
+
+                        <CheckBox
+                            android:id="@+id/cb_wednesday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/wednesday" />
+
+                        <CheckBox
+                            android:id="@+id/cb_thursday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/thursday" />
+
+                        <CheckBox
+                            android:id="@+id/cb_friday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/friday" />
+
+                        <CheckBox
+                            android:id="@+id/cb_saturday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/saturday" />
+
+                        <CheckBox
+                            android:id="@+id/cb_sunday"
+                            style="@style/textBody"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:text="@string/sunday" />
+                    </LinearLayout>
+                </LinearLayout>
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/tv_repeat_from"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/repeat_starting_with"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rg_repeat_options" />
+
+            <TextView
+                android:id="@+id/tv_repeat_start"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_repeat_from" />
+
+            <TextView
+                android:id="@+id/tv_importance"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/importance"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_repeat_from" />
+
+            <Spinner
+                android:id="@+id/sp_importance"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_importance" />
+
+            <TextView
+                android:id="@+id/tv_location"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/has_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_importance" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/sw_has_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_location" />
+
+            <com.yandex.mapkit.mapview.MapView
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_location" />
+
+            <TextView
+                android:id="@+id/tv_attach_file"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/attach_file"
+                app:drawableStartCompat="@drawable/add"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/map" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_files"
+                style="@style/textBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_attach_file" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
