@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation"
-    app:startDestination="@id/welcomeFragment">
+    app:startDestination="@id/newTaskInfoFragment">
     <fragment
         android:id="@+id/welcomeFragment"
         android:name="com.familyplanner.auth.view.WelcomeFragment"
@@ -102,4 +102,12 @@
             app:popUpToInclusive="true"
             app:destination="@id/welcomeFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/newTaskInfoFragment"
+        android:name="com.familyplanner.tasks.view.NewTaskInfoFragment"
+        android:label="NewTaskInfoFragment" />
+    <fragment
+        android:id="@+id/fr"
+        android:name="com.familyplanner.tasks.view.fr"
+        android:label="fr" />
 </navigation>

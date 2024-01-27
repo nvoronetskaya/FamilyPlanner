@@ -16,7 +16,7 @@ class TasksListViewModel : ViewModel() {
     private val user = MutableSharedFlow<User>(replay = 1)
     private val userRepo = UserRepository()
     private val familyRepo = FamilyRepository()
-    private val taskRepo = TaskRepository()
+//    private val taskRepo = TaskRepository()
     private val firestore = Firebase.firestore
 
     init {

@@ -17,6 +17,7 @@ import com.familyplanner.family.view.NoFamilyFragment
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
+import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -28,6 +29,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
+
+        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
+        MapKitFactory.initialize(this)
         viewModel = ViewModelProvider(this)[ActivityViewModel::class.java]
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
@@ -36,10 +40,20 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         val navController = navHostFragment.navController
-        if (Firebase.auth.currentUser != null) {
+/*        if (Firebase.auth.currentUser != null) {
             navController.navigate(R.id.action_welcomeFragment_to_noFamilyFragment)
             binding.bottomNavigation.visibility = View.VISIBLE
-        }
+        }*/
         binding.fragmentContainerView.visibility = View.VISIBLE
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
     }
 }
