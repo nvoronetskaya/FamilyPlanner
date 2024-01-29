@@ -1,5 +1,6 @@
 package com.familyplanner
 
+import android.app.SearchManager
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -22,15 +23,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
+
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: ActivityViewModel
+    private lateinit var searchManager: SearchManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
 
-        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
+        MapKitFactory.setApiKey("20c53eda-cff4-4d4e-bbac-f2d4a5cda330")
         MapKitFactory.initialize(this)
         viewModel = ViewModelProvider(this)[ActivityViewModel::class.java]
         binding = ActivityMainBinding.inflate(layoutInflater)

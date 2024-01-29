@@ -29,7 +29,7 @@ android {
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true 
+        buildConfig = true
     }
 
     buildTypes {
@@ -51,7 +51,8 @@ android {
 }
 
 dependencies {
-    implementation("com.yandex.android:maps.mobile:4.4.0-lite")
+    //implementation("com.yandex.android:maps.mobile:4.4.0-lite")
+    implementation("com.yandex.android:maps.mobile:4.4.0-full")
     implementation("com.airbnb.android:lottie:3.5.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")

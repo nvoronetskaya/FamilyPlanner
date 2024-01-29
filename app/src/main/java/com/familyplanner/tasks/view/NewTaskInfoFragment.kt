@@ -1,21 +1,44 @@
 package com.familyplanner.tasks.view
 
 import android.app.DatePickerDialog
+import android.app.SearchManager
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.familyplanner.MainActivity
+import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
+import com.familyplanner.tasks.viewmodel.NewTaskViewModel
+import com.familyplanner.tasks.viewmodel.TasksListViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.layers.GeoObjectTapEvent
+import com.yandex.mapkit.layers.GeoObjectTapListener
+import com.yandex.mapkit.map.InputListener
+import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.mapview.MapView
 import java.util.Calendar
 
 class NewTaskInfoFragment : Fragment() {
     private var _binding: FragmentNewTaskBinding? = null
     private val binding get() = _binding!!
     private val calendar = Calendar.getInstance()
+    private lateinit var viewModel: NewTaskViewModel
+
+    private val inputListener = object : InputListener {
+        override fun onMapTap(p0: Map, p1: Point) {
+            viewModel.getAddressByGeo(p1)
+        }
+
+        override fun onMapLongTap(p0: Map, p1: Point) {
+
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,6 +51,7 @@ class NewTaskInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this)[NewTaskViewModel::class.java]
 
         binding.ivBack.setOnClickListener {
             findNavController().popBackStack()
@@ -123,9 +147,10 @@ class NewTaskInfoFragment : Fragment() {
 
         binding.swHasLocation.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                binding.map.visibility = View.VISIBLE
+                binding.tvAddress.visibility = View.VISIBLE
+                showBottomSheet()
             } else {
-                binding.map.visibility = View.GONE
+                binding.tvAddress.visibility = View.GONE
             }
         }
 
@@ -215,6 +240,20 @@ class NewTaskInfoFragment : Fragment() {
 
         val parts = textTime.split(':').map { it.toInt() }
         return parts[0] * 60 + parts[1]
+    }
+
+    private fun showBottomSheet() {
+        val bottomSheet = BottomSheetDialog(activity as MainActivity)
+        bottomSheet.setContentView(R.layout.bottomsheet_map)
+        val map = bottomSheet.findViewById<MapView>(R.id.map)?.mapWindow?.map ?: return
+
+        map.addInputListener(inputListener)
+        bottomSheet.setOnDismissListener {
+            if (binding.tvAddress.text.isNullOrBlank()) {
+                binding.swHasLocation.isChecked = false
+            }
+        }
+        bottomSheet.show()
     }
 
     override fun onDestroyView() {
