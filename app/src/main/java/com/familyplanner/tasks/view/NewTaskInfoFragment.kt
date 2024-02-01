@@ -158,6 +158,10 @@ class NewTaskInfoFragment : Fragment() {
             setStartDate()
         }
 
+        binding.tvAttachFile.setOnClickListener {
+
+        }
+
         binding.ivNext.setOnClickListener {
 
         }

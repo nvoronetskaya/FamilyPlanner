@@ -36,9 +36,19 @@ class UserRepository {
                 )
             }
 
-    fun getUserById(userId: String): Flow<List<User>> = firestore.collection("users").whereEqualTo(
+    fun getUserById(userId: String): Flow<User> = firestore.collection("users").whereEqualTo(
         FieldPath.documentId(), userId
-    ).dataObjects()
+    ).snapshots().map {
+        val doc = it.documents[0]
+        User(
+            doc.id,
+            doc["name"].toString(),
+            doc["birthday"].toString(),
+            doc["hasFamily"] as Boolean,
+            doc["familyId"].toString(),
+            doc["email"].toString()
+        )
+    }
 
     fun updateUser(id: String, name: String, birthday: String) {
         firestore.collection("users").whereEqualTo(FieldPath.documentId(), id).get()
