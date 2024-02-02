@@ -332,13 +332,15 @@
 
             <TextView
                 android:id="@+id/tv_address"
-                style="@style/textBody"
+                style="@style/subText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginEnd="30dp"
+                android:layout_gravity="start"
+                app:layout_constrainedWidth="true"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/add"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/sw_has_location"
+                app:layout_constraintStart_toStartOf="@id/tv_location"
                 app:layout_constraintTop_toBottomOf="@id/tv_location" />
 
             <TextView

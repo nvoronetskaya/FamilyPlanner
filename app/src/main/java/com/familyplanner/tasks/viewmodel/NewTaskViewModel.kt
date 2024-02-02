@@ -29,20 +29,11 @@ class NewTaskViewModel : ViewModel() {
     private val session = searchManager.createSuggestSession()
     private val searchStatus = MutableSharedFlow<Status>()
     private var curAddress = ""
-    private val familyMembers = MutableSharedFlow<List<User>>(replay = 1)
     private val familyRepo = FamilyRepository()
     private var familyId = ""
-    private var taskObservers = listOf<User>()
 
     fun setFamilyId(familyId: String) {
         this.familyId = familyId
-
-
-        viewModelScope.launch(Dispatchers.IO) {
-            familyRepo.getFamilyMembers(familyId).collect {
-                familyMembers.emit(it)
-            }
-        }
     }
 
     private val searchSessionListener = object : Session.SearchListener {
@@ -51,6 +42,8 @@ class NewTaskViewModel : ViewModel() {
                 it.obj?.metadataContainer?.getItem(ToponymObjectMetadata::class.java)?.address?.formattedAddress
                     ?: it.obj?.metadataContainer?.getItem(BusinessObjectMetadata::class.java)?.address?.formattedAddress
             }
+
+            curAddress = items[0]
             viewModelScope.launch(Dispatchers.IO) {
                 searchStatus.emit(Status.SUCCESS)
             }
@@ -63,8 +56,11 @@ class NewTaskViewModel : ViewModel() {
         }
     }
 
-    fun getAddressByGeo(obj: Point) {
-        searchManager.submit(obj, 100, SearchOptions(), searchSessionListener)
+    fun getAddressByGeo(obj: Point): Flow<Status> {
+        viewModelScope.launch(Dispatchers.Main) {
+            searchManager.submit(obj, 21, SearchOptions(), searchSessionListener)
+        }
+        return searchStatus
     }
 
     fun createTask(
@@ -88,14 +84,14 @@ class NewTaskViewModel : ViewModel() {
         val newTask = Task()
         newTask.title = title
         newTask.hasDeadline = hasDeadline
-        newTask.deadline = deadline
+        newTask.deadline = deadline.toString()
         newTask.isContinuous = isContinuous
         newTask.startTime = startTime
         newTask.finishTime = finishTime
         newTask.repeatType = repeatType
         newTask.nDays = nDays
         newTask.daysOfWeek = daysOfWeek
-        newTask.repeatStart = repeatStart
+        newTask.repeatStart = repeatStart.toString()
         newTask.importance = importance
         newTask.hasLocation = hasLocation
         newTask.location = GeoPoint(location.latitude, location.longitude)
@@ -105,12 +101,4 @@ class NewTaskViewModel : ViewModel() {
     }
 
     fun getAddress() = curAddress
-
-    fun getFamilyMembers(): Flow<List<User>> = familyMembers
-
-    fun setTaskObservers(observers: List<User>) {
-        this.taskObservers = observers
-    }
-
-    fun getTaskObservers() = taskObservers
 }

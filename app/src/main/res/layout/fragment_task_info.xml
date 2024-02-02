@@ -158,6 +158,16 @@
                     app:layout_constraintEnd_toEndOf="@id/tf_name"
                     app:layout_constraintStart_toStartOf="@id/tf_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_repeat" />
+
+                <TextView
+                    android:id="@+id/tv_address"
+                    style="@style/textBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="Москва, ул. Полянка, д. 10"
+                    app:layout_constraintStart_toStartOf="@id/map"
+                    app:layout_constraintTop_toBottomOf="@id/map" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout

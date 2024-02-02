@@ -109,7 +109,7 @@
     </style>
 
     <style name="switchButton" parent="textBody">
-        <item name="colorPrimary">?attr/colorSecondary</item>
+        <item name="buttonTint">?attr/colorSecondary</item>
         <item name="colorOnPrimary">?attr/colorOnSecondary</item>
         <item name="colorOutline">?attr/colorOutline</item>
         <item name="colorSurfaceContainerHighest">@color/gray</item>

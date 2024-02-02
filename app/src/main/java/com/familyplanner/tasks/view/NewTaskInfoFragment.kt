@@ -1,27 +1,36 @@
 package com.familyplanner.tasks.view
 
 import android.app.DatePickerDialog
-import android.app.SearchManager
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
+import com.familyplanner.databinding.MapBinding
+import com.familyplanner.tasks.FileAdapter
+import com.familyplanner.tasks.Status
 import com.familyplanner.tasks.viewmodel.NewTaskViewModel
-import com.familyplanner.tasks.viewmodel.TasksListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.layers.GeoObjectTapEvent
-import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.mapview.MapView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class NewTaskInfoFragment : Fragment() {
@@ -29,14 +38,34 @@ class NewTaskInfoFragment : Fragment() {
     private val binding get() = _binding!!
     private val calendar = Calendar.getInstance()
     private lateinit var viewModel: NewTaskViewModel
+    private var bottomSheet: BottomSheetDialog? = null
 
     private val inputListener = object : InputListener {
         override fun onMapTap(p0: Map, p1: Point) {
-            viewModel.getAddressByGeo(p1)
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.getAddressByGeo(p1).collect {
+                        if (it == Status.SUCCESS) {
+                            activity?.runOnUiThread {
+                                binding.tvAddress.visibility = View.VISIBLE
+                                binding.tvAddress.text = viewModel.getAddress()
+                                bottomSheet?.cancel()
+                            }
+                        } else {
+                            activity?.runOnUiThread {
+                                Toast.makeText(
+                                    activity,
+                                    "Ошибка. Проверьте подключение к сети и повторите позднее",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         override fun onMapLongTap(p0: Map, p1: Point) {
-
         }
     }
 
@@ -56,6 +85,11 @@ class NewTaskInfoFragment : Fragment() {
         binding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }
+
+        val adapter = FileAdapter()
+        val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvFiles.layoutManager = layoutManager
+        binding.rvFiles.adapter = adapter
 
         binding.swDeadline.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -154,12 +188,18 @@ class NewTaskInfoFragment : Fragment() {
             }
         }
 
+        binding.tvAddress.setOnClickListener {
+            showBottomSheet()
+        }
+
         binding.tvRepeatStart.setOnClickListener {
             setStartDate()
         }
 
         binding.tvAttachFile.setOnClickListener {
-
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "file/*"
+            startActivityForResult(intent, 1)
         }
 
         binding.ivNext.setOnClickListener {
@@ -257,6 +297,9 @@ class NewTaskInfoFragment : Fragment() {
                 binding.swHasLocation.isChecked = false
             }
         }
+
+        bottomSheet.behavior.isDraggable = false
+        this.bottomSheet = bottomSheet
         bottomSheet.show()
     }
 
