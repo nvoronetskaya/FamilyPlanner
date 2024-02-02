@@ -73,7 +73,7 @@
 
     <CheckBox
         android:id="@+id/cb_notify_every_day"
-        style="@style/textBody"
+        style="@style/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"

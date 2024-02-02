@@ -102,7 +102,7 @@
 
             <CheckBox
                 android:id="@+id/cb_continuous_task"
-                style="@style/textBody"
+                style="@style/checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -225,49 +225,49 @@
 
                         <CheckBox
                             android:id="@+id/cb_monday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/monday" />
 
                         <CheckBox
                             android:id="@+id/cb_tuesday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/tuesday" />
 
                         <CheckBox
                             android:id="@+id/cb_wednesday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/wednesday" />
 
                         <CheckBox
                             android:id="@+id/cb_thursday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/thursday" />
 
                         <CheckBox
                             android:id="@+id/cb_friday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/friday" />
 
                         <CheckBox
                             android:id="@+id/cb_saturday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/saturday" />
 
                         <CheckBox
                             android:id="@+id/cb_sunday"
-                            style="@style/textBody"
+                            style="@style/checkbox"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/sunday" />

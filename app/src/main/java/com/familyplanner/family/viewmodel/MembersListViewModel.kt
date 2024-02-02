@@ -25,13 +25,13 @@ class MembersListViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             repository.getUserById(userId).collect { user ->
-                val familyId = user[0].familyId
+                val familyId = user.familyId
 
                 if (familyId.isNullOrBlank()) {
                     family.emit(null)
                 } else {
                     repository.getFamilyById(familyId).collect {
-                        family.emit(it[0])
+                        family.emit(it)
                     }
 
                     repository.getFamilyMembers(familyId).collect {

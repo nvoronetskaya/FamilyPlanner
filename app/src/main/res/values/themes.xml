@@ -82,4 +82,11 @@
     <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/black</item>
     </style>
+
+    <style name="checkbox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">?attr/colorSecondary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
 </resources>
