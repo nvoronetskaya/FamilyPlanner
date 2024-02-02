@@ -55,6 +55,23 @@
         <item name="android:fontFamily">@font/roboto_serif</item>
     </style>
 
+    <style name="commentName">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="commentTime">
+        <item name="android:textSize">8sp</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="commentText">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
     <style name="inputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/edit_text</item>
         <item name="hintTextColor">?attr/colorOutline</item>
