@@ -83,10 +83,18 @@
         <item name="android:textColor">@color/black</item>
     </style>
 
-    <style name="checkbox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+    <style name="checkbox" parent="textBody">
         <item name="buttonTint">?attr/colorSecondary</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="radiobutton" parent="textBody">
+        <item name="buttonTint">?attr/colorSecondary</item>
+    </style>
+
+    <style name="switchButton" parent="textBody">
+        <item name="colorPrimary">?attr/colorSecondary</item>
+        <item name="colorOnPrimary">?attr/colorOnSecondary</item>
+        <item name="colorOutline">?attr/colorOutline</item>
+        <item name="colorSurfaceContainerHighest">@color/gray</item>
     </style>
 </resources>

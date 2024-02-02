@@ -64,6 +64,7 @@
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/sw_notify"
+        style="@style/switchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
@@ -93,6 +94,7 @@
         app:layout_constraintTop_toBottomOf="@id/cb_notify_every_day" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
+        style="@style/switchButton"
         android:id="@+id/sw_notify_around_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
