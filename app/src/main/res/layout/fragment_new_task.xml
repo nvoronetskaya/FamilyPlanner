@@ -9,7 +9,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:background="?attr/colorSecondary"
+        android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -103,7 +103,7 @@
 
             <CheckBox
                 android:id="@+id/cb_continuous_task"
-                style="@style/checkbox"
+                style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -165,14 +165,14 @@
 
                 <RadioButton
                     android:id="@+id/rb_once"
-                    style="@style/radiobutton"
+                    style="@style/textBody"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:text="@string/once" />
 
                 <RadioButton
                     android:id="@+id/rb_every_day"
-                    style="@style/radiobutton"
+                    style="@style/textBody"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:text="@string/every_day" />
@@ -184,7 +184,7 @@
 
                     <RadioButton
                         android:id="@+id/rb_each_n_days"
-                        style="@style/radiobutton"
+                        style="@style/textBody"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:text="@string/every" />
@@ -207,7 +207,7 @@
 
                 <RadioButton
                     android:id="@+id/rb_days_of_week"
-                    style="@style/radiobutton"
+                    style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:text="@string/certain_days_of_week" />
@@ -226,49 +226,49 @@
 
                         <CheckBox
                             android:id="@+id/cb_monday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/monday" />
 
                         <CheckBox
                             android:id="@+id/cb_tuesday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/tuesday" />
 
                         <CheckBox
                             android:id="@+id/cb_wednesday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/wednesday" />
 
                         <CheckBox
                             android:id="@+id/cb_thursday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/thursday" />
 
                         <CheckBox
                             android:id="@+id/cb_friday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/friday" />
 
                         <CheckBox
                             android:id="@+id/cb_saturday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/saturday" />
 
                         <CheckBox
                             android:id="@+id/cb_sunday"
-                            style="@style/checkbox"
+                            style="@style/textBody"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:text="@string/sunday" />
@@ -328,6 +328,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/tv_location"
                 app:layout_constraintTop_toTopOf="@id/tv_location" />
 
             <TextView
@@ -335,10 +336,10 @@
                 style="@style/subText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="30dp"
                 android:layout_gravity="start"
-                app:layout_constrainedWidth="true"
+                android:layout_marginEnd="30dp"
                 android:visibility="gone"
+                app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toStartOf="@id/sw_has_location"
                 app:layout_constraintStart_toStartOf="@id/tv_location"
                 app:layout_constraintTop_toBottomOf="@id/tv_location" />
@@ -358,12 +359,12 @@
                 android:id="@+id/rv_files"
                 style="@style/textBody"
                 android:layout_width="wrap_content"
-                android:orientation="horizontal"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:scrollbars="horizontal"
-                tools:listitem="@layout/viewholder_file"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_attach_file" />
+                app:layout_constraintTop_toBottomOf="@id/tv_attach_file"
+                tools:listitem="@layout/viewholder_file" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

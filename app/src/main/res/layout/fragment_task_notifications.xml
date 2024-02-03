@@ -9,7 +9,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:background="?attr/colorSecondary"
+        android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,8 +64,8 @@
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/sw_notify"
-        style="@style/switchButton"
         android:layout_width="wrap_content"
+        style="@style/switchButton"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         app:layout_constraintBottom_toBottomOf="@id/tv_remind"
@@ -74,8 +74,8 @@
 
     <CheckBox
         android:id="@+id/cb_notify_every_day"
-        style="@style/checkbox"
         android:layout_width="wrap_content"
+        style="@style/textBody"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="@string/notify_every_day"
@@ -94,8 +94,8 @@
         app:layout_constraintTop_toBottomOf="@id/cb_notify_every_day" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        style="@style/switchButton"
         android:id="@+id/sw_notify_around_task"
+        style="@style/switchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
