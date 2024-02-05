@@ -105,9 +105,22 @@
     <fragment
         android:id="@+id/newTaskInfoFragment"
         android:name="com.familyplanner.tasks.view.NewTaskInfoFragment"
-        android:label="NewTaskInfoFragment" />
+        android:label="NewTaskInfoFragment" >
+        <action
+            android:id="@+id/action_newTaskInfoFragment_to_newTaskObserversFragment"
+            app:destination="@id/newTaskObserversFragment" />
+        <action
+            android:id="@+id/action_newTaskInfoFragment_to_tasksListFragment"
+            app:destination="@id/tasksListFragment" />
+    </fragment>
     <fragment
-        android:id="@+id/fr"
-        android:name="com.familyplanner.tasks.view.fr"
-        android:label="fr" />
+        android:id="@+id/newTaskObserversFragment"
+        android:name="com.familyplanner.tasks.view.NewTaskObserversFragment"
+        android:label="NewTaskObserversFragment" >
+        <action
+            android:id="@+id/action_newTaskObserversFragment_to_tasksListFragment"
+            app:popUpTo="@id/tasksListFragment"
+            app:popUpToInclusive="true"
+            app:destination="@id/tasksListFragment" />
+    </fragment>
 </navigation>

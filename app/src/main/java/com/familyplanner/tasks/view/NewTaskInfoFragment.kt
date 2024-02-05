@@ -1,11 +1,11 @@
 package com.familyplanner.tasks.view
 
+import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -17,21 +17,19 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.MainActivity
-import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
-import com.familyplanner.databinding.MapBinding
-import com.familyplanner.tasks.FileAdapter
-import com.familyplanner.tasks.Status
+import com.familyplanner.tasks.adapters.FileAdapter
+import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.viewmodel.NewTaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
+
 
 class NewTaskInfoFragment : Fragment() {
     private var _binding: FragmentNewTaskBinding? = null
@@ -39,6 +37,8 @@ class NewTaskInfoFragment : Fragment() {
     private val calendar = Calendar.getInstance()
     private lateinit var viewModel: NewTaskViewModel
     private var bottomSheet: BottomSheetDialog? = null
+    private val ATTACH_FILES = 1
+    private lateinit var adapter: FileAdapter
 
     private val inputListener = object : InputListener {
         override fun onMapTap(p0: Map, p1: Point) {
@@ -69,6 +69,20 @@ class NewTaskInfoFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        MapKitFactory.setApiKey("20c53eda-cff4-4d4e-bbac-f2d4a5cda330")
+        MapKitFactory.initialize(activity)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -90,6 +104,7 @@ class NewTaskInfoFragment : Fragment() {
         val layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvFiles.layoutManager = layoutManager
         binding.rvFiles.adapter = adapter
+        this.adapter = adapter
 
         binding.swDeadline.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -179,7 +194,7 @@ class NewTaskInfoFragment : Fragment() {
             )
         }
 
-        binding.swHasLocation.setOnCheckedChangeListener { _, isChecked ->
+/*        binding.swHasLocation.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 binding.tvAddress.visibility = View.VISIBLE
                 showBottomSheet()
@@ -190,20 +205,32 @@ class NewTaskInfoFragment : Fragment() {
 
         binding.tvAddress.setOnClickListener {
             showBottomSheet()
-        }
+        }*/
 
         binding.tvRepeatStart.setOnClickListener {
             setStartDate()
         }
 
         binding.tvAttachFile.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "file/*"
-            startActivityForResult(intent, 1)
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.type = "*/*"
+            startActivityForResult(intent, ATTACH_FILES)
         }
 
         binding.ivNext.setOnClickListener {
 
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ATTACH_FILES) {
+            if (resultCode == RESULT_OK) {
+                val path = data?.data?.path
+                if (path != null) {
+                    adapter.addPath(path)
+                }
+            }
         }
     }
 
@@ -286,7 +313,7 @@ class NewTaskInfoFragment : Fragment() {
         return parts[0] * 60 + parts[1]
     }
 
-    private fun showBottomSheet() {
+/*    private fun showBottomSheet() {
         val bottomSheet = BottomSheetDialog(activity as MainActivity)
         bottomSheet.setContentView(R.layout.bottomsheet_map)
         val map = bottomSheet.findViewById<MapView>(R.id.map)?.mapWindow?.map ?: return
@@ -301,7 +328,7 @@ class NewTaskInfoFragment : Fragment() {
         bottomSheet.behavior.isDraggable = false
         this.bottomSheet = bottomSheet
         bottomSheet.show()
-    }
+    }*/
 
     override fun onDestroyView() {
         super.onDestroyView()

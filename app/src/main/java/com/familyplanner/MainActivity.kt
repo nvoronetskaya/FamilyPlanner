@@ -27,14 +27,10 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: ActivityViewModel
-    private lateinit var searchManager: SearchManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
-
-        MapKitFactory.setApiKey("20c53eda-cff4-4d4e-bbac-f2d4a5cda330")
-        MapKitFactory.initialize(this)
         viewModel = ViewModelProvider(this)[ActivityViewModel::class.java]
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
@@ -48,15 +44,5 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigation.visibility = View.VISIBLE
         }*/
         binding.fragmentContainerView.visibility = View.VISIBLE
-    }
-
-    override fun onStart() {
-        super.onStart()
-        MapKitFactory.getInstance().onStart()
-    }
-
-    override fun onStop() {
-        MapKitFactory.getInstance().onStop()
-        super.onStop()
     }
 }

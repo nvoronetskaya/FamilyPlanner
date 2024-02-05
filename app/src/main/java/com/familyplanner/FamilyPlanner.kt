@@ -5,7 +5,8 @@ import com.yandex.mapkit.MapKitFactory
 
 class FamilyPlanner: Application() {
     override fun onCreate() {
+        MapKitFactory.setApiKey("20c53eda-cff4-4d4e-bbac-f2d4a5cda330")
+
         super.onCreate()
-        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
     }
 }

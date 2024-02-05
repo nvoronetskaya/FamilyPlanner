@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -14,10 +16,11 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <ImageView
-            android:id="@+id/iv_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back" />
+            android:id="@+id/iv_close"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            app:srcCompat="@drawable/close"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/tv_new_task"
@@ -29,21 +32,21 @@
             android:text="@string/new_task" />
 
         <ImageView
-            android:id="@+id/iv_edit"
+            android:id="@+id/iv_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/navigate_next" />
+            app:srcCompat="@drawable/done" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
         android:id="@+id/tv_observers"
-        style="@style/textBar"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        style="@style/textBody"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
         android:layout_margin="20dp"
-        android:text="@string/choose_task_observers" />
+        android:text="@string/task_added" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_observers"
@@ -51,5 +54,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:listitem="@layout/viewholder_member"/>
+        tools:listitem="@layout/viewholder_observer" />
 </LinearLayout>

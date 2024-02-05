@@ -1,7 +1,5 @@
 package com.familyplanner.tasks.model
 
-import com.familyplanner.tasks.Importance
-import com.familyplanner.tasks.RepeatType
 import com.google.firebase.firestore.GeoPoint
 
 data class Task(

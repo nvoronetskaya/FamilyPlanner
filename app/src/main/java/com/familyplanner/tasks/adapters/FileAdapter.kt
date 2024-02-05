@@ -1,4 +1,4 @@
-package com.familyplanner.tasks
+package com.familyplanner.tasks.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
