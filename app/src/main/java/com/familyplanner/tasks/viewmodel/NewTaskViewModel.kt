@@ -7,7 +7,11 @@ import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.model.Task
+import com.familyplanner.tasks.model.TaskCreationStatus
+import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.tasks.repository.TaskRepository
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.storage.UploadTask
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.search.BusinessObjectMetadata
 import com.yandex.mapkit.search.Response
@@ -27,9 +31,12 @@ class NewTaskViewModel : ViewModel() {
         SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
     private val session = searchManager.createSuggestSession()
     private val searchStatus = MutableSharedFlow<Status>()
+    private val addTask = MutableSharedFlow<TaskCreationStatus>()
     private var curAddress = ""
     private val familyRepo = FamilyRepository()
+    private val tasksRepo = TaskRepository()
     private var familyId = ""
+    private var uploadTasks = listOf<UploadTask>()
 
     fun setFamilyId(familyId: String) {
         this.familyId = familyId
@@ -78,7 +85,8 @@ class NewTaskViewModel : ViewModel() {
         location: Point,
         isPrivate: Boolean,
         userId: String,
-        familyId: String
+        familyId: String,
+        files: List<UserFile>?
     ) {
         val newTask = Task()
         newTask.title = title
@@ -97,7 +105,32 @@ class NewTaskViewModel : ViewModel() {
         newTask.isPrivate = isPrivate
         newTask.createdBy = userId
         newTask.familyId = familyId
+
+        tasksRepo.addTask(newTask).addOnCompleteListener {
+            var result: TaskCreationStatus
+            if (!it.isSuccessful) {
+                result = TaskCreationStatus.FAILED
+            } else {
+                if (files != null) {
+                    this.uploadTasks = tasksRepo.uploadFiles(files, it.result.id)
+                    while (!uploadTasks.all { task -> task.isComplete }) {
+                    }
+                    result = if (uploadTasks.any { task -> !task.isSuccessful }) {
+                        TaskCreationStatus.FILE_UPLOAD_FAILED
+                    } else {
+                        TaskCreationStatus.SUCCESS
+                    }
+                } else {
+                    result = TaskCreationStatus.SUCCESS
+                }
+            }
+
+            viewModelScope.launch(Dispatchers.IO) {
+                addTask.emit(result)
+            }
+        }
     }
 
     fun getAddress() = curAddress
+    fun getCreationStatus() = addTask
 }

@@ -30,6 +30,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (!FamilyPlanner.isInit) {
+            FamilyPlanner.isInit = true
+            MapKitFactory.setApiKey("20c53eda-cff4-4d4e-bbac-f2d4a5cda330")
+        }
+        MapKitFactory.initialize(this)
+
         supportActionBar?.hide()
         viewModel = ViewModelProvider(this)[ActivityViewModel::class.java]
         binding = ActivityMainBinding.inflate(layoutInflater)

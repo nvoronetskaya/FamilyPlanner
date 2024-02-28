@@ -2,12 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="10dp">
 
     <ImageView
         android:id="@+id/iv_file"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="@id/tv_file_name"
         app:layout_constraintStart_toStartOf="@id/tv_file_name"
@@ -16,8 +17,8 @@
 
     <ImageView
         android:id="@+id/iv_remove"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         app:layout_constraintStart_toEndOf="@id/iv_file"
         app:layout_constraintTop_toTopOf="@id/iv_file"
         app:srcCompat="@drawable/close" />

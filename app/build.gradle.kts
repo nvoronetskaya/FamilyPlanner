@@ -1,6 +1,3 @@
-import com.android.build.api.dsl.Packaging
-
-val mapkitApiKey: String by rootProject.extra
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -24,7 +21,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "MAPKIT_API_KEY", "\"${mapkitApiKey}\"")
     }
 
     buildFeatures {
@@ -55,6 +51,7 @@ dependencies {
     implementation("com.yandex.android:maps.mobile:4.4.0-full")
     implementation("com.airbnb.android:lottie:3.5.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("androidx.core:core-ktx:1.12.0")

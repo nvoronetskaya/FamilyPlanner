@@ -1,21 +1,23 @@
 package com.familyplanner.tasks.adapters
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderFileBinding
+import com.familyplanner.tasks.model.UserFile
 
 class FileAdapter() :
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
-    private val filePaths = mutableListOf<String>()
+    private val files = mutableListOf<UserFile>()
 
     inner class FileViewHolder(private val binding: ViewholderFileBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
-            binding.tvFileName.text = filePaths[position]
+            binding.tvFileName.text = files[position].name
             binding.ivRemove.setOnClickListener {
-                filePaths.removeAt(position)
-                notifyItemRemoved(position)
+                files.removeAt(position)
+                notifyDataSetChanged()
             }
         }
     }
@@ -26,22 +28,16 @@ class FileAdapter() :
         return FileViewHolder(itemBinding)
     }
 
-    override fun getItemCount(): Int = filePaths.size
+    override fun getItemCount(): Int = files.size
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
         holder.onBind(position)
     }
 
-    fun setData(paths: List<String>) {
-        filePaths.clear()
-        filePaths.addAll(paths)
-        notifyDataSetChanged()
+    fun addFile(uri: Uri, fileName: String, size: Double) {
+        files.add(UserFile(uri, fileName, size))
+        notifyItemInserted(files.size - 1)
     }
 
-    fun addPath(path: String) {
-        filePaths.add(path)
-        notifyItemInserted(filePaths.size - 1)
-    }
-
-    fun getPaths(): List<String> = filePaths
+    fun getFiles(): List<UserFile> = files
 }
