@@ -9,6 +9,7 @@ import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.core.view.children
@@ -23,6 +24,7 @@ import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
 import com.familyplanner.tasks.adapters.FileAdapter
+import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.model.TaskCreationStatus
@@ -49,7 +51,10 @@ class NewTaskInfoFragment : Fragment() {
     private val ATTACH_FILES = 10
     private lateinit var filesAdapter: FileAdapter
     private var curPoint: Point? = null
-    private lateinit var isPrivate = false
+    private var isPrivate = false
+    private lateinit var userId: String
+    private lateinit var familyId: String
+    private var parentId: String? = null
 
     private val inputListener = object : InputListener {
         override fun onMapTap(p0: Map, p1: Point) {
@@ -58,6 +63,7 @@ class NewTaskInfoFragment : Fragment() {
                     viewModel.getAddressByGeo(p1).collect {
                         if (it == Status.SUCCESS) {
                             activity?.runOnUiThread {
+                                curPoint = p1
                                 binding.tvAddress.visibility = View.VISIBLE
                                 binding.tvAddress.text = viewModel.getAddress()
                                 bottomSheet?.cancel()
@@ -158,6 +164,7 @@ class NewTaskInfoFragment : Fragment() {
         }
 
         binding.rbEveryDay.setOnClickListener {
+            binding.swHasLocation.isChecked = false
             if (binding.tvRepeatStart.text.isNullOrBlank()) {
                 binding.tvRepeatStart.text = String.format(
                     "%02d.%02d.%d",
@@ -174,6 +181,7 @@ class NewTaskInfoFragment : Fragment() {
         }
 
         binding.rbEachNDays.setOnClickListener {
+            binding.swHasLocation.isChecked = false
             if (binding.tvRepeatStart.text.isNullOrBlank()) {
                 binding.tvRepeatStart.text = String.format(
                     "%02d.%02d.%d",
@@ -192,6 +200,7 @@ class NewTaskInfoFragment : Fragment() {
         }
 
         binding.rbDaysOfWeek.setOnClickListener {
+            binding.swHasLocation.isChecked = false
             binding.llWeekdays.visibility = View.VISIBLE
             binding.rbEachNDays.isChecked = false
             binding.tvRepeatFrom.visibility = View.VISIBLE
@@ -232,6 +241,15 @@ class NewTaskInfoFragment : Fragment() {
         binding.ivNext.setOnClickListener {
             createTask()
         }
+        var options = listOf("Низкий", "Средний", "Высокий")
+        binding.spImportance.adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
+        binding.spImportance.setSelection(0)
+
+        isPrivate = requireArguments().getBoolean("isPrivate")
+        userId = requireArguments().getString("userId")!!
+        familyId = requireArguments().getString("familyId")!!
+        parentId = requireArguments().getString("parentId")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -286,10 +304,6 @@ class NewTaskInfoFragment : Fragment() {
             calendar.get(Calendar.DAY_OF_MONTH)
         )
         dialog.datePicker.minDate = calendar.timeInMillis
-
-        if (!binding.tvDeadline.text.isNullOrBlank()) {
-            // TODO()
-        }
         dialog.show()
     }
 
@@ -389,7 +403,7 @@ class NewTaskInfoFragment : Fragment() {
         viewModel.createTask(
             binding.etName.toString(),
             binding.swDeadline.isChecked,
-            sdf,
+            dateFormatter.parse(binding.tvDeadline.toString()),
             binding.cbContinuousTask.isChecked,
             if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvStartValue.toString()) else 0,
             if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvFinishValue.toString()) else 0,
@@ -397,22 +411,40 @@ class NewTaskInfoFragment : Fragment() {
             eachNDays,
             weekDays,
             dateFormatter.parse(binding.tvRepeatStart.toString()),
-            asd,
+            Importance.values()[binding.spImportance.selectedItemPosition],
             binding.swHasLocation.isChecked,
             curPoint,
             isPrivate,
             userId,
-            familyId,
-            filesAdapter.getFiles()
+            if (isPrivate) "" else familyId,
+            filesAdapter.getFiles(),
+            parentId
         )
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getCreationStatus().collect {
                     when (it) {
-                        TaskCreationStatus.SUCCESS -> TODO()
-                        TaskCreationStatus.FILE_UPLOAD_FAILED -> TODO()
-                        TaskCreationStatus.FAILED -> TODO()
+                        TaskCreationStatus.SUCCESS -> if (parentId != null) {
+                            findNavController().popBackStack()
+                        } else {
+                            findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
+                        }
+
+                        TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                            Toast.makeText(
+                                requireContext(),
+                                "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
+                        }
+
+                        TaskCreationStatus.FAILED -> Toast.makeText(
+                            requireContext(),
+                            "Ошибка. Проверьте подключение к сети и повторите позднее",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }

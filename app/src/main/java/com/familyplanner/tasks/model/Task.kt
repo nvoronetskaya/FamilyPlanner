@@ -16,15 +16,16 @@ data class Task(
     var repeatStart: String,
     var importance: Importance,
     var hasLocation: Boolean,
-    var location: GeoPoint,
+    var location: GeoPoint?,
     var isPrivate: Boolean,
     var createdBy: String,
     var familyId: String,
-    var lastCompletionDate: String
+    var lastCompletionDate: String?,
+    var parentId: String?
 ) {
     constructor() : this(
         "", "", false, "", false, 0,
         0, RepeatType.ONCE, 0, 0, "", Importance.HIGH,
-        false, GeoPoint(0.0, 0.0), false, "", "", ""
+        false, GeoPoint(0.0, 0.0), false, "", "", "", null
     )
 }

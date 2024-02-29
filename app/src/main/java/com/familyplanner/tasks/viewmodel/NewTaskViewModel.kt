@@ -82,11 +82,12 @@ class NewTaskViewModel : ViewModel() {
         repeatStart: Date,
         importance: Importance,
         hasLocation: Boolean,
-        location: Point,
+        location: Point?,
         isPrivate: Boolean,
         userId: String,
         familyId: String,
-        files: List<UserFile>?
+        files: List<UserFile>?,
+        parentId: String?
     ) {
         val newTask = Task()
         newTask.title = title
@@ -101,10 +102,11 @@ class NewTaskViewModel : ViewModel() {
         newTask.repeatStart = repeatStart.toString()
         newTask.importance = importance
         newTask.hasLocation = hasLocation
-        newTask.location = GeoPoint(location.latitude, location.longitude)
+        newTask.location = if (location != null) GeoPoint(location.latitude, location.longitude) else null
         newTask.isPrivate = isPrivate
         newTask.createdBy = userId
         newTask.familyId = familyId
+        newTask.parentId = parentId
 
         tasksRepo.addTask(newTask).addOnCompleteListener {
             var result: TaskCreationStatus
