@@ -36,6 +36,7 @@ class NewTaskObserversFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val familyId = requireArguments().getString("familyId")!!
+        val taskId = requireArguments().getString("taskId")!!
         viewModel = ViewModelProvider(this)[TaskObserversViewModel::class.java]
         viewModel.setFamily(familyId)
 
@@ -59,7 +60,8 @@ class NewTaskObserversFragment : Fragment() {
             viewModel.setObserversAndExecutors(
                 adapter.getMembers(),
                 adapter.getObservers(),
-                adapter.getExecutors()
+                adapter.getExecutors(),
+                taskId
             )
             findNavController().navigate(R.id.action_newTaskObserversFragment_to_tasksListFragment)
         }

@@ -425,9 +425,12 @@ class NewTaskInfoFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getCreationStatus().collect {
                     when (it) {
-                        TaskCreationStatus.SUCCESS -> if (parentId != null) {
+                        TaskCreationStatus.SUCCESS -> if (parentId != null || isPrivate) {
                             findNavController().popBackStack()
                         } else {
+                            val bundle = Bundle()
+                            bundle.putString("taskId", viewModel.getCreatedTaskId())
+                            bundle.putString("familyId", familyId)
                             findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
                         }
 
@@ -437,7 +440,14 @@ class NewTaskInfoFragment : Fragment() {
                                 "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
                                 Toast.LENGTH_LONG
                             ).show()
-                            findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
+                            if (isPrivate) {
+                                findNavController().popBackStack()
+                            } else {
+                                val bundle = Bundle()
+                                bundle.putString("taskId", viewModel.getCreatedTaskId())
+                                bundle.putString("familyId", familyId)
+                                findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
+                            }
                         }
 
                         TaskCreationStatus.FAILED -> Toast.makeText(

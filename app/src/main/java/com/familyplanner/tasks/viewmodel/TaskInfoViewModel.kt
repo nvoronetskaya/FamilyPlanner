@@ -11,12 +11,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class NewTaskInfoViewModel : ViewModel() {
-    private var task: MutableSharedFlow<Task> = MutableSharedFlow()
-    private var comments: MutableSharedFlow<List<Comment>> = MutableSharedFlow()
-    private var observers: MutableSharedFlow<List<Observer>> = MutableSharedFlow()
-    private var executors: MutableSharedFlow<List<Observer>> = MutableSharedFlow()
+class TaskInfoViewModel : ViewModel() {
+    private var task: MutableSharedFlow<Task> = MutableSharedFlow(replay = 1)
+    private var comments: MutableSharedFlow<List<Comment>> = MutableSharedFlow(replay = 1)
+    private var observers: MutableSharedFlow<List<Observer>> = MutableSharedFlow(replay = 1)
+    private var executors: MutableSharedFlow<List<Observer>> = MutableSharedFlow(replay = 1)
     private val repo = TaskRepository()
+    private var subTasks: MutableSharedFlow<List<Task>> = MutableSharedFlow(replay = 1)
 
     fun setTask(taskId: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -31,6 +32,10 @@ class NewTaskInfoViewModel : ViewModel() {
             repo.getTaskObservers(taskId).collect {
                 TODO()
             }
+
+            repo.getSubtasks(taskId).collect {
+
+            }
         }
     }
 
@@ -40,5 +45,5 @@ class NewTaskInfoViewModel : ViewModel() {
 
     fun getObservers(): Flow<List<Observer>> = observers
 
-    fun getExecutors(): Flow<List<Observer>> = executors
+    fun getSubtasks(): Flow<List<Task>> = subTasks
 }

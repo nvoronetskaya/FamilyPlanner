@@ -37,6 +37,7 @@ class NewTaskViewModel : ViewModel() {
     private val tasksRepo = TaskRepository()
     private var familyId = ""
     private var uploadTasks = listOf<UploadTask>()
+    private var createdTaskId: String? = null
 
     fun setFamilyId(familyId: String) {
         this.familyId = familyId
@@ -113,6 +114,7 @@ class NewTaskViewModel : ViewModel() {
             if (!it.isSuccessful) {
                 result = TaskCreationStatus.FAILED
             } else {
+                createdTaskId = it.result.id
                 if (files != null) {
                     this.uploadTasks = tasksRepo.uploadFiles(files, it.result.id)
                     while (!uploadTasks.all { task -> task.isComplete }) {
@@ -135,4 +137,5 @@ class NewTaskViewModel : ViewModel() {
 
     fun getAddress() = curAddress
     fun getCreationStatus() = addTask
+    fun getCreatedTaskId() = createdTaskId
 }
