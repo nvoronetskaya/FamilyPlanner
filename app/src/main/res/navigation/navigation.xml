@@ -87,6 +87,9 @@
         <action
             android:id="@+id/action_tasksListFragment_to_noFamilyFragment2"
             app:destination="@id/noFamilyFragment" />
+        <action
+            android:id="@+id/action_tasksListFragment_to_showTaskInfoFragment"
+            app:destination="@id/showTaskInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/applicationsListFragment"
@@ -122,5 +125,13 @@
             app:popUpTo="@id/tasksListFragment"
             app:popUpToInclusive="true"
             app:destination="@id/tasksListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showTaskInfoFragment"
+        android:name="com.familyplanner.tasks.view.ShowTaskInfoFragment"
+        android:label="ShowTaskInfoFragment" >
+        <action
+            android:id="@+id/action_showTaskInfoFragment_to_newTaskInfoFragment"
+            app:destination="@id/newTaskInfoFragment" />
     </fragment>
 </navigation>

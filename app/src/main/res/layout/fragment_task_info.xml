@@ -109,7 +109,7 @@
                     app:layout_constraintStart_toEndOf="@id/tv_deadline" />
 
                 <TextView
-                    android:id="@+id/tv_start_time"
+                    android:id="@+id/tv_continuous_time"
                     style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -117,16 +117,6 @@
                     android:text="14:00–"
                     app:layout_constraintStart_toStartOf="@id/tv_deadline_date"
                     app:layout_constraintTop_toBottomOf="@id/tv_deadline_date" />
-
-                <TextView
-                    android:id="@+id/tv_finish_time"
-                    style="@style/textBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="15:00"
-                    app:layout_constraintStart_toEndOf="@id/tv_start_time"
-                    app:layout_constraintTop_toTopOf="@id/tv_start_time" />
 
                 <TextView
                     android:id="@+id/tv_repeat"
@@ -137,7 +127,7 @@
                     android:gravity="center_vertical"
                     android:text="@string/repeat_task"
                     app:layout_constraintStart_toStartOf="@id/tv_deadline"
-                    app:layout_constraintTop_toBottomOf="@id/tv_start_time" />
+                    app:layout_constraintTop_toBottomOf="@id/tv_continuous_time" />
 
                 <TextView
                     android:id="@+id/tv_repeat_type"
@@ -223,7 +213,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_subtasks"
                     style="@style/textBody"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_subtasks"
@@ -233,7 +223,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <TextView
                     style="@style/textBar"
@@ -248,7 +239,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_files"
                     style="@style/textBody"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:scrollbars="horizontal"
@@ -297,7 +288,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_observers"
                     style="@style/textBody"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_observers"
@@ -346,7 +337,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_executors"
                     style="@style/textBody"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_executors"
@@ -394,19 +385,19 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/tf_comment"
-                    app:layout_constraintTop_toTopOf="@id/tf_comment"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tf_comment"
                     app:srcCompat="@drawable/attach_file" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tf_comment"
                     style="@style/inputLayout"
-                    android:layout_marginBottom="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
                     android:hint="@string/add_comment"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="0dp"
@@ -417,11 +408,11 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_comment"
-                       android:includeFontPadding="false"
-                        android:lineSpacingExtra="0dp"
                         style="@style/editText"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:lineSpacingExtra="0dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageView
@@ -429,8 +420,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="@id/tf_comment"
-                    app:layout_constraintTop_toTopOf="@id/tf_comment"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tf_comment"
                     app:srcCompat="@drawable/send" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
