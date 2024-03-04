@@ -1,44 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <CheckBox
-        android:id="@+id/cb_make_observer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|start"
-        app:layout_constraintBottom_toBottomOf="@id/tv_birthday"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tv_name" />
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/tv_name"
         style="@style/textBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="middle"
-        android:maxLines="1"
-        app:layout_constraintStart_toEndOf="@id/cb_make_observer"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="16dp"
+        android:text="Name"
+        android:maxWidth="300dp" />
 
-    <TextView
-        android:id="@+id/tv_birthday"
-        style="@style/textBody"
+    <ImageView
+        android:id="@+id/iv_is_executor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@id/tv_name"
-        app:layout_constraintTop_toBottomOf="@id/tv_name" />
-
-    <CheckBox
-        android:id="@+id/cb_make_executor"
-        style="@style/textBody"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:visibility="gone"
-        android:text="@string/make_executor"
-        app:layout_constraintStart_toStartOf="@id/tv_birthday"
-        app:layout_constraintTop_toBottomOf="@id/tv_birthday" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_gravity="end|center_vertical"
+        app:srcCompat="@drawable/executor" />
+</LinearLayout>

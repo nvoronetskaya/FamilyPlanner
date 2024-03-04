@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentTaskObserversBinding
-import com.familyplanner.tasks.adapters.TaskObserverAdapter
+import com.familyplanner.tasks.adapters.AddTaskObserverAdapter
 import com.familyplanner.tasks.viewmodel.TaskObserversViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class NewTaskObserversFragment : Fragment() {
         viewModel = ViewModelProvider(this)[TaskObserversViewModel::class.java]
         viewModel.setFamily(familyId)
 
-        val adapter = TaskObserverAdapter()
+        val adapter = AddTaskObserverAdapter()
         binding.rvObservers.layoutManager = LinearLayoutManager(activity)
         binding.rvObservers.adapter = adapter
 

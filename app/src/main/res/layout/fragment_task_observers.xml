@@ -54,5 +54,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:listitem="@layout/viewholder_observer" />
+        tools:listitem="@layout/viewholder_add_observer" />
 </LinearLayout>

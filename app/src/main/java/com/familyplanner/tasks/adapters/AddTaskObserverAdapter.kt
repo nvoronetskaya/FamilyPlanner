@@ -5,15 +5,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.common.User
+import com.familyplanner.databinding.ViewholderAddObserverBinding
 import com.familyplanner.databinding.ViewholderObserverBinding
 
-class TaskObserverAdapter :
-    RecyclerView.Adapter<TaskObserverAdapter.ObserverViewHolder>() {
+class AddTaskObserverAdapter :
+    RecyclerView.Adapter<AddTaskObserverAdapter.ObserverViewHolder>() {
     private val members = mutableListOf<User>()
     private var observers: BooleanArray = booleanArrayOf()
     private var executors: BooleanArray = booleanArrayOf()
 
-    inner class ObserverViewHolder(private val binding: ViewholderObserverBinding) :
+    inner class ObserverViewHolder(private val binding: ViewholderAddObserverBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun onBind(position: Int) {
             binding.tvName.text = members[position].name
@@ -42,7 +43,7 @@ class TaskObserverAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ObserverViewHolder {
         val itemBinding =
-            ViewholderObserverBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ViewholderAddObserverBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ObserverViewHolder(itemBinding)
     }
 

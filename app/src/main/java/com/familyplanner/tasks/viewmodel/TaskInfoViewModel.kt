@@ -2,6 +2,8 @@ package com.familyplanner.tasks.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.tasks.dto.CommentDto
+import com.familyplanner.tasks.dto.ObserverDto
 import com.familyplanner.tasks.model.Comment
 import com.familyplanner.tasks.model.Observer
 import com.familyplanner.tasks.model.Status
@@ -20,8 +22,8 @@ import kotlinx.coroutines.launch
 
 class TaskInfoViewModel : ViewModel() {
     private var task: MutableSharedFlow<Task> = MutableSharedFlow(replay = 1)
-    private var comments: MutableSharedFlow<List<Comment>> = MutableSharedFlow(replay = 1)
-    private var observers: MutableSharedFlow<List<Observer>> = MutableSharedFlow(replay = 1)
+    private var comments: MutableSharedFlow<List<CommentDto>> = MutableSharedFlow(replay = 1)
+    private var observers: MutableSharedFlow<List<ObserverDto>> = MutableSharedFlow(replay = 1)
     private var executors: MutableSharedFlow<List<Observer>> = MutableSharedFlow(replay = 1)
     private val repo = TaskRepository()
     private var subTasks: MutableSharedFlow<List<Task>> = MutableSharedFlow(replay = 1)
@@ -75,9 +77,9 @@ class TaskInfoViewModel : ViewModel() {
 
     fun getTask(): Flow<Task> = task
 
-    fun getComments(): Flow<List<Comment>> = comments
+    fun getComments(): Flow<List<CommentDto>> = comments
 
-    fun getObservers(): Flow<List<Observer>> = observers
+    fun getObservers(): Flow<List<ObserverDto>> = observers
 
     fun getSubtasks(): Flow<List<Task>> = subTasks
 }

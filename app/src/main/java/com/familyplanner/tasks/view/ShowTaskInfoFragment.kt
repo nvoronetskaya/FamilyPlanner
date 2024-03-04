@@ -10,12 +10,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentTaskInfoBinding
+import com.familyplanner.tasks.adapters.CommentsListAdapter
+import com.familyplanner.tasks.adapters.ObserversListAdapter
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.search.Line
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +50,13 @@ class ShowTaskInfoFragment : Fragment() {
         viewModel.setTask(taskId)
 
         var task: Task? = null
+        val commentsAdapter = CommentsListAdapter()
+        val observersAdapter = ObserversListAdapter()
         userId = requireArguments().getString("userId")!!
+        binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvComment.adapter = commentsAdapter
+        binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvObservers.adapter = observersAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getTask().collect {
@@ -54,13 +64,13 @@ class ShowTaskInfoFragment : Fragment() {
                     bindTask(it)
                 }
                 viewModel.getComments().collect {
-
+                    commentsAdapter.setComments(it)
                 }
                 viewModel.getObservers().collect {
-
+                    observersAdapter.setObservers(it)
                 }
                 viewModel.getSubtasks().collect {
-                    
+
                 }
             }
         }
@@ -91,16 +101,6 @@ class ShowTaskInfoFragment : Fragment() {
             binding.ivObserversFolded.visibility = View.GONE
             binding.ivObserversUnfolded.visibility = View.VISIBLE
             binding.rvObservers.visibility = View.VISIBLE
-        }
-        binding.ivExecutorsUnfolded.setOnClickListener {
-            binding.ivExecutorsUnfolded.visibility = View.GONE
-            binding.ivExecutorsFolded.visibility = View.VISIBLE
-            binding.rvExecutors.visibility = View.GONE
-        }
-        binding.ivExecutorsFolded.setOnClickListener {
-            binding.ivExecutorsFolded.visibility = View.GONE
-            binding.ivExecutorsUnfolded.visibility = View.VISIBLE
-            binding.rvExecutors.visibility = View.VISIBLE
         }
     }
 
