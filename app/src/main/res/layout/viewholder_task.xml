@@ -23,7 +23,6 @@
         android:layout_marginTop="5dp"
         android:ellipsize="end"
         android:maxLines="3"
-        android:text="@string/name"
         app:layout_constraintStart_toEndOf="@id/cb_is_done"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,7 +31,6 @@
         style="@style/textBody"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="@string/birthday"
         app:layout_constraintStart_toStartOf="@id/tv_task"
         app:layout_constraintTop_toBottomOf="@id/tv_task" />
 

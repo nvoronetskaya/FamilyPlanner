@@ -19,7 +19,6 @@ import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.search.Line
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
