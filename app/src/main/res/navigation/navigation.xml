@@ -2,11 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation"
-    app:startDestination="@id/newTaskInfoFragment">
+    app:startDestination="@id/groceryListInfoFragment">
     <fragment
         android:id="@+id/welcomeFragment"
         android:name="com.familyplanner.auth.view.WelcomeFragment"
-        android:label="WelcomeFragment" >
+        android:label="WelcomeFragment">
         <action
             android:id="@+id/action_welcomeFragment_to_signInFragment"
             app:destination="@id/signInFragment" />
@@ -20,27 +20,27 @@
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.familyplanner.auth.view.SignInFragment"
-        android:label="SignInFragment" >
+        android:label="SignInFragment">
         <action
             android:id="@+id/action_signInFragment_to_noFamilyFragment"
+            app:destination="@id/noFamilyFragment"
             app:popUpTo="@id/navigation"
-            app:popUpToInclusive="true"
-            app:destination="@id/noFamilyFragment" />
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/enterInfoFragment"
         android:name="com.familyplanner.auth.view.EnterInfoFragment"
-        android:label="EnterInfoFragment" >
+        android:label="EnterInfoFragment">
         <action
             android:id="@+id/action_enterInfoFragment_to_noFamilyFragment"
+            app:destination="@id/noFamilyFragment"
             app:popUpTo="@id/navigation"
-            app:popUpToInclusive="true"
-            app:destination="@id/noFamilyFragment" />
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/enterEmailFragment"
         android:name="com.familyplanner.auth.view.EnterEmailFragment"
-        android:label="EnterEmailFragment" >
+        android:label="EnterEmailFragment">
         <action
             android:id="@+id/action_enterEmailFragment_to_confirmEmailFragment"
             app:destination="@id/confirmEmailFragment" />
@@ -48,7 +48,7 @@
     <fragment
         android:id="@+id/confirmEmailFragment"
         android:name="com.familyplanner.auth.view.ConfirmEmailFragment"
-        android:label="ConfirmEmailFragment" >
+        android:label="ConfirmEmailFragment">
         <action
             android:id="@+id/action_confirmEmailFragment_to_enterInfoFragment"
             app:destination="@id/enterInfoFragment" />
@@ -56,20 +56,20 @@
     <fragment
         android:id="@+id/noFamilyFragment"
         android:name="com.familyplanner.family.view.NoFamilyFragment"
-        android:label="NoFamilyFragment" >
+        android:label="NoFamilyFragment">
         <action
             android:id="@+id/action_noFamilyFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
         <action
             android:id="@+id/action_noFamilyFragment_to_tasksListFragment"
-            app:popUpTo="@id/navigation"
             app:destination="@id/tasksListFragment"
+            app:popUpTo="@id/navigation"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/membersListFragment"
         android:name="com.familyplanner.family.view.MembersListFragment"
-        android:label="MembersListFragment" >
+        android:label="MembersListFragment">
         <action
             android:id="@+id/action_membersListFragment_to_applicationsListFragment"
             app:destination="@id/applicationsListFragment" />
@@ -77,7 +77,7 @@
     <fragment
         android:id="@+id/tasksListFragment"
         android:name="com.familyplanner.tasks.view.TasksListFragment"
-        android:label="TasksListFragment" >
+        android:label="TasksListFragment">
         <action
             android:id="@+id/action_tasksListFragment_to_membersListFragment"
             app:destination="@id/membersListFragment" />
@@ -98,17 +98,17 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.familyplanner.auth.view.ProfileFragment"
-        android:label="ProfileFragment" >
+        android:label="ProfileFragment">
         <action
             android:id="@+id/action_profileFragment_to_welcomeFragment"
+            app:destination="@id/welcomeFragment"
             app:popUpTo="@id/navigation"
-            app:popUpToInclusive="true"
-            app:destination="@id/welcomeFragment" />
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/newTaskInfoFragment"
         android:name="com.familyplanner.tasks.view.NewTaskInfoFragment"
-        android:label="NewTaskInfoFragment" >
+        android:label="NewTaskInfoFragment">
         <action
             android:id="@+id/action_newTaskInfoFragment_to_newTaskObserversFragment"
             app:destination="@id/newTaskObserversFragment" />
@@ -119,19 +119,31 @@
     <fragment
         android:id="@+id/newTaskObserversFragment"
         android:name="com.familyplanner.tasks.view.NewTaskObserversFragment"
-        android:label="NewTaskObserversFragment" >
+        android:label="NewTaskObserversFragment">
         <action
             android:id="@+id/action_newTaskObserversFragment_to_tasksListFragment"
+            app:destination="@id/tasksListFragment"
             app:popUpTo="@id/tasksListFragment"
-            app:popUpToInclusive="true"
-            app:destination="@id/tasksListFragment" />
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/showTaskInfoFragment"
         android:name="com.familyplanner.tasks.view.ShowTaskInfoFragment"
-        android:label="ShowTaskInfoFragment" >
+        android:label="ShowTaskInfoFragment">
         <action
             android:id="@+id/action_showTaskInfoFragment_to_newTaskInfoFragment"
             app:destination="@id/newTaskInfoFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/listsListFragment"
+        android:name="com.familyplanner.lists.view.ListsListFragment"
+        android:label="ListsListFragment">
+        <action
+            android:id="@+id/action_listsListFragment_to_groceryListInfoFragment"
+            app:destination="@id/groceryListInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/groceryListInfoFragment"
+        android:name="com.familyplanner.lists.view.GroceryListInfoFragment"
+        android:label="GroceryListInfoFragment"/>
 </navigation>

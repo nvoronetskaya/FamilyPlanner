@@ -2,6 +2,7 @@ package com.familyplanner.lists.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.lists.adapters.ProductAdapter
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.model.ListObserver
 import com.familyplanner.lists.model.Product
@@ -36,4 +37,20 @@ class GroceryListInfoViewModel : ViewModel() {
     fun getListObservers(): Flow<List<ListObserver>> = listObservers
 
     fun getListProducts(): Flow<List<Product>> = listProducts
+
+    fun addProduct(name: String) {
+
+    }
+
+    fun deleteProduct(product: Product) {
+
+    }
+
+    fun changeProductPurchased(product: Product, isPurchased: Boolean) {
+
+    }
+
+    fun deleteObserver(observer: ListObserver) {
+
+    }
 }

@@ -48,59 +48,59 @@ class ShowTaskInfoFragment : Fragment() {
         viewModel = ViewModelProvider(this)[TaskInfoViewModel::class.java]
         viewModel.setTask(taskId)
 
-        var task: Task? = null
-        val commentsAdapter = CommentsListAdapter()
-        val observersAdapter = ObserversListAdapter()
-        userId = requireArguments().getString("userId")!!
-        binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvComment.adapter = commentsAdapter
-        binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvObservers.adapter = observersAdapter
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getTask().collect {
-                    task = it
-                    bindTask(it)
-                }
-                viewModel.getComments().collect {
-                    commentsAdapter.setComments(it)
-                }
-                viewModel.getObservers().collect {
-                    observersAdapter.setObservers(it)
-                }
-                viewModel.getSubtasks().collect {
-
-                }
-            }
-        }
-        binding.ivAddSubtask.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putString("parentId", taskId)
-            bundle.putString("familyId", task!!.familyId)
-            bundle.putBoolean("isPrivate", task!!.isPrivate)
-            bundle.putString("userId", userId)
-            findNavController().navigate(R.id.action_showTaskInfoFragment_to_newTaskInfoFragment)
-        }
-        binding.ivSubtasksUnfolded.setOnClickListener {
-            binding.ivSubtasksUnfolded.visibility = View.GONE
-            binding.ivSubtasksFolded.visibility = View.VISIBLE
-            binding.rvSubtasks.visibility = View.GONE
-        }
-        binding.ivSubtasksFolded.setOnClickListener {
-            binding.ivSubtasksFolded.visibility = View.GONE
-            binding.ivSubtasksUnfolded.visibility = View.VISIBLE
-            binding.rvSubtasks.visibility = View.VISIBLE
-        }
-        binding.ivObserversUnfolded.setOnClickListener {
-            binding.ivObserversUnfolded.visibility = View.GONE
-            binding.ivObserversFolded.visibility = View.VISIBLE
-            binding.rvObservers.visibility = View.GONE
-        }
-        binding.ivObserversFolded.setOnClickListener {
-            binding.ivObserversFolded.visibility = View.GONE
-            binding.ivObserversUnfolded.visibility = View.VISIBLE
-            binding.rvObservers.visibility = View.VISIBLE
-        }
+//        var task: Task? = null
+//        val commentsAdapter = CommentsListAdapter()
+//        val observersAdapter = ObserversListAdapter()
+//        userId = requireArguments().getString("userId")!!
+//        binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
+//        binding.rvComment.adapter = commentsAdapter
+//        binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
+//        binding.rvObservers.adapter = observersAdapter
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.getTask().collect {
+//                    task = it
+//                    bindTask(it)
+//                }
+//                viewModel.getComments().collect {
+//                    commentsAdapter.setComments(it)
+//                }
+//                viewModel.getObservers().collect {
+//                    observersAdapter.setObservers(it)
+//                }
+//                viewModel.getSubtasks().collect {
+//
+//                }
+//            }
+//        }
+//        binding.ivAddSubtask.setOnClickListener {
+//            val bundle = Bundle()
+//            bundle.putString("parentId", taskId)
+//            bundle.putString("familyId", task!!.familyId)
+//            bundle.putBoolean("isPrivate", task!!.isPrivate)
+//            bundle.putString("userId", userId)
+//            findNavController().navigate(R.id.action_showTaskInfoFragment_to_newTaskInfoFragment)
+//        }
+//        binding.ivSubtasksUnfolded.setOnClickListener {
+//            binding.ivSubtasksUnfolded.visibility = View.GONE
+//            binding.ivSubtasksFolded.visibility = View.VISIBLE
+//            binding.rvSubtasks.visibility = View.GONE
+//        }
+//        binding.ivSubtasksFolded.setOnClickListener {
+//            binding.ivSubtasksFolded.visibility = View.GONE
+//            binding.ivSubtasksUnfolded.visibility = View.VISIBLE
+//            binding.rvSubtasks.visibility = View.VISIBLE
+//        }
+//        binding.ivObserversUnfolded.setOnClickListener {
+//            binding.ivObserversUnfolded.visibility = View.GONE
+//            binding.ivObserversFolded.visibility = View.VISIBLE
+//            binding.rvObservers.visibility = View.GONE
+//        }
+//        binding.ivObserversFolded.setOnClickListener {
+//            binding.ivObserversFolded.visibility = View.GONE
+//            binding.ivObserversUnfolded.visibility = View.VISIBLE
+//            binding.rvObservers.visibility = View.VISIBLE
+//        }
     }
 
     private fun bindTask(task: Task) {

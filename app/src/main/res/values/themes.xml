@@ -104,4 +104,9 @@
         <item name="thumbTint">@color/thumb</item>
         <item name="trackTint">@color/track</item>
     </style>
+
+    <style name="fab_round" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">90dp</item>
+    </style>
 </resources>

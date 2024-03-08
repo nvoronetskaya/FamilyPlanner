@@ -28,32 +28,32 @@ class TaskInfoViewModel : ViewModel() {
     private val repo = TaskRepository()
     private var subTasks: MutableSharedFlow<List<Task>> = MutableSharedFlow(replay = 1)
 
-    private val searchSessionListener = object : Session.SearchListener {
-        override fun onSearchResponse(response: Response) {
-            val items = response.collection.children.mapNotNull {
-                it.obj?.metadataContainer?.getItem(ToponymObjectMetadata::class.java)?.address?.formattedAddress
-                    ?: it.obj?.metadataContainer?.getItem(BusinessObjectMetadata::class.java)?.address?.formattedAddress
-            }
+//    private val searchSessionListener = object : Session.SearchListener {
+//        override fun onSearchResponse(response: Response) {
+//            val items = response.collection.children.mapNotNull {
+//                it.obj?.metadataContainer?.getItem(ToponymObjectMetadata::class.java)?.address?.formattedAddress
+//                    ?: it.obj?.metadataContainer?.getItem(BusinessObjectMetadata::class.java)?.address?.formattedAddress
+//            }
+//
+//            curAddress = items[0]
+//            viewModelScope.launch(Dispatchers.IO) {
+//                searchStatus.emit(Status.SUCCESS)
+//            }
+//        }
+//
+//        override fun onSearchError(p0: com.yandex.runtime.Error) {
+//            viewModelScope.launch(Dispatchers.IO) {
+//                searchStatus.emit(Status.ERROR)
+//            }
+//        }
+//    }
 
-            curAddress = items[0]
-            viewModelScope.launch(Dispatchers.IO) {
-                searchStatus.emit(Status.SUCCESS)
-            }
-        }
-
-        override fun onSearchError(p0: com.yandex.runtime.Error) {
-            viewModelScope.launch(Dispatchers.IO) {
-                searchStatus.emit(Status.ERROR)
-            }
-        }
-    }
-
-    fun getAddressByGeo(obj: Point): Flow<Status> {
-        viewModelScope.launch(Dispatchers.Main) {
-            searchManager.submit(obj, 21, SearchOptions(), searchSessionListener)
-        }
-        return searchStatus
-    }
+//    fun getAddressByGeo(obj: Point): Flow<Status> {
+////        viewModelScope.launch(Dispatchers.Main) {
+////            searchManager.submit(obj, 21, SearchOptions(), searchSessionListener)
+////        }
+////        return searchStatus
+//    }
 
     fun setTask(taskId: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -61,17 +61,17 @@ class TaskInfoViewModel : ViewModel() {
                 task.emit(it)
             }
 
-            repo.getTaskComments(taskId).collect {
-                comments.emit(it)
-            }
+//            repo.getTaskComments(taskId).collect {
+//                comments.emit(it)
+//            }
 
-            repo.getTaskObservers(taskId).collect {
-                TODO()
-            }
+//            repo.getTaskObservers(taskId).collect {
+//                TODO()
+//            }
 
-            repo.getSubtasks(taskId).collect {
-
-            }
+//            repo.getSubtasks(taskId).collect {
+//
+//            }
         }
     }
 

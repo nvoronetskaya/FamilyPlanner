@@ -22,4 +22,12 @@ class GroceryListsViewModel : ViewModel() {
     }
 
     fun getGroceryLists(): Flow<List<GroceryList>> = groceryLists
+
+    fun changeListStatus(groceryList: GroceryList, isCompleted: Boolean) {
+
+    }
+
+    fun removeList(groceryList: GroceryList) {
+
+    }
 }

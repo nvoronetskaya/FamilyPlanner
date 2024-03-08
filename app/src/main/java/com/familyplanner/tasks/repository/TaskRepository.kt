@@ -35,39 +35,39 @@ class TaskRepository {
         TODO()
     }
 
-    fun getTaskComments(taskId: String): Flow<List<Comment>> {
-        firestore.collection("comments").whereEqualTo("taskId", taskId).snapshots().map {
-            val comments = mutableListOf<Comment>()
-            for (doc in it.documents) {
-                val comment = Comment(
-                    doc.id,
-                    doc["text"].toString(),
-                    doc["createdAt"].toString(),
-                    doc["userId"].toString()
-                )
-                comments.add(comment)
-            }
-            comments
-        }
-    }
+//    fun getTaskComments(taskId: String): Flow<List<Comment>> {
+//        firestore.collection("comments").whereEqualTo("taskId", taskId).snapshots().map {
+//            val comments = mutableListOf<Comment>()
+//            for (doc in it.documents) {
+//                val comment = Comment(
+//                    doc.id,
+//                    doc["text"].toString(),
+//                    doc["createdAt"].toString(),
+//                    doc["userId"].toString()
+//                )
+//                comments.add(comment)
+//            }
+//            comments
+//        }
+//    }
 
-    fun getTaskObservers(taskId: String): Flow<List<Observer>> {
-        firestore.collection("observers").whereEqualTo("familyId", familyId).snapshots().map {
-            val users = mutableListOf<User>()
-            for (doc in it.documents) {
-                val user = User(
-                    doc.id,
-                    doc["name"].toString(),
-                    doc["birthday"].toString(),
-                    doc["hasFamily"] as Boolean,
-                    doc["familyId"].toString(),
-                    doc["email"].toString()
-                )
-                users.add(user)
-            }
-            users
-        }
-    }
+//    fun getTaskObservers(taskId: String): Flow<List<Observer>> {
+//        firestore.collection("observers").whereEqualTo("familyId", familyId).snapshots().map {
+//            val users = mutableListOf<User>()
+//            for (doc in it.documents) {
+//                val user = User(
+//                    doc.id,
+//                    doc["name"].toString(),
+//                    doc["birthday"].toString(),
+//                    doc["hasFamily"] as Boolean,
+//                    doc["familyId"].toString(),
+//                    doc["email"].toString()
+//                )
+//                users.add(user)
+//            }
+//            users
+//        }
+//    }
 
     fun addTask(task: Task): GoogleTask<DocumentReference> {
         return firestore.collection(("tasks")).add(task)
