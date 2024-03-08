@@ -10,14 +10,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.familyplanner.databinding.FragmentGroceryListsBinding
 import com.familyplanner.databinding.FragmentTasksListBinding
 import com.familyplanner.tasks.viewmodel.TasksListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GroceryListsFragment : Fragment() {
-    private var _binding: FragmentGroceryListsBinding? = null
+class GroceryListInfoFragment : Fragment() {
+    private var _binding: FragmentTasksListBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: TasksListViewModel
 
@@ -26,7 +25,7 @@ class GroceryListsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentGroceryListsBinding.inflate(inflater, container, false)
+        _binding = FragmentTasksListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
