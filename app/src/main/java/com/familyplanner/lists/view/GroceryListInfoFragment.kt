@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
@@ -16,7 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.familyplanner.MainActivity
+import com.familyplanner.R
 import com.familyplanner.databinding.FragmentGroceryItemsBinding
+import com.familyplanner.lists.adapters.NonObserverAdapter
 import com.familyplanner.lists.adapters.ObserversAdapter
 import com.familyplanner.lists.adapters.ProductAdapter
 import com.familyplanner.lists.adapters.ProductsListDecorator
@@ -43,9 +48,10 @@ class GroceryListInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val listId = """requireArguments().getString("listId", "")"""
+        val familyId = """requireArguments().getString("familyId", "")"""
         val isListCreator = true
         viewModel = ViewModelProvider(this)[GroceryListInfoViewModel::class.java]
-        viewModel.setList(listId)
+        viewModel.setList(listId, familyId)
         val productsAdapter = ProductAdapter(viewModel::changeProductPurchased, ::onProductDelete)
         val observerAdapter = ObserversAdapter(isListCreator, ::onObserverDelete)
         val bottomOffset = TypedValue.applyDimension(
@@ -100,9 +106,9 @@ class GroceryListInfoFragment : Fragment() {
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.fabAdd.setOnClickListener {
             if (binding.tabs[0].isVisible) {
-                TODO()
+                createAddProductDialog()
             } else {
-                TODO()
+                createAddObserversDialog()
             }
         }
     }
@@ -132,5 +138,40 @@ class GroceryListInfoFragment : Fragment() {
             .setNegativeButton("Отмена") { dialog, _ ->
                 dialog.cancel()
             }.create().show()
+    }
+
+    private fun createAddProductDialog() {
+        val name = EditText(activity)
+        name.hint = "Название товара"
+        name.textSize = 19F
+        AlertDialog.Builder(activity as MainActivity).setTitle("Добавление товара")
+            .setView(name)
+            .setPositiveButton("Готово") { _, _ ->
+                if (name.text.isNullOrBlank()) {
+                    name.error = "Введите название"
+                } else {
+                    viewModel.addProduct(name.text.trim().toString())
+                }
+            }
+            .setNegativeButton("Отмена") { dialog, _ ->
+                dialog.cancel()
+            }.show()
+    }
+
+    private fun createAddObserversDialog() {
+        val curActivity = requireActivity()
+        val builder = AlertDialog.Builder(curActivity)
+        val view = curActivity.layoutInflater.inflate(R.layout.dialog_add_list_observers, null)
+        val nonObserversList = view.findViewById<RecyclerView>(R.id.rv_observers)
+        nonObserversList.layoutManager = LinearLayoutManager(requireContext())
+        val nonObserversAdapter = NonObserverAdapter()
+        nonObserversAdapter.updateData(viewModel.getNonObservers())
+
+        builder.setView(view)
+        builder.setPositiveButton("Готово") { dialog, _ ->
+            viewModel.addObservers(nonObserversAdapter.getObservers())
+            dialog.dismiss()
+        }.setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+        builder.create().show()
     }
 }

@@ -2,6 +2,7 @@ package com.familyplanner.lists.repository
 
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.model.ListObserver
+import com.familyplanner.lists.model.NonObserver
 import com.familyplanner.lists.model.Product
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldPath
@@ -17,7 +18,6 @@ class GroceryListRepository {
     fun getListsForUser(userId: String): Flow<List<GroceryList>> {
         val lists = MutableSharedFlow<List<GroceryList>>(replay = 1)
         firestore.collection("usersLists").whereEqualTo("userId", userId).snapshots().map {
-            var counter = 0
             val listIds = it.map { list -> list.id }
             firestore.collection("lists").whereIn(FieldPath.documentId(), listIds).snapshots()
                 .map { result ->
@@ -85,5 +85,64 @@ class GroceryListRepository {
                 }
         }
         return observers
+    }
+
+    fun getNonObservers(listId: String, familyId: String): Flow<List<NonObserver>> {
+        val result = MutableSharedFlow<List<NonObserver>>()
+        firestore.collection("usersLists").whereEqualTo("listId", listId).snapshots().map {
+            val observersIds = it.documents.map { doc -> doc.id }
+            firestore.collection("users").whereEqualTo("familyId", familyId)
+                .whereNotIn(FieldPath.documentId(), observersIds).snapshots().map {
+                    val nonObservers = it.documents.map { doc ->
+                        NonObserver(doc.id, doc["name"].toString(), false)
+                    }
+                    result.emit(nonObservers)
+                }
+        }
+        return result
+    }
+
+    fun addProduct(productName: String, listId: String) {
+        val product =
+            mapOf<String, Any>("name" to productName, "listId" to listId, "isPurchased" to false)
+        firestore.collection("products").add(product)
+    }
+
+    fun changeProductPurchased(productId: String, isPurchased: Boolean) {
+        firestore.collection("products").document(productId).update("isPurchased", isPurchased)
+    }
+
+    fun deleteProduct(id: String) {
+        firestore.collection("products").document(id).delete()
+    }
+
+    fun addObservers(observersId: List<String>, listId: String) {
+        for (id in observersId) {
+            val data = mapOf("userId" to id, "listId" to listId)
+            firestore.collection("usersLists").add(data)
+        }
+    }
+
+    fun deleteObserver(observerId: String, listId: String) {
+        firestore.collection("usersLists").whereEqualTo("listId", listId)
+            .whereEqualTo("userId", observerId).get().addOnCompleteListener {
+                for (doc in it.result.documents) {
+                    doc.reference.delete()
+                }
+            }
+    }
+
+    fun addList(name: String, createdBy: String, observersId: List<String>) {
+        val listData =
+            mapOf<String, Any>("name" to name, "createdBy" to createdBy, "isCompleted" to false)
+        firestore.collection("lists").add(listData).addOnCompleteListener {
+            val listId = it.result.id
+            for (id in observersId) {
+                val observerData = mapOf("listId" to listId, "userId" to id)
+                firestore.collection("usersLists").add(observerData)
+            }
+            firestore.collection("usersLists")
+                .add(mapOf("listId" to listId, "userId" to createdBy))
+        }
     }
 }
