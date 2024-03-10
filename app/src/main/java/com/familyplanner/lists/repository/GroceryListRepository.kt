@@ -132,18 +132,10 @@ class GroceryListRepository {
             }
     }
 
-    fun addList(name: String, createdBy: String, observersId: List<String>) {
+    fun addList(name: String, createdBy: String) {
         val listData =
             mapOf<String, Any>("name" to name, "createdBy" to createdBy, "isCompleted" to false)
-        firestore.collection("lists").add(listData).addOnCompleteListener {
-            val listId = it.result.id
-            for (id in observersId) {
-                val observerData = mapOf("listId" to listId, "userId" to id)
-                firestore.collection("usersLists").add(observerData)
-            }
-            firestore.collection("usersLists")
-                .add(mapOf("listId" to listId, "userId" to createdBy))
-        }
+        firestore.collection("lists").add(listData)
     }
 
     fun changeListCompleted(listId: String, isCompleted: Boolean) {

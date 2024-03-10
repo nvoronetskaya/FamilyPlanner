@@ -26,15 +26,6 @@
             android:text="@string/lists" />
 
         <ImageView
-            android:id="@+id/iv_add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/add"
-            app:tint="@color/white" />
-
-        <ImageView
             android:id="@+id/iv_eye"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,4 +51,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         tools:listitem="@layout/viewholder_list_product" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="@color/orange"
+        app:fabCustomSize="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:shapeAppearanceOverlay="@style/fab_round"
+        app:srcCompat="@drawable/add"
+        app:tint="@color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>
