@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/back" />
 
-        <EditText
+        <TextView
             android:id="@+id/tv_list_name"
             style="@style/textBar"
             android:layout_width="wrap_content"

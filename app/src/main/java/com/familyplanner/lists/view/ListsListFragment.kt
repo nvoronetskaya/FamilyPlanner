@@ -39,7 +39,7 @@ class ListsListFragment : Fragment() {
         val userId = requireArguments().getString("userId")!!
         binding.rvLists.layoutManager = LinearLayoutManager(activity)
         val listsAdapter =
-            ListAdapter(viewModel::changeListStatus, ::openList, ::onListDelete, userId)
+            ListAdapter(viewModel::editList, viewModel::changeListStatus, ::openList, ::onListDelete, userId)
         binding.rvLists.adapter = listsAdapter
         viewModel = ViewModelProvider(this)[GroceryListsViewModel::class.java]
         lifecycleScope.launch(Dispatchers.IO) {

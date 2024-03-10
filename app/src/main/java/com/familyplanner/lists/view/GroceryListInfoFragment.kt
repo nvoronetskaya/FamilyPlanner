@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -47,12 +48,12 @@ class GroceryListInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val listId = """requireArguments().getString("listId", "")"""
-        val familyId = """requireArguments().getString("familyId", "")"""
+//        val listId = """requireArguments().getString("listId", "")"""
+//        val familyId = """requireArguments().getString("familyId", "")"""
         val isListCreator = true
         viewModel = ViewModelProvider(this)[GroceryListInfoViewModel::class.java]
-        viewModel.setList(listId, familyId)
-        val productsAdapter = ProductAdapter(viewModel::changeProductPurchased, ::onProductDelete)
+        // viewModel.setList(listId, familyId)
+        val productsAdapter = ProductAdapter(viewModel::editProduct, viewModel::changeProductPurchased, ::onProductDelete)
         val observerAdapter = ObserversAdapter(isListCreator, ::onObserverDelete)
         val bottomOffset = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -67,42 +68,42 @@ class GroceryListInfoFragment : Fragment() {
         binding.rvObservers.adapter = observerAdapter
         val products = mutableListOf<Product>()
         for (i in 0..20) {
-            products.add(Product("", "name", false))
+            products.add(Product("", "Name", false))
         }
         productsAdapter.updateData(products)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getListInfo().collect {
-                    activity?.runOnUiThread {
-                        if (it == null) {
-                            Toast.makeText(
-                                requireContext(),
-                                "Не удалось найти список",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            findNavController().popBackStack()
-                        } else {
-                            binding.tvListName.setText(it.name)
-                        }
-                    }
-                }
-                viewModel.getListProducts().collect {
-                    productsAdapter.updateData(it)
-                }
-                viewModel.getListObservers().collect {
-                    observerAdapter.updateData(it)
-                }
-            }
-        }
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.getListInfo().collect {
+//                    activity?.runOnUiThread {
+//                        if (it == null) {
+//                            Toast.makeText(
+//                                requireContext(),
+//                                "Не удалось найти список",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                            findNavController().popBackStack()
+//                        } else {
+//                            binding.tvListName.setText(it.name)
+//                        }
+//                    }
+//                }
+//                viewModel.getListProducts().collect {
+//                    productsAdapter.updateData(it)
+//                }
+//                viewModel.getListObservers().collect {
+//                    observerAdapter.updateData(it)
+//                }
+//            }
+//        }
         binding.tabs[0].setOnClickListener {
             binding.rvProducts.visibility = View.GONE
             binding.rvObservers.visibility = View.VISIBLE
         }
-        binding.tabs[1].setOnClickListener {
-            binding.rvObservers.visibility = View.GONE
-            binding.rvProducts.visibility = View.VISIBLE
-        }
+//        binding.tabs[1].setOnClickListener {
+//            binding.rvObservers.visibility = View.GONE
+//            binding.rvProducts.visibility = View.VISIBLE
+//        }
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.fabAdd.setOnClickListener {
             if (binding.tabs[0].isVisible) {

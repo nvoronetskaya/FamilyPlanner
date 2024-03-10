@@ -13,12 +13,57 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="2dp"
+        android:background="@null"
+        android:textColor="@color/black"
+        android:enabled="false"
+        android:gravity="start|center_vertical"
+        android:maxLines="1"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@id/cb_list"
+        app:layout_constraintEnd_toStartOf="@id/iv_delete"
+        app:layout_constraintStart_toEndOf="@id/cb_list"
+        app:layout_constraintTop_toTopOf="@id/cb_list" />
+
+    <ImageView
+        android:id="@+id/iv_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="@id/cb_list"
+        app:layout_constraintEnd_toStartOf="@id/iv_delete"
+        app:layout_constraintTop_toTopOf="@id/cb_list"
+        app:srcCompat="@drawable/edit"
+        app:tint="@color/dark_gray" />
+
+    <ImageView
+        android:id="@+id/iv_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="5dp"
+        android:visibility="gone"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="@id/cb_list"
+        app:layout_constraintEnd_toStartOf="@id/iv_delete"
+        app:layout_constraintTop_toTopOf="@id/cb_list"
+        app:srcCompat="@drawable/done"
+        app:tint="@color/dark_gray" />
+
     <ImageView
         android:id="@+id/iv_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="15dp"
+        android:layout_marginEnd="5dp"
         android:layout_marginBottom="2dp"
         app:layout_constraintBottom_toBottomOf="@id/cb_list"
         app:layout_constraintEnd_toEndOf="parent"

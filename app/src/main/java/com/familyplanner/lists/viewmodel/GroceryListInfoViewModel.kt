@@ -10,6 +10,7 @@ import com.familyplanner.lists.repository.GroceryListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class GroceryListInfoViewModel : ViewModel() {
@@ -18,7 +19,7 @@ class GroceryListInfoViewModel : ViewModel() {
     private val listsRepository = GroceryListRepository()
     private val listObservers = MutableSharedFlow<List<ListObserver>>(replay = 1)
     private val list = MutableSharedFlow<GroceryList?>(replay = 1)
-    private val listProducts = MutableSharedFlow<List<Product>>(replay = 1)
+    private val listProducts = MutableStateFlow(listOf<Product>())
     private val nonObservers = mutableListOf<NonObserver>()
 
     fun setList(listId: String, familyId: String) {
@@ -41,6 +42,10 @@ class GroceryListInfoViewModel : ViewModel() {
         }
     }
 
+    fun editProduct(product: Product, newName: String) {
+
+    }
+
     fun getListInfo(): Flow<GroceryList?> = list
 
     fun getListObservers(): Flow<List<ListObserver>> = listObservers
@@ -49,6 +54,7 @@ class GroceryListInfoViewModel : ViewModel() {
 
     fun addProduct(name: String) {
         listsRepository.addProduct(name, listId)
+        listsRepository.changeListCompleted(listId, false)
     }
 
     fun deleteProduct(product: Product) {
@@ -57,6 +63,7 @@ class GroceryListInfoViewModel : ViewModel() {
 
     fun changeProductPurchased(product: Product, isPurchased: Boolean) {
         listsRepository.changeProductPurchased(product.id, isPurchased)
+        listsRepository.changeListCompleted(listId, listProducts.value.all { it.isPurchased })
     }
 
     fun addObservers(newObservers: List<NonObserver>) {
@@ -65,6 +72,7 @@ class GroceryListInfoViewModel : ViewModel() {
 
     fun deleteObserver(observer: ListObserver) {
         listsRepository.deleteObserver(observer.userId, listId)
+        listsRepository.changeListCompleted(listId, listProducts.value.all { it.isPurchased })
     }
 
     fun getNonObservers(): List<NonObserver> = nonObservers

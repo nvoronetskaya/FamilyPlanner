@@ -145,4 +145,28 @@ class GroceryListRepository {
                 .add(mapOf("listId" to listId, "userId" to createdBy))
         }
     }
+
+    fun changeListCompleted(listId: String, isCompleted: Boolean) {
+        firestore.collection("lists").document(listId).update("isCompleted", isCompleted)
+        firestore.collection("products").whereEqualTo("listId", listId).get()
+            .addOnCompleteListener {
+                for (doc in it.result.documents) {
+                    doc.reference.update("isPurchased", true)
+                }
+            }
+    }
+
+    fun deleteList(listId: String) {
+        firestore.collection("products").whereEqualTo("listId", listId).get()
+            .addOnCompleteListener {
+                for (doc in it.result.documents) {
+                    doc.reference.delete()
+                }
+            }
+        firestore.collection("lists").document(listId).delete()
+    }
+
+    fun changeListName(listId: String, newName: String) {
+        firestore.collection("lists").document(listId).update("name", newName)
+    }
 }

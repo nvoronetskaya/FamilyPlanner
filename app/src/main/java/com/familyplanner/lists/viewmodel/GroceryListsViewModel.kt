@@ -24,10 +24,14 @@ class GroceryListsViewModel : ViewModel() {
     fun getGroceryLists(): Flow<List<GroceryList>> = groceryLists
 
     fun changeListStatus(groceryList: GroceryList, isCompleted: Boolean) {
-
+        listsRepository.changeListCompleted(groceryList.id, isCompleted)
     }
 
     fun removeList(groceryList: GroceryList) {
+        listsRepository.deleteList(groceryList.id)
+    }
 
+    fun editList(list: GroceryList, newName: String) {
+        listsRepository.changeListName(list.id, newName)
     }
 }
