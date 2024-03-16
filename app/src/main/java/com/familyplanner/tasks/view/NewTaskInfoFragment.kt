@@ -40,7 +40,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-
 class NewTaskInfoFragment : Fragment() {
     private var _binding: FragmentNewTaskBinding? = null
     private val binding get() = _binding!!

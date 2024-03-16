@@ -12,6 +12,7 @@
         android:text="@string/sort_by" />
 
     <com.google.android.material.chip.ChipGroup
+        android:id="@+id/sorting_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:chipSpacingVertical="0dp"
@@ -53,17 +54,39 @@
         android:text="@string/filter_executors" />
 
     <com.google.android.material.chip.ChipGroup
+        android:id="@+id/importance_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:chipSpacingVertical="0dp"
-        app:singleSelection="false" />
+        app:singleSelection="true" />
 
-    <CheckBox
+    <TextView
         style="@style/textBody"
-        android:id="@+id/cb_has_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/has_location"/>
+        android:text="@string/has_deadline" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/deadline_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:chipSpacingVertical="0dp"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/has_deadline"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/yes" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/no_deadline"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no" />
+    </com.google.android.material.chip.ChipGroup>
 
     <TextView
         style="@style/textBody"
@@ -72,15 +95,37 @@
         android:text="@string/importance" />
 
     <com.google.android.material.chip.ChipGroup
+        android:id="@+id/users_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:chipSpacingVertical="0dp"
         app:singleSelection="true" />
 
-    <CheckBox
+    <TextView
         style="@style/textBody"
-        android:id="@+id/cb_has_deadline"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/has_deadline"/>
+        android:text="@string/has_location" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/location_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:chipSpacingVertical="0dp"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/has_location"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/yes" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/no_location"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no" />
+    </com.google.android.material.chip.ChipGroup>
 </LinearLayout>
