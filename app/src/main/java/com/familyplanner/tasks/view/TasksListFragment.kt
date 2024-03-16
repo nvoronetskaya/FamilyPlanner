@@ -9,8 +9,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.MainActivity
+import com.familyplanner.R
 import com.familyplanner.databinding.BottomsheetTaskFiltersBinding
 import com.familyplanner.databinding.FragmentTasksListBinding
 import com.familyplanner.tasks.model.Importance
@@ -62,6 +64,12 @@ class TasksListFragment : Fragment() {
         }
         binding.ivTune.setOnClickListener {
             showFiltersBottomSheet()
+        }
+        binding.fabAdd.setOnClickListener {
+            findNavController().navigate(R.id.action_tasksListFragment_to_newTaskInfoFragment)
+        }
+        binding.ivPerson.setOnClickListener {
+            findNavController().navigate(R.id.action_tasksListFragment_to_profileFragment) 
         }
     }
 

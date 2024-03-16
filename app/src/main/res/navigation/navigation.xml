@@ -90,6 +90,9 @@
         <action
             android:id="@+id/action_tasksListFragment_to_showTaskInfoFragment"
             app:destination="@id/showTaskInfoFragment" />
+        <action
+            android:id="@+id/action_tasksListFragment_to_newTaskInfoFragment"
+            app:destination="@id/newTaskInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/applicationsListFragment"
