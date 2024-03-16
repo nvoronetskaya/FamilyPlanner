@@ -109,4 +109,10 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">90dp</item>
     </style>
+
+    <style name="chip" parent="commentText">
+        <item name="textStartPadding">0dp</item>
+        <item name="textEndPadding">0dp</item>
+        <item name="fontWeight">200</item>
+    </style>
 </resources>

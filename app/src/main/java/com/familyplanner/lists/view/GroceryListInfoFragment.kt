@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -71,7 +70,6 @@ class GroceryListInfoFragment : Fragment() {
             products.add(Product("", "Name", false))
         }
         productsAdapter.updateData(products)
-
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getListInfo().collect {

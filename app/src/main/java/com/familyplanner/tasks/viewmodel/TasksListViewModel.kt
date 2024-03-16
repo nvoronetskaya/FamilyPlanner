@@ -5,6 +5,7 @@ import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
 import com.familyplanner.tasks.model.Task
+import com.familyplanner.tasks.repository.TaskRepository
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ class TasksListViewModel : ViewModel() {
     private val user = MutableSharedFlow<User>(replay = 1)
     private val userRepo = UserRepository()
     private val familyRepo = FamilyRepository()
-//    private val taskRepo = TaskRepository()
+    private val taskRepo = TaskRepository()
     private val firestore = Firebase.firestore
 
     init {

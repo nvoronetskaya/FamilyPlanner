@@ -64,7 +64,7 @@
     <string name="low">Низкая</string>
     <string name="medium">Средняя</string>
     <string name="high">Высокая</string>
-    <string name="has_location">Привязать к локации</string>
+    <string name="add_location">Привязать к локации</string>
     <string name="attach_file">Прикрепить файл</string>
     <string name="task_added">Задача создана! \nВы можете выбрать, кто может её просматривать: </string>
     <string name="choose_task_executors">Назначьте исполнителей задачи:</string>
@@ -83,4 +83,12 @@
     <string name="radius">Радиус:</string>
     <string name="metres">метров</string>
     <string name="make_executor">Сделать исполнителем</string>
+    <string name="sort_by">Сортировать по:</string>
+    <string name="importance_asc">важности <b>↑</b></string>
+    <string name="importance_desc">важности <b>↓</b></string>
+    <string name="deadline_asc">дедлайну <b>↑</b></string>
+    <string name="deadline_desc">дедлайну <b>↓</b></string>
+    <string name="filter_executors">Исполнители задачи:</string>
+    <string name="has_location">Привязана к локации</string>
+    <string name="has_deadline">Есть дедлайн</string>
 </resources>

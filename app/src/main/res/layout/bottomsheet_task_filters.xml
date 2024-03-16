@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/textBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sort_by" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:chipSpacingVertical="0dp"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/sort_importance_ascending"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/importance_asc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/sort_importance_descending"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/importance_desc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/sort_deadline_ascending"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/deadline_asc" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/sort_deadline_descending"
+            style="@style/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/deadline_desc" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        style="@style/textBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_executors" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:chipSpacingVertical="0dp"
+        app:singleSelection="false" />
+
+    <CheckBox
+        style="@style/textBody"
+        android:id="@+id/cb_has_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/has_location"/>
+
+    <TextView
+        style="@style/textBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/importance" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:chipSpacingVertical="0dp"
+        app:singleSelection="true" />
+
+    <CheckBox
+        style="@style/textBody"
+        android:id="@+id/cb_has_deadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/has_deadline"/>
+</LinearLayout>
