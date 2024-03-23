@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">FamilyPlanner</string>
-    <string name="title">Семейный помощник</string>
+    <string name="title">Семейный планировщик</string>
     <string name="start">Начать</string>
     <string name="ready">Готово</string>
     <string name="cancel">Отмена</string>

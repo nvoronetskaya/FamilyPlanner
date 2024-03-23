@@ -23,7 +23,7 @@
     <style name="filledButton" parent="button">
         <item name="android:backgroundTint">?attr/colorPrimary</item>
         <item name="android:color">?attr/colorPrimary</item>
-        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
     <style name="outlinedButton" parent="button">
@@ -34,8 +34,8 @@
     </style>
 
     <style name="textTitle">
-        <item name="android:textSize">35sp</item>
         <item name="android:fontFamily">@font/tenor_sans</item>
+        <item name="android:textSize">28sp</item>
     </style>
 
     <style name="textBar">

@@ -10,9 +10,11 @@
         layout="@layout/fragment_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tf_email"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tf_email"
@@ -25,7 +27,7 @@
         app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fr_title">
+        app:layout_constraintBottom_toTopOf="@id/tf_password">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_email"
@@ -45,7 +47,7 @@
         app:endIconMode="password_toggle"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tf_email">
+        app:layout_constraintBottom_toTopOf="@id/b_enter">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_password"
@@ -71,9 +73,8 @@
         style="@style/subText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="45dp"
         android:text="@string/forgot_password"
-        android:textColor="?attr/colorOnPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

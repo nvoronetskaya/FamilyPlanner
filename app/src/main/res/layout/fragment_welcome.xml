@@ -10,6 +10,9 @@
         layout="@layout/fragment_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constrainedHeight="true"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintBottom_toTopOf="@id/tv_welcome"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -19,15 +22,15 @@
         style="@style/textBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/promo_text"
-        android:textColor="?attr/colorOnPrimary"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="5dp"
         android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="15dp"
+        android:gravity="center_horizontal"
         android:paddingHorizontal="5dp"
+        android:text="@string/promo_text"
+        app:layout_constraintTop_toBottomOf="@id/fr_title"
+        app:layout_constraintBottom_toTopOf="@id/b_start"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fr_title"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/b_start"
@@ -46,9 +49,8 @@
         style="@style/subText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="45dp"
         android:text="@string/has_account"
-        android:textColor="?attr/colorOnPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
