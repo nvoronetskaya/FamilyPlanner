@@ -1,5 +1,6 @@
 package com.familyplanner.tasks.repository
 
+import android.net.Uri
 import com.familyplanner.common.User
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.familyplanner.tasks.model.Comment
@@ -11,9 +12,11 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
+import com.google.firebase.storage.ListResult
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
+import com.google.type.DateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
@@ -125,5 +128,29 @@ class TaskRepository {
             val observer = Observer(users[i].id, executors[i], taskId)
             firestore.collection("observers").add(observer)
         }
+    }
+
+    fun getSubtasks(taskId: String): Flow<List<Task>> {
+        return firestore.collection("tasks").whereEqualTo("parentId", taskId).snapshots().map {
+            val subTasks = mutableListOf<Task>()
+            for (doc in it.documents) {
+                val task = doc.toObject(Task::class.java) ?: continue
+                task.id = doc.id
+                subTasks.add(task)
+            }
+            subTasks
+        }
+    }
+
+    fun getFilesForTask(taskId: String): GoogleTask<ListResult> {
+        return storage.reference.child(taskId).listAll()
+    }
+
+    fun downloadFile(path: String): GoogleTask<Uri> {
+        return storage.reference.child(path).downloadUrl
+    }
+
+    fun addComment(userId: String, comment: String, createdAt: String) {
+        val data = mapOf<String, String>("userId" to userId, "text" to comment, "createdAt" to createdAt)
     }
 }

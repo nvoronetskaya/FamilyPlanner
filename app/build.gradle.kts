@@ -47,7 +47,9 @@ android {
 }
 
 dependencies {
-    //implementation("com.yandex.android:maps.mobile:4.4.0-lite")
+    implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
+    val work_version = "2.9.0"
+    implementation("androidx.work:work-runtime-ktx:$work_version")
     implementation("com.yandex.android:maps.mobile:4.4.0-full")
     implementation("com.airbnb.android:lottie:3.5.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))

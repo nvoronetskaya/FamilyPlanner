@@ -7,17 +7,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderFileBinding
 import com.familyplanner.tasks.model.UserFile
 
-class FileAdapter() :
+class FileAdapter :
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
     private val files = mutableListOf<UserFile>()
 
     inner class FileViewHolder(private val binding: ViewholderFileBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun onBind(position: Int) {
-            binding.tvFileName.text = files[position].name
+        fun onBind(file: UserFile) {
+            binding.tvFileName.text = file.name
             binding.ivRemove.setOnClickListener {
+                val position = files.indexOf(file)
                 files.removeAt(position)
-                notifyDataSetChanged()
+                notifyItemRemoved(position)
             }
         }
     }
@@ -31,7 +32,7 @@ class FileAdapter() :
     override fun getItemCount(): Int = files.size
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
-        holder.onBind(position)
+        holder.onBind(files[position])
     }
 
     fun addFile(uri: Uri, fileName: String, size: Double) {
