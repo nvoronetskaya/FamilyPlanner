@@ -40,8 +40,7 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
                 android:paddingHorizontal="25dp"
-                android:text="@string/almost_ready"
-                android:textColor="?attr/colorOnPrimary" />
+                android:text="@string/almost_ready" />
 
             <TextView
                 style="@style/textBody"
@@ -49,8 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
-                android:text="@string/additional_info"
-                android:textColor="?attr/colorOnPrimary" />
+                android:text="@string/additional_info" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tf_name"
@@ -115,6 +113,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="15dp"
+                android:layout_marginBottom="45dp"
                 android:hint="@string/repeat_password"
                 app:endIconMode="password_toggle">
 
@@ -125,13 +124,18 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <ProgressBar
+                android:id="@+id/pb_loading"
+                style="@style/progressBar"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal" />
+
             <Button
                 android:id="@+id/b_ready"
                 style="@style/filledButton"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="75dp"
-                android:layout_marginTop="45dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/ready" />
 
@@ -141,7 +145,7 @@
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="75dp"
-                android:layout_marginBottom="60dp"
+                android:layout_marginBottom="30dp"
                 android:text="@string/back" />
         </LinearLayout>
     </ScrollView>

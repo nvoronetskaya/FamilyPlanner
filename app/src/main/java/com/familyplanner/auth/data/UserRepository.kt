@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.map
 class UserRepository {
     private val firestore = Firebase.firestore
 
-    fun addUser(name: String, birthday: String, email: String) {
+    fun addUser(name: String, birthday: String, email: String, uid: String) {
         val data = HashMap<String, Any>()
         data["name"] = name
         data["birthday"] = birthday
         data["email"] = email
         data["familyId"] = ""
         data["hasFamily"] = false
-        firestore.collection("users").add(data)
+        firestore.collection("users").document(uid).set(data)
     }
 
     fun getUserByEmail(email: String): Flow<User> =

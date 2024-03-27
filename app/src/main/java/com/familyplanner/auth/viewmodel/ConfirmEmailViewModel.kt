@@ -8,10 +8,11 @@ import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.google.firebase.ktx.Firebase
+import com.sun.mail.smtp.SMTPAddressFailedException
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class ConfirmEmailViewModel : ViewModel() {
-    private val letterSent =  MutableSharedFlow<Boolean>()
+    private val letterSent =  MutableSharedFlow<String>()
     private var firestore = Firebase.firestore
     private var code = ""
 
@@ -21,7 +22,7 @@ class ConfirmEmailViewModel : ViewModel() {
         firestore.collection("users").whereEqualTo("email", address).get().addOnCompleteListener {
                 if (!it.isSuccessful) {
                     viewModelScope.launch {
-                        letterSent.emit(false)
+                        letterSent.emit("Ошибка. Проверьте подключение к сети")
                     }
                 } else {
                     var message = ""
@@ -35,9 +36,14 @@ class ConfirmEmailViewModel : ViewModel() {
                     viewModelScope.launch(Dispatchers.IO) {
                         try {
                             sendSignUpCode(address, message)
-                            letterSent.emit(true)
+                            letterSent.emit("")
                         } catch (e: Exception) {
-                            letterSent.emit(false)
+                            val errorMessage = if (e.cause is SMTPAddressFailedException) {
+                                "Некорректный адрес почты" 
+                            } else {
+                                "Ошибка. Проверьте подключение к сети"
+                            }
+                            letterSent.emit(errorMessage)
                         }
                     }
                 }

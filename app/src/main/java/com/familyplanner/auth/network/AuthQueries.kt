@@ -9,7 +9,6 @@ class AuthQueries {
     private val auth = Firebase.auth
 
     fun signUp(email: String, password: String): Task<AuthResult> {
-
         return auth.createUserWithEmailAndPassword(
             email, password
         )

@@ -38,10 +38,9 @@ class EnterEmailFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getLetterSent().collect { isSuccessful ->
-                    if (isSuccessful) {
+                viewModel.getLetterSent().collect { errorMessage ->
+                    if (errorMessage.isBlank()) {
                         val emailAddress = binding.etEmail.text?.trim().toString()
-
                         val bundle = Bundle()
                         bundle.putString("email", emailAddress)
                         bundle.putString("code", viewModel.getConfirmationCode())
@@ -57,7 +56,7 @@ class EnterEmailFragment : Fragment() {
                             binding.pbLoading.visibility = View.GONE
                             Toast.makeText(
                                 activity,
-                                "Ошибка. Проверьте подключение к интернету и повторите попытку",
+                                errorMessage,
                                 Toast.LENGTH_LONG
                             ).show()
                             binding.bNext.isEnabled = true

@@ -64,6 +64,7 @@ class ProfileFragment : Fragment() {
         binding.etBirthday.setOnClickListener {
             val dialog = DatePickerDialog(
                 activity as MainActivity,
+                R.style.datePickerDialog,
                 { _, year, month, day ->
                     binding.etBirthday.setText(String.format("%d.%02d.%02d", year, month + 1, day))
                 },

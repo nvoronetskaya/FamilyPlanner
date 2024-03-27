@@ -42,14 +42,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        binding.bottomNavigation.visibility = View.VISIBLE
+        binding.bottomNavigation.visibility = View.GONE
 
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         val navController = navHostFragment.navController
-/*        if (Firebase.auth.currentUser != null) {
+        val value = Firebase.auth.currentUser?.uid
+        if (Firebase.auth.currentUser != null) {
             navController.navigate(R.id.action_welcomeFragment_to_noFamilyFragment)
             binding.bottomNavigation.visibility = View.VISIBLE
-        }*/
+        }
         binding.fragmentContainerView.visibility = View.VISIBLE
     }
 }

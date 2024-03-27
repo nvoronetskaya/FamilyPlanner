@@ -27,7 +27,6 @@
         android:gravity="center_horizontal"
         android:paddingHorizontal="25dp"
         android:text="@string/enter_email"
-        android:textColor="?attr/colorOnPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title" />
@@ -81,10 +80,7 @@
 
     <ProgressBar
         android:id="@+id/pb_loading"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginBottom="10dp"
+        style="@style/progressBar"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/b_next"
         app:layout_constraintEnd_toEndOf="parent"

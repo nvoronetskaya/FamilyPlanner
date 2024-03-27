@@ -27,7 +27,6 @@
         android:gravity="center_horizontal"
         android:paddingHorizontal="25dp"
         android:text="@string/enter_email"
-        android:textColor="?attr/colorOnPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title" />
@@ -61,7 +60,6 @@
         android:gravity="center_horizontal"
         android:paddingHorizontal="25dp"
         android:text="@string/enter_code"
-        android:textColor="?attr/colorOnPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tf_email" />
