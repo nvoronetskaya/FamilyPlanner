@@ -2,6 +2,7 @@ package com.familyplanner.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.auth.network.AuthQueries
 import com.google.firebase.FirebaseNetworkException
@@ -31,6 +32,7 @@ class SignUpViewModel : ViewModel() {
                         loggedIn.emit("Ошибка. Попробуйте позднее")
                     } else {
                         loggedIn.emit("")
+                        FamilyPlanner.userId = logIn.user!!.uid
                     }
                 }
             } catch (e: FirebaseNetworkException) {

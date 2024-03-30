@@ -13,11 +13,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.ProfileViewModel
 import com.familyplanner.databinding.FragmentProfileBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -39,9 +41,12 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userId = requireArguments().getString("userId")!!
+        val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
-
+//        val newEmail = arguments?.getString("newEmail")
+//        if (newEmail != null) {
+//            viewModel.changeEmail()
+//        }
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {
@@ -58,7 +63,7 @@ class ProfileFragment : Fragment() {
             binding.ivEdit.visibility = View.GONE
             binding.ivDone.visibility = View.VISIBLE
             binding.etName.isEnabled = true
-            binding.etBirthday.isClickable = true
+            binding.etBirthday.isEnabled = true
         }
 
         binding.etBirthday.setOnClickListener {
@@ -66,7 +71,7 @@ class ProfileFragment : Fragment() {
                 activity as MainActivity,
                 R.style.datePickerDialog,
                 { _, year, month, day ->
-                    binding.etBirthday.setText(String.format("%d.%02d.%02d", year, month + 1, day))
+                    binding.etBirthday.setText(String.format("%02d.%02d.%d", day, month + 1, year))
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -78,10 +83,15 @@ class ProfileFragment : Fragment() {
 
         binding.ivDone.setOnClickListener {
             if (binding.etName.text.isNullOrBlank()) {
-                binding.etName.error = "Имя не может быть пустым"
+                binding.tfName.error = "Имя не может быть пустым"
                 return@setOnClickListener
             }
-
+            binding.tfName.isErrorEnabled = false
+            if (binding.etBirthday.text.isNullOrBlank()) {
+                binding.tfBirthday.error = "Дата рождения не может быть пустой"
+                return@setOnClickListener
+            }
+            binding.tfBirthday.isErrorEnabled = false
             viewModel.updateUserInfo(
                 userId,
                 binding.etName.text!!.trim().toString(),
@@ -91,6 +101,7 @@ class ProfileFragment : Fragment() {
             binding.ivDone.visibility = View.GONE
             binding.ivEdit.visibility = View.VISIBLE
             binding.etName.isEnabled = false
+            binding.etBirthday.isEnabled = false
         }
 
         binding.bExit.setOnClickListener {
@@ -98,6 +109,7 @@ class ProfileFragment : Fragment() {
                 .setMessage("Вы уверены, что хотите выйти?")
                 .setPositiveButton("Да") { _, _ ->
                     viewModel.exit()
+                    (requireActivity() as MainActivity).hideBottomNavigation()
                     findNavController().navigate(R.id.action_profileFragment_to_welcomeFragment)
                 }
                 .setNegativeButton("Отмена") { dialog, _ ->
@@ -106,7 +118,27 @@ class ProfileFragment : Fragment() {
         }
 
         binding.tvChangePassword.setOnClickListener {
-            viewModel.changePassword()
+            lifecycleScope.launch(Dispatchers.IO) {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.changePassword().collect {
+                        requireActivity().runOnUiThread {
+                            if (it.isEmpty()) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Письмо для восстановления пароля направлено на почту",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    it,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         binding.tvChangeEmail.setOnClickListener {
@@ -130,6 +162,8 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+
+        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
     }
 
     override fun onDestroyView() {

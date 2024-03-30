@@ -41,7 +41,7 @@ class SignInFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isLoggedIn().collect {
-                    if (it) {
+                    if (it.isEmpty()) {
                         activity?.runOnUiThread {
                             findNavController().navigate(R.id.action_signInFragment_to_noFamilyFragment)
                         }
@@ -50,7 +50,7 @@ class SignInFragment : Fragment() {
                             binding.bEnter.isEnabled = true
                             Toast.makeText(
                                 activity,
-                                "Ошибка. Проверьте данные и подключение к интернету и повторите попытку",
+                                it,
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -62,15 +62,17 @@ class SignInFragment : Fragment() {
         binding.bEnter.setOnClickListener {
             binding.bEnter.isEnabled = false
             if (binding.etEmail.text.isNullOrBlank()) {
-                binding.etEmail.error = "Введите почту"
+                binding.tfEmail.error = "Введите почту"
                 binding.bEnter.isEnabled = true
+                return@setOnClickListener
             }
-
+            binding.tfEmail.isErrorEnabled = false
             if (binding.etPassword.text.isNullOrBlank()) {
-                binding.etPassword.error = "Введите пароль"
+                binding.tfPassword.error = "Введите пароль"
                 binding.bEnter.isEnabled = true
+                return@setOnClickListener
             }
-
+            binding.tfPassword.isErrorEnabled = false
             viewModel.signIn(
                 binding.etEmail.text!!.trim().toString(),
                 binding.etPassword.text!!.trim().toString()

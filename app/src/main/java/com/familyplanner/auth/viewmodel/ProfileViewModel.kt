@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -11,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ProfileViewModel : ViewModel() {
     private var user = MutableSharedFlow<User>(replay = 1)
@@ -35,8 +37,19 @@ class ProfileViewModel : ViewModel() {
         auth.signOut()
     }
 
-    fun changePassword() {
-        auth.sendPasswordResetEmail(auth.currentUser!!.email!!)
+    fun changePassword(): Flow<String> {
+        val errorMessage = MutableSharedFlow<String>(replay = 1)
+        viewModelScope.launch {
+            try {
+                auth.sendPasswordResetEmail(auth.currentUser!!.email!!).await()
+                errorMessage.emit("")
+            } catch (e: FirebaseNetworkException) {
+                errorMessage.emit("Проверьте соединение и поввторите позднее")
+            } catch (e: Exception) {
+                errorMessage.emit("Ошибка. Попробуйте снова позднее")
+            }
+        }
+        return errorMessage
     }
 
     fun changeEmail(newEmail: String, password: String): Flow<Boolean> {

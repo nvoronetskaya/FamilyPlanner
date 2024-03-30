@@ -48,7 +48,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
             android:visibility="gone"
-            app:srcCompat="@drawable/edit" />
+            app:srcCompat="@drawable/done" />
     </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -89,7 +89,8 @@
             style="@style/editText"
             android:layout_height="wrap_content"
             android:clickable="false"
-            android:enabled="false" />
+            android:enabled="false"
+            android:editable="false" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
