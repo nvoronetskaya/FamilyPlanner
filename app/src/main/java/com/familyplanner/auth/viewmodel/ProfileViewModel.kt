@@ -38,13 +38,13 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun changePassword(): Flow<String> {
-        val errorMessage = MutableSharedFlow<String>(replay = 1)
-        viewModelScope.launch {
+        val errorMessage = MutableSharedFlow<String>()
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 auth.sendPasswordResetEmail(auth.currentUser!!.email!!).await()
                 errorMessage.emit("")
             } catch (e: FirebaseNetworkException) {
-                errorMessage.emit("Проверьте соединение и поввторите позднее")
+                errorMessage.emit("Проверьте соединение и повторите позднее")
             } catch (e: Exception) {
                 errorMessage.emit("Ошибка. Попробуйте снова позднее")
             }
@@ -59,7 +59,7 @@ class ProfileViewModel : ViewModel() {
             password
         )
 
-        val wasSuccessful = MutableSharedFlow<Boolean>(1)
+        val wasSuccessful = MutableSharedFlow<Boolean>()
         currentUser.reauthenticate(credentials).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 currentUser.verifyBeforeUpdateEmail(newEmail)

@@ -119,8 +119,9 @@ class ProfileFragment : Fragment() {
 
         binding.tvChangePassword.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
+                val changePasswordResult = viewModel.changePassword()
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.changePassword().collect {
+                    changePasswordResult.collect {
                         requireActivity().runOnUiThread {
                             if (it.isEmpty()) {
                                 Toast.makeText(
@@ -143,8 +144,9 @@ class ProfileFragment : Fragment() {
 
         binding.tvChangeEmail.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
+                val changeEmailResult = viewModel.changeEmail("", "")
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.changeEmail("", "").collect {
+                    changeEmailResult.collect {
                         if (it) {
                             Toast.makeText(
                                 activity,

@@ -8,6 +8,7 @@ import com.familyplanner.auth.network.AuthQueries
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -19,8 +20,19 @@ class SignInViewModel : ViewModel() {
 
     fun isLoggedIn() = loggedIn
 
-    fun resetPassword(email: String) {
-        auth.resetPassword(email)
+    fun resetPassword(email: String): Flow<String> {
+        val errorMessage = MutableSharedFlow<String>()
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                auth.resetPassword(email).await()
+                errorMessage.emit("")
+            } catch (e: FirebaseNetworkException) {
+                errorMessage.emit("Проверьте соединение и повторите позднее")
+            } catch (e: Exception) {
+                errorMessage.emit("Ошибка. Проверьте данные и попробуйте снова")
+            }
+        }
+        return errorMessage
     }
 
     fun signIn(email: String, password: String) {

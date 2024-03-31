@@ -20,7 +20,7 @@ class AuthQueries {
         )
     }
 
-    fun resetPassword(email: String) {
-        Firebase.auth.sendPasswordResetEmail(email)
+    fun resetPassword(email: String): Task<Void> {
+        return Firebase.auth.sendPasswordResetEmail(email)
     }
 }

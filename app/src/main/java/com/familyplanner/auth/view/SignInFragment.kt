@@ -88,12 +88,37 @@ class SignInFragment : Fragment() {
                     if (email.text.isNullOrBlank()) {
                         email.error = "Введите почту"
                     } else {
-                        viewModel.resetPassword(email.text.trim().toString())
+                        resetPassword(email.text.trim().toString())
                     }
                 }
                 .setNegativeButton("Отмена") { dialog, _ ->
                     dialog.cancel()
                 }.show()
+        }
+    }
+
+    private fun resetPassword(email: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val resetPasswordResult = viewModel.resetPassword(email)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                resetPasswordResult.collect {
+                    requireActivity().runOnUiThread {
+                        if (it.isEmpty()) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Письмо для восстановления пароля направлено на почту",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                it,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
         }
     }
 
