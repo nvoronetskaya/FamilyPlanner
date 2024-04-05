@@ -13,36 +13,34 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.ListResult
-import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
-import com.google.type.DateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
 class TaskRepository {
     private val firestore = Firebase.firestore
     private val storage = Firebase.storage
 
-    fun getCommonTasksForUser(userId: String): Flow<List<Task>> {
-        val tasks = MutableSharedFlow<List<Task>>()
-        firestore.collection("observers").whereEqualTo("userId", userId).snapshots().map {
-            val taskIds = it.map { task -> task.id }
-            firestore.collection("tasks").whereIn(FieldPath.documentId(), taskIds).snapshots()
-                .map { result ->
-                    val queryTasks = mutableListOf<Task>()
-                    for (doc in result.documents) {
-                        val task = doc.toObject(Task::class.java)!!
-                        task.id = doc.id
-                    }
-                    tasks.emit(queryTasks)
+    suspend fun getCommonTasksForUser(userId: String): Flow<List<Task>> {
+        val tasksIds = firestore.collection("observers")
+            .whereEqualTo("userId", userId).get()
+            .await().map { it["taskId"] }
+        return firestore.collection("tasks").whereIn(FieldPath.documentId(), tasksIds).snapshots()
+            .map { result ->
+                val queryTasks = mutableListOf<Task>()
+                for (doc in result.documents) {
+                    val task = doc.toObject(Task::class.java)!!
+                    task.id = doc.id
+                    queryTasks.add(task)
                 }
-        }
-        return tasks
+                queryTasks
+            }
     }
 
-    fun getSharedTasks(userId: String, executorId: String): Flow<List<Task>> {
+    suspend fun getSharedTasks(userId: String, executorId: String): Flow<List<Task>> {
         if (userId.equals(executorId)) {
             return getCommonTasksForUser(userId)
         }
@@ -105,22 +103,32 @@ class TaskRepository {
         return firestore.collection("tasks").add(task)
     }
 
-    fun uploadFiles(files: List<UserFile>, taskId: String): List<UploadTask> {
-        val tasks = mutableListOf<UploadTask>()
+    fun addCreatorObserver(taskId: String, userId: String) {
+        val observer = Observer(userId, false, taskId)
+        firestore.collection("observers").add(observer)
+    }
+
+    suspend fun tryUploadFiles(files: List<UserFile>, taskId: String): Boolean {
+        var isSuccessful = true
         val filesRef = storage.reference.child(taskId)
         for (file in files) {
             val metadata = storageMetadata { setCustomMetadata("name", file.name) }
-            tasks.add(filesRef.putFile(file.uri, metadata))
+            if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
+                isSuccessful = false
+            }
         }
-        return tasks
+        return isSuccessful
     }
 
-    fun addTaskObservers(
+    suspend fun updateTaskObservers(
         taskId: String,
         users: List<User>,
         observers: BooleanArray,
         executors: BooleanArray
     ) {
+        val curObservers =
+            firestore.collection("observers").whereEqualTo("taskId", taskId).get().await()
+        curObservers.forEach { it.reference.delete() }
         for (i in users.indices) {
             if (!observers[i]) {
                 continue
@@ -151,6 +159,11 @@ class TaskRepository {
     }
 
     fun addComment(userId: String, comment: String, createdAt: String) {
-        val data = mapOf<String, String>("userId" to userId, "text" to comment, "createdAt" to createdAt)
+        val data =
+            mapOf<String, String>("userId" to userId, "text" to comment, "createdAt" to createdAt)
+    }
+
+    fun changeTaskCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
+        //TODO()
     }
 }

@@ -14,8 +14,10 @@ class TaskAdapter(val onTaskCompleted: (String, Boolean, String) -> Unit, val us
         RecyclerView.ViewHolder(binding.root) {
         fun onBind(task: Task) {
             binding.tvTask.text = task.title
-            binding.cbIsDone.isChecked = TODO()
-            binding.tvDeadline = TODO()
+//            binding.cbIsDone.isChecked = TODO()
+//            binding.tvDeadline = TODO()
+            binding.cbIsDone.isChecked = false
+            binding.tvDeadline.text = "deadline"
             binding.cbIsDone.setOnCheckedChangeListener { _, isChecked ->
                 onTaskCompleted(task.id, isChecked, userId)
             }
@@ -25,6 +27,7 @@ class TaskAdapter(val onTaskCompleted: (String, Boolean, String) -> Unit, val us
     fun setTasks(tasks: List<Task>) {
         this.tasks.clear()
         this.tasks.addAll(tasks)
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder =

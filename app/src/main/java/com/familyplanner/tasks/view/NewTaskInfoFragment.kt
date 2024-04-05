@@ -20,6 +20,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
@@ -246,7 +247,7 @@ class NewTaskInfoFragment : Fragment() {
         binding.spImportance.setSelection(0)
 
         isPrivate = requireArguments().getBoolean("isPrivate")
-        userId = requireArguments().getString("userId")!!
+        userId = FamilyPlanner.userId
         familyId = requireArguments().getString("familyId")!!
         parentId = requireArguments().getString("parentId")
     }
@@ -276,6 +277,7 @@ class NewTaskInfoFragment : Fragment() {
     private fun setDeadline(calledBySwitch: Boolean = false) {
         val dialog = DatePickerDialog(
             activity as MainActivity,
+            R.style.datePickerDialog,
             { _, year, month, day ->
                 binding.tvDeadline.text = String.format("%02d.%02d.%d", day, month + 1, year)
             },
@@ -295,6 +297,7 @@ class NewTaskInfoFragment : Fragment() {
     private fun setStartDate() {
         val dialog = DatePickerDialog(
             activity as MainActivity,
+            R.style.datePickerDialog,
             { _, year, month, day ->
                 binding.tvRepeatStart.text = String.format("%02d.%02d.%d", day, month + 1, year)
             },
@@ -400,16 +403,16 @@ class NewTaskInfoFragment : Fragment() {
         }
 
         viewModel.createTask(
-            binding.etName.toString(),
+            binding.etName.text!!.trim().toString(),
             binding.swDeadline.isChecked,
-            dateFormatter.parse(binding.tvDeadline.toString()),
+            if (binding.swDeadline.isChecked) dateFormatter.parse(binding.tvDeadline.text.trim().toString()) else null,
             binding.cbContinuousTask.isChecked,
-            if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvStartValue.toString()) else 0,
-            if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvFinishValue.toString()) else 0,
+            if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvStartValue.text.trim().toString()) else 0,
+            if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvFinishValue.text.trim().toString()) else 0,
             type,
             eachNDays,
             weekDays,
-            dateFormatter.parse(binding.tvRepeatStart.toString()),
+            if (type != RepeatType.ONCE) dateFormatter.parse(binding.tvRepeatStart.text.trim().toString()) else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
             binding.swHasLocation.isChecked,
             curPoint,
@@ -421,39 +424,42 @@ class NewTaskInfoFragment : Fragment() {
         )
 
         lifecycleScope.launch(Dispatchers.IO) {
+            val creationResult = viewModel.getCreationStatus()
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getCreationStatus().collect {
-                    when (it) {
-                        TaskCreationStatus.SUCCESS -> if (parentId != null || isPrivate) {
-                            findNavController().popBackStack()
-                        } else {
-                            val bundle = Bundle()
-                            bundle.putString("taskId", viewModel.getCreatedTaskId())
-                            bundle.putString("familyId", familyId)
-                            findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
-                        }
-
-                        TaskCreationStatus.FILE_UPLOAD_FAILED -> {
-                            Toast.makeText(
-                                requireContext(),
-                                "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            if (isPrivate) {
+                creationResult.collect {
+                    requireActivity().runOnUiThread {
+                        when (it) {
+                            TaskCreationStatus.SUCCESS -> if (parentId != null || isPrivate) {
                                 findNavController().popBackStack()
                             } else {
                                 val bundle = Bundle()
                                 bundle.putString("taskId", viewModel.getCreatedTaskId())
                                 bundle.putString("familyId", familyId)
-                                findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment)
+                                findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment, bundle)
                             }
-                        }
 
-                        TaskCreationStatus.FAILED -> Toast.makeText(
-                            requireContext(),
-                            "Ошибка. Проверьте подключение к сети и повторите позднее",
-                            Toast.LENGTH_LONG
-                        ).show()
+                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                if (isPrivate) {
+                                    findNavController().popBackStack()
+                                } else {
+                                    val bundle = Bundle()
+                                    bundle.putString("taskId", viewModel.getCreatedTaskId())
+                                    bundle.putString("familyId", familyId)
+                                    findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment, bundle)
+                                }
+                            }
+
+                            TaskCreationStatus.FAILED -> Toast.makeText(
+                                requireContext(),
+                                "Ошибка. Проверьте подключение к сети и повторите позднее",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 }
             }

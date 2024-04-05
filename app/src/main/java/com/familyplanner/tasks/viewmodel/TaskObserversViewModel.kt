@@ -26,6 +26,8 @@ class TaskObserversViewModel : ViewModel() {
     }
 
     fun setObserversAndExecutors(members: List<User>, observers: BooleanArray, executors: BooleanArray, taskId: String) {
-        tasksRepo.addTaskObservers(taskId, members, observers, executors)
+        viewModelScope.launch(Dispatchers.IO) {
+            tasksRepo.updateTaskObservers(taskId, members, observers, executors)
+        }
     }
 }

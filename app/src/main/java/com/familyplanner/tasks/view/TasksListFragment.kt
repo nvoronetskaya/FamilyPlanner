@@ -1,9 +1,15 @@
 package com.familyplanner.tasks.view
 
+import android.Manifest
+import android.app.AlertDialog
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -11,10 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.BottomsheetTaskFiltersBinding
 import com.familyplanner.databinding.FragmentTasksListBinding
+import com.familyplanner.tasks.adapters.TaskAdapter
 import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.SortingType
 import com.familyplanner.tasks.viewmodel.TasksListViewModel
@@ -39,25 +47,27 @@ class TasksListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val userId = requireArguments().getString("userId") ?: ""
-        binding.rvTasks.layoutManager = LinearLayoutManager(activity)
+        val userId = FamilyPlanner.userId
+        val familyId = requireArguments().getString("familyId")
         viewModel = ViewModelProvider(this)[TasksListViewModel::class.java]
+        val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId)
+        binding.rvTasks.layoutManager = LinearLayoutManager(activity)
+        binding.rvTasks.adapter = tasksAdapter
         viewModel.setUser(userId)
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getTasks().collect {
-                    if (it.isEmpty()) {
-                        activity?.runOnUiThread {
-                            binding.rvTasks.visibility = View.GONE
-                            binding.ivNoTasks.visibility = View.VISIBLE
-                            binding.tvNoTasks.visibility = View.VISIBLE
-                        }
-                    } else {
-                        activity?.runOnUiThread {
-                            binding.rvTasks.visibility = View.VISIBLE
-                            binding.ivNoTasks.visibility = View.GONE
-                            binding.tvNoTasks.visibility = View.GONE
-                        }
+                    activity?.runOnUiThread {
+//                        if (it.isEmpty()) {
+//                            binding.rvTasks.visibility = View.GONE
+//                            binding.ivNoTasks.visibility = View.VISIBLE
+//                            binding.tvNoTasks.visibility = View.VISIBLE
+//                        } else {
+//                            binding.rvTasks.visibility = View.VISIBLE
+//                            binding.ivNoTasks.visibility = View.GONE
+//                            binding.tvNoTasks.visibility = View.GONE
+//                        }
+                        tasksAdapter.setTasks(it)
                     }
                 }
             }
@@ -66,10 +76,39 @@ class TasksListFragment : Fragment() {
             showFiltersBottomSheet()
         }
         binding.fabAdd.setOnClickListener {
-            findNavController().navigate(R.id.action_tasksListFragment_to_newTaskInfoFragment)
+            val bundle = Bundle()
+            bundle.putBoolean("isPrivate", false)
+            bundle.putString("parentId", null)
+            bundle.putString("familyId", familyId)
+            findNavController().navigate(
+                R.id.action_tasksListFragment_to_newTaskInfoFragment,
+                bundle
+            )
         }
         binding.ivPerson.setOnClickListener {
-            findNavController().navigate(R.id.action_tasksListFragment_to_profileFragment) 
+            findNavController().navigate(R.id.action_tasksListFragment_to_profileFragment)
+        }
+        askNotificationPermission()
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                registerForActivityResult(
+                    ActivityResultContracts.RequestPermission(),
+                ) { isGranted: Boolean ->
+                    if (!isGranted) {
+                        AlertDialog.Builder(requireContext()).setTitle("Важно")
+                            .setMessage("Вы не будете получать уведомления о новых задачах")
+                            .create().show()
+                    }
+                }
+            }
         }
     }
 
@@ -137,8 +176,12 @@ class TasksListFragment : Fragment() {
             viewModel.setLocationFilter(if ((it as Chip).isChecked) false else null)
         }
         when (viewModel.getSortingType()) {
-            SortingType.IMPORTANCE_ASC -> filtersBinding.sortImportanceAscending.isChecked = true
-            SortingType.IMPORTANCE_DESC -> filtersBinding.sortImportanceDescending.isChecked = true
+            SortingType.IMPORTANCE_ASC -> filtersBinding.sortImportanceAscending.isChecked =
+                true
+
+            SortingType.IMPORTANCE_DESC -> filtersBinding.sortImportanceDescending.isChecked =
+                true
+
             SortingType.DEADLINE_ASC -> filtersBinding.sortDeadlineAscending.isChecked = true
             SortingType.DEADLINE_DESC -> filtersBinding.sortDeadlineDescending.isChecked = true
             SortingType.NONE -> filtersBinding.sortingGroup.clearCheck()

@@ -59,7 +59,7 @@ class ShowTaskInfoFragment : Fragment() {
         var task: Task? = null
         val commentsAdapter = CommentsListAdapter(::downloadFile, userId)
         val observersAdapter = ObserversListAdapter(userId)
-        val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId)
+        //val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId)
         val filesAdapter = ObserveFilesAdapter(::downloadFile)
         binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
         binding.rvComment.adapter = commentsAdapter
@@ -81,9 +81,9 @@ class ShowTaskInfoFragment : Fragment() {
                 viewModel.getObservers().collect {
                     observersAdapter.setObservers(it)
                 }
-                viewModel.getSubtasks().collect {
-                    subtasksAdapter.setTasks(it)
-                }
+//                viewModel.getSubtasks().collect {
+//                    subtasksAdapter.setTasks(it)
+//                }
                 viewModel.getFiles().collect {
                     if (it == null) {
                         requireActivity().runOnUiThread {
@@ -129,7 +129,7 @@ class ShowTaskInfoFragment : Fragment() {
                 binding.etComment.error = "Текст комментария не может быть пустым"
                 return@setOnClickListener
             }
-            viewModel.addComment(userId, comment.trim()).
+            //viewModel.addComment(userId, comment.trim()).
         }
     }
 

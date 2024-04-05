@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.Date
 
 class NewTaskViewModel : ViewModel() {
@@ -73,14 +74,14 @@ class NewTaskViewModel : ViewModel() {
     fun createTask(
         title: String,
         hasDeadline: Boolean,
-        deadline: Date,
+        deadline: Date?,
         isContinuous: Boolean,
         startTime: Int,
         finishTime: Int,
         repeatType: RepeatType,
         nDays: Int,
         daysOfWeek: Int,
-        repeatStart: Date,
+        repeatStart: Date?,
         importance: Importance,
         hasLocation: Boolean,
         location: Point?,
@@ -93,43 +94,41 @@ class NewTaskViewModel : ViewModel() {
         val newTask = Task()
         newTask.title = title
         newTask.hasDeadline = hasDeadline
-        newTask.deadline = deadline.toString()
+        newTask.deadline = deadline?.toString() ?: ""
         newTask.isContinuous = isContinuous
         newTask.startTime = startTime
         newTask.finishTime = finishTime
         newTask.repeatType = repeatType
         newTask.nDays = nDays
         newTask.daysOfWeek = daysOfWeek
-        newTask.repeatStart = repeatStart.toString()
+        newTask.repeatStart = repeatStart?.toString() ?: ""
         newTask.importance = importance
         newTask.hasLocation = hasLocation
-        newTask.location = if (location != null) GeoPoint(location.latitude, location.longitude) else null
+        newTask.location =
+            if (location != null) GeoPoint(location.latitude, location.longitude) else null
         newTask.isPrivate = isPrivate
         newTask.createdBy = userId
         newTask.familyId = familyId
         newTask.parentId = parentId
 
         tasksRepo.addTask(newTask).addOnCompleteListener {
-            var result: TaskCreationStatus
-            if (!it.isSuccessful) {
-                result = TaskCreationStatus.FAILED
-            } else {
-                createdTaskId = it.result.id
-                if (files != null) {
-                    this.uploadTasks = tasksRepo.uploadFiles(files, it.result.id)
-                    while (!uploadTasks.all { task -> task.isComplete }) {
-                    }
-                    result = if (uploadTasks.any { task -> !task.isSuccessful }) {
-                        TaskCreationStatus.FILE_UPLOAD_FAILED
-                    } else {
-                        TaskCreationStatus.SUCCESS
-                    }
-                } else {
-                    result = TaskCreationStatus.SUCCESS
-                }
-            }
-
             viewModelScope.launch(Dispatchers.IO) {
+                var result: TaskCreationStatus
+                if (!it.isSuccessful) {
+                    result = TaskCreationStatus.FAILED
+                } else {
+                    createdTaskId = it.result.id
+                    tasksRepo.addCreatorObserver(createdTaskId!!, userId)
+                    if (files != null) {
+                        result = if (!tasksRepo.tryUploadFiles(files, it.result.id)) {
+                            TaskCreationStatus.FILE_UPLOAD_FAILED
+                        } else {
+                            TaskCreationStatus.SUCCESS
+                        }
+                    } else {
+                        result = TaskCreationStatus.SUCCESS
+                    }
+                }
                 addTask.emit(result)
             }
         }

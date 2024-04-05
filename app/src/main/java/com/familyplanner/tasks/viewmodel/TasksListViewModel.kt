@@ -12,11 +12,10 @@ import com.familyplanner.tasks.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class TasksListViewModel : ViewModel() {
-    private val filteredTasks = MutableStateFlow<List<Task>>(listOf())
+    private val filteredTasks = MutableSharedFlow<List<Task>>()
     private val allTasks = mutableListOf<Task>()
     private var userId: String = ""
     private val users = mutableListOf<User>()
@@ -30,18 +29,6 @@ class TasksListViewModel : ViewModel() {
     private var importanceFilter: Importance? = null
     private var userFilterId: String? = null
 
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            userFilter.collect {
-                taskRepo.getSharedTasks(userId, it).collect { tasks ->
-                    allTasks.clear()
-                    allTasks.addAll(tasks)
-                    filteredTasks.emit(applyFilters())
-                }
-            }
-        }
-    }
-
     fun setUser(userId: String) {
         this.userId = userId
         viewModelScope.launch(Dispatchers.IO) {
@@ -50,6 +37,15 @@ class TasksListViewModel : ViewModel() {
                 familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
                     users.clear()
                     users.addAll(members)
+                }
+            }
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            userFilter.collect {
+                taskRepo.getSharedTasks(userId, it).collect { tasks ->
+                    allTasks.clear()
+                    allTasks.addAll(tasks)
+                    filteredTasks.emit(applyFilters())
                 }
             }
         }
@@ -107,5 +103,9 @@ class TasksListViewModel : ViewModel() {
             SortingType.DEADLINE_ASC -> result.sortedBy { it.deadline }
             SortingType.DEADLINE_DESC -> result.sortedByDescending { it.deadline }
         }
+    }
+
+    fun changeCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
+        taskRepo.changeTaskCompleted(taskId, isCompleted, completedById)
     }
 }

@@ -44,7 +44,7 @@ class NoFamilyFragment : Fragment() {
                         activity?.runOnUiThread {
                             binding.pbLoading.visibility = View.GONE
                             val bundle = Bundle()
-                            bundle.putString("userId", it.id)
+                            bundle.putString("familyId", it.familyId)
                             findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment, bundle)
                         }
                     } else {
