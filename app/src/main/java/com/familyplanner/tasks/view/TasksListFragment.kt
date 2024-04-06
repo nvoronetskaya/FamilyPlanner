@@ -58,15 +58,15 @@ class TasksListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getTasks().collect {
                     activity?.runOnUiThread {
-//                        if (it.isEmpty()) {
-//                            binding.rvTasks.visibility = View.GONE
-//                            binding.ivNoTasks.visibility = View.VISIBLE
-//                            binding.tvNoTasks.visibility = View.VISIBLE
-//                        } else {
-//                            binding.rvTasks.visibility = View.VISIBLE
-//                            binding.ivNoTasks.visibility = View.GONE
-//                            binding.tvNoTasks.visibility = View.GONE
-//                        }
+                        if (it.isEmpty()) {
+                            binding.rvTasks.visibility = View.GONE
+                            binding.ivNoTasks.visibility = View.VISIBLE
+                            binding.tvNoTasks.visibility = View.VISIBLE
+                        } else {
+                            binding.rvTasks.visibility = View.VISIBLE
+                            binding.ivNoTasks.visibility = View.GONE
+                            binding.tvNoTasks.visibility = View.GONE
+                        }
                         tasksAdapter.setTasks(it)
                     }
                 }
@@ -88,7 +88,6 @@ class TasksListFragment : Fragment() {
         binding.ivPerson.setOnClickListener {
             findNavController().navigate(R.id.action_tasksListFragment_to_profileFragment)
         }
-        askNotificationPermission()
     }
 
     private fun askNotificationPermission() {

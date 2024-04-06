@@ -39,6 +39,10 @@ import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 
 class NewTaskInfoFragment : Fragment() {
@@ -312,16 +316,17 @@ class NewTaskInfoFragment : Fragment() {
     private fun setTime(isStartTime: Boolean, calledByCheckbox: Boolean = false) {
         val dialog = TimePickerDialog(
             activity,
+            R.style.datePickerDialog,
             { _, hour, minute ->
                 if (isStartTime) {
                     binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
 
-                    if (getTimeFromString(binding.tvFinishTime.text.toString()) < hour * 60 + minute) {
+                    if (binding.tvFinishTime.text.isNullOrBlank() || getTimeFromString(binding.tvFinishValue.text.toString()) < hour * 60 + minute) {
                         binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
                     }
                 } else {
                     binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
-                    if (getTimeFromString(binding.tvStartValue.text.toString()) > hour * 60 + minute) {
+                    if (binding.tvStartValue.text.isNullOrBlank() || getTimeFromString(binding.tvStartValue.text.toString()) > hour * 60 + minute) {
                         binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
                     }
                 }
@@ -343,7 +348,7 @@ class NewTaskInfoFragment : Fragment() {
     }
 
     private fun getTimeFromString(textTime: String): Int {
-        if (textTime.isNullOrBlank()) {
+        if (textTime.isBlank()) {
             return -1
         }
 
@@ -405,14 +410,22 @@ class NewTaskInfoFragment : Fragment() {
         viewModel.createTask(
             binding.etName.text!!.trim().toString(),
             binding.swDeadline.isChecked,
-            if (binding.swDeadline.isChecked) dateFormatter.parse(binding.tvDeadline.text.trim().toString()) else null,
+            if (binding.swDeadline.isChecked) LocalDate.parse(
+                binding.tvDeadline.text.trim().toString(), FamilyPlanner.uiDateFormatter
+            ).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() else null,
             binding.cbContinuousTask.isChecked,
-            if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvStartValue.text.trim().toString()) else 0,
-            if (binding.cbContinuousTask.isChecked) getTimeFromString(binding.tvFinishValue.text.trim().toString()) else 0,
+            if (binding.cbContinuousTask.isChecked) getTimeFromString(
+                binding.tvStartValue.text.trim().toString()
+            ) else 0,
+            if (binding.cbContinuousTask.isChecked) getTimeFromString(
+                binding.tvFinishValue.text.trim().toString()
+            ) else 0,
             type,
             eachNDays,
             weekDays,
-            if (type != RepeatType.ONCE) dateFormatter.parse(binding.tvRepeatStart.text.trim().toString()) else null,
+            if (type != RepeatType.ONCE) LocalDate.parse(
+                binding.tvRepeatStart.text.trim().toString(), FamilyPlanner.uiDateFormatter
+            ).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
             binding.swHasLocation.isChecked,
             curPoint,
@@ -435,7 +448,10 @@ class NewTaskInfoFragment : Fragment() {
                                 val bundle = Bundle()
                                 bundle.putString("taskId", viewModel.getCreatedTaskId())
                                 bundle.putString("familyId", familyId)
-                                findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment, bundle)
+                                findNavController().navigate(
+                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                    bundle
+                                )
                             }
 
                             TaskCreationStatus.FILE_UPLOAD_FAILED -> {
@@ -450,7 +466,10 @@ class NewTaskInfoFragment : Fragment() {
                                     val bundle = Bundle()
                                     bundle.putString("taskId", viewModel.getCreatedTaskId())
                                     bundle.putString("familyId", familyId)
-                                    findNavController().navigate(R.id.action_newTaskInfoFragment_to_newTaskObserversFragment, bundle)
+                                    findNavController().navigate(
+                                        R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                        bundle
+                                    )
                                 }
                             }
 

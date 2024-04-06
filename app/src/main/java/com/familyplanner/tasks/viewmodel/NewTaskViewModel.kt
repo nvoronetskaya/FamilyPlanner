@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 import java.util.Date
 
 class NewTaskViewModel : ViewModel() {
@@ -74,14 +75,14 @@ class NewTaskViewModel : ViewModel() {
     fun createTask(
         title: String,
         hasDeadline: Boolean,
-        deadline: Date?,
+        deadline: Long?,
         isContinuous: Boolean,
         startTime: Int,
         finishTime: Int,
         repeatType: RepeatType,
         nDays: Int,
         daysOfWeek: Int,
-        repeatStart: Date?,
+        repeatStart: Long?,
         importance: Importance,
         hasLocation: Boolean,
         location: Point?,
@@ -94,14 +95,14 @@ class NewTaskViewModel : ViewModel() {
         val newTask = Task()
         newTask.title = title
         newTask.hasDeadline = hasDeadline
-        newTask.deadline = deadline?.toString() ?: ""
+        newTask.deadline = deadline
         newTask.isContinuous = isContinuous
         newTask.startTime = startTime
         newTask.finishTime = finishTime
         newTask.repeatType = repeatType
         newTask.nDays = nDays
         newTask.daysOfWeek = daysOfWeek
-        newTask.repeatStart = repeatStart?.toString() ?: ""
+        newTask.repeatStart = repeatStart
         newTask.importance = importance
         newTask.hasLocation = hasLocation
         newTask.location =

@@ -6,13 +6,16 @@ import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
 import com.familyplanner.tasks.model.Importance
+import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.SortingType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class TasksListViewModel : ViewModel() {
     private val filteredTasks = MutableSharedFlow<List<Task>>()
@@ -28,6 +31,7 @@ class TasksListViewModel : ViewModel() {
     private val userFilter = MutableSharedFlow<String>(replay = 1)
     private var importanceFilter: Importance? = null
     private var userFilterId: String? = null
+    private var curDate: LocalDate = LocalDate.now()
 
     fun setUser(userId: String) {
         this.userId = userId
@@ -77,6 +81,23 @@ class TasksListViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             userFilter.emit(userFilterId ?: userId)
         }
+    }
+
+    fun getTasksForDate(date: LocalDate) {
+//        val today = LocalDate.now()
+//        val curAllTasks = filteredTasks.replayCache.lastOrNull() ?: return
+//        val tasksForDate = mutableListOf<Task>()
+//        for (task in tasksForDate) {
+//            when (task.repeatType) {
+//                RepeatType.ONCE -> {
+//                    if (today.equals(date)) {
+//
+//                    } else if (task.deadline?.equals(date) == true) {
+//
+//                    }
+//                }
+//            }
+//        }
     }
 
     fun getUsers(): List<User> = users

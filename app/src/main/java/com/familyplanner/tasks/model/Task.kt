@@ -6,26 +6,26 @@ data class Task(
     var id: String,
     var title: String,
     var hasDeadline: Boolean,
-    var deadline: String,
+    var deadline: Long?,
     var isContinuous: Boolean,
     var startTime: Int,
     var finishTime: Int,
     var repeatType: RepeatType,
     var nDays: Int,
     var daysOfWeek: Int,
-    var repeatStart: String,
+    var repeatStart: Long?,
     var importance: Importance,
     var hasLocation: Boolean,
     var location: GeoPoint?,
     var isPrivate: Boolean,
     var createdBy: String,
     var familyId: String,
-    var lastCompletionDate: String?,
+    var lastCompletionDate: Long?,
     var parentId: String?
 ) {
     constructor() : this(
-        "", "", false, "", false, 0,
-        0, RepeatType.ONCE, 0, 0, "", Importance.HIGH,
-        false, GeoPoint(0.0, 0.0), false, "", "", "", null
+        "", "", false, System.currentTimeMillis(), false, 0,
+        0, RepeatType.ONCE, 0, 0, System.currentTimeMillis(), Importance.HIGH,
+        false, GeoPoint(0.0, 0.0), false, "", "", System.currentTimeMillis(), null
     )
 }
