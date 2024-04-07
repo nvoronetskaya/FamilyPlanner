@@ -412,7 +412,7 @@ class NewTaskInfoFragment : Fragment() {
             binding.swDeadline.isChecked,
             if (binding.swDeadline.isChecked) LocalDate.parse(
                 binding.tvDeadline.text.trim().toString(), FamilyPlanner.uiDateFormatter
-            ).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() else null,
+            ).toEpochDay() else null,
             binding.cbContinuousTask.isChecked,
             if (binding.cbContinuousTask.isChecked) getTimeFromString(
                 binding.tvStartValue.text.trim().toString()
@@ -425,7 +425,7 @@ class NewTaskInfoFragment : Fragment() {
             weekDays,
             if (type != RepeatType.ONCE) LocalDate.parse(
                 binding.tvRepeatStart.text.trim().toString(), FamilyPlanner.uiDateFormatter
-            ).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() else null,
+            ).toEpochDay() else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
             binding.swHasLocation.isChecked,
             curPoint,

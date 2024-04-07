@@ -15,12 +15,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentTaskInfoBinding
 import com.familyplanner.tasks.adapters.CommentsListAdapter
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import com.familyplanner.tasks.adapters.ObserversListAdapter
-import com.familyplanner.tasks.adapters.TaskAdapter
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
@@ -52,7 +52,7 @@ class ShowTaskInfoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val taskId = requireArguments().getString("taskId")!!
-        userId = requireArguments().getString("userId")!!
+        userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[TaskInfoViewModel::class.java]
         viewModel.setTask(taskId)
 
@@ -73,7 +73,9 @@ class ShowTaskInfoFragment : Fragment() {
                         return@collect
                     }
                     task = it
-                    bindTask(it)
+                    requireActivity().runOnUiThread {
+                        bindTask(it)
+                    }
                 }
                 viewModel.getComments().collect {
                     commentsAdapter.setComments(it)

@@ -24,8 +24,8 @@ data class Task(
     var parentId: String?
 ) {
     constructor() : this(
-        "", "", false, System.currentTimeMillis(), false, 0,
-        0, RepeatType.ONCE, 0, 0, System.currentTimeMillis(), Importance.HIGH,
-        false, GeoPoint(0.0, 0.0), false, "", "", System.currentTimeMillis(), null
+        "", "", false, null, false, 0,
+        0, RepeatType.ONCE, 0, 0, null, Importance.HIGH,
+        false, GeoPoint(0.0, 0.0), false, "", "", null, null
     )
 }

@@ -11,7 +11,6 @@ class FamilyPlanner: Application() {
         var isInit = false
         var userId = Firebase.auth.currentUser?.uid ?: ""
         val uiDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val dbDateFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd")
     }
     override fun onCreate() {
         super.onCreate()

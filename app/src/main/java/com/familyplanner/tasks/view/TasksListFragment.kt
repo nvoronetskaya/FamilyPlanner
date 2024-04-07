@@ -2,6 +2,8 @@ package com.familyplanner.tasks.view
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -10,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -30,11 +33,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.util.Calendar
 
 class TasksListFragment : Fragment() {
     private var _binding: FragmentTasksListBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: TasksListViewModel
+    private val calendar = Calendar.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +56,7 @@ class TasksListFragment : Fragment() {
         val userId = FamilyPlanner.userId
         val familyId = requireArguments().getString("familyId")
         viewModel = ViewModelProvider(this)[TasksListViewModel::class.java]
-        val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId)
+        val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, true)
         binding.rvTasks.layoutManager = LinearLayoutManager(activity)
         binding.rvTasks.adapter = tasksAdapter
         viewModel.setUser(userId)
@@ -88,6 +94,44 @@ class TasksListFragment : Fragment() {
         binding.ivPerson.setOnClickListener {
             findNavController().navigate(R.id.action_tasksListFragment_to_profileFragment)
         }
+        binding.tvDate.text = String.format(
+            "%02d.%02d.%d",
+            calendar.get(Calendar.DAY_OF_MONTH),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.YEAR)
+        )
+        binding.tvDate.setOnClickListener {
+            val dialog = DatePickerDialog(
+                activity as MainActivity,
+                R.style.datePickerDialog,
+                { _, year, month, day ->
+                    binding.tvDate.text = String.format("%02d.%02d.%d", day, month + 1, year)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            dialog.setButton(
+                DialogInterface.BUTTON_POSITIVE, "Ок"
+            ) { _, _ ->
+                val newDate = LocalDate.of(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1,
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+                viewModel.getTasksForDate(newDate)
+                tasksAdapter.canCheck = newDate.toEpochDay().equals(LocalDate.now().toEpochDay())
+            }
+            dialog.datePicker.minDate = calendar.timeInMillis
+            dialog.show()
+        }
+    }
+
+    private fun onTaskClicked(taskId: String) {
+        findNavController().navigate(
+            R.id.action_tasksListFragment_to_showTaskInfoFragment,
+            bundleOf("taskId" to taskId)
+        )
     }
 
     private fun askNotificationPermission() {

@@ -2,29 +2,43 @@ package com.familyplanner.tasks.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderTaskBinding
-import com.familyplanner.tasks.model.Task
+import com.familyplanner.tasks.dto.TaskWithDate
+import com.familyplanner.tasks.model.RepeatType
+import java.time.LocalDate
 
-class TaskAdapter(val onTaskCompleted: (String, Boolean, String) -> Unit, val userId: String) :
+class TaskAdapter(
+    val onTaskCompleted: (String, Boolean, String) -> Unit,
+    val userId: String,
+    val onClick: (String) -> Unit,
+    var canCheck: Boolean
+) :
     RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
-    private val tasks = mutableListOf<Task>()
+    private val tasks = mutableListOf<TaskWithDate>()
 
     inner class TaskViewHolder(val binding: ViewholderTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun onBind(task: Task) {
-            binding.tvTask.text = task.title
-//            binding.cbIsDone.isChecked = TODO()
-//            binding.tvDeadline = TODO()
-            binding.cbIsDone.isChecked = false
-            binding.tvDeadline.text = "deadline"
+        fun onBind(task: TaskWithDate) {
+            binding.tvTask.text = task.task.title
+            binding.cbIsDone.isChecked =
+                task.task.lastCompletionDate != null && (task.task.repeatType == RepeatType.ONCE || task.task.lastCompletionDate == LocalDate.now()
+                    .toEpochDay())
+            binding.tvDeadline.isVisible = task.date != null
+            binding.tvDeadline.text = if (task.date != null) FamilyPlanner.uiDateFormatter.format(
+                LocalDate.ofEpochDay(task.date!!)
+            ) else ""
+            binding.cbIsDone.isClickable = canCheck
             binding.cbIsDone.setOnCheckedChangeListener { _, isChecked ->
-                onTaskCompleted(task.id, isChecked, userId)
+                onTaskCompleted(task.task.id, isChecked, userId)
             }
+            binding.root.setOnClickListener { onClick(task.task.id) }
         }
     }
 
-    fun setTasks(tasks: List<Task>) {
+    fun setTasks(tasks: List<TaskWithDate>) {
         this.tasks.clear()
         this.tasks.addAll(tasks)
         notifyDataSetChanged()
