@@ -2,7 +2,6 @@ package com.familyplanner.tasks.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderTaskBinding
@@ -14,7 +13,7 @@ class TaskAdapter(
     val onTaskCompleted: (String, Boolean, String) -> Unit,
     val userId: String,
     val onClick: (String) -> Unit,
-    var canCheck: Boolean
+    var day: Long
 ) :
     RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
     private val tasks = mutableListOf<TaskWithDate>()
@@ -26,11 +25,10 @@ class TaskAdapter(
             binding.cbIsDone.isChecked =
                 task.task.lastCompletionDate != null && (task.task.repeatType == RepeatType.ONCE || task.task.lastCompletionDate == LocalDate.now()
                     .toEpochDay())
-            binding.tvDeadline.isVisible = task.date != null
             binding.tvDeadline.text = if (task.date != null) FamilyPlanner.uiDateFormatter.format(
                 LocalDate.ofEpochDay(task.date!!)
             ) else ""
-            binding.cbIsDone.isClickable = canCheck
+            binding.cbIsDone.isClickable = task.date != null && task.date!! <= day || task.task.repeatType == RepeatType.ONCE
             binding.cbIsDone.setOnCheckedChangeListener { _, isChecked ->
                 onTaskCompleted(task.task.id, isChecked, userId)
             }

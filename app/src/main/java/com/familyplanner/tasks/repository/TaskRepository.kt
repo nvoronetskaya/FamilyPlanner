@@ -3,6 +3,7 @@ package com.familyplanner.tasks.repository
 import android.net.Uri
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.common.User
+import com.familyplanner.tasks.dto.CommentDto
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.familyplanner.tasks.model.Comment
 import com.familyplanner.tasks.model.Observer
@@ -30,7 +31,7 @@ class TaskRepository {
         val tasksIds = firestore.collection("observers")
             .whereEqualTo("userId", userId).get()
             .await().map { it["taskId"] }
-        return firestore.collection("tasks").whereIn(FieldPath.documentId(), tasksIds).snapshots()
+        return firestore.collection("tasks").whereEqualTo("parentId", null).whereIn(FieldPath.documentId(), tasksIds).snapshots()
             .map { result ->
                 val queryTasks = mutableListOf<Task>()
                 for (doc in result.documents) {
@@ -55,6 +56,9 @@ class TaskRepository {
                     for (doc in result.documents) {
                         val task = doc.toObject(Task::class.java)!!
                         task.id = doc.id
+                        if (task.parentId != null) {
+                            queryTasks.add(task)
+                        }
                     }
                     tasks.emit(queryTasks)
                 }
@@ -70,15 +74,19 @@ class TaskRepository {
         }
     }
 
-    fun getTaskComments(taskId: String): Flow<List<Comment>> {
+    fun getTaskComments(taskId: String): Flow<List<CommentDto>> {
         return firestore.collection("comments").whereEqualTo("taskId", taskId).snapshots().map {
-            val comments = mutableListOf<Comment>()
+            val comments = mutableListOf<CommentDto>()
             for (doc in it.documents) {
-                val comment = Comment(
+                val userName = firestore.collection("users").document(doc["userId"].toString()).get().await()["name"].toString()
+                val files = storage.reference.child(doc.id).listAll().await().items.map { it.path }
+                val comment = CommentDto(
                     doc.id,
+                    doc["userId"].toString(),
+                    userName,
+                    doc.getLong("createdAt")!!,
                     doc["text"].toString(),
-                    doc["createdAt"].toString(),
-                    doc["userId"].toString()
+                    files
                 )
                 comments.add(comment)
             }
@@ -160,9 +168,10 @@ class TaskRepository {
         return storage.reference.child(path).downloadUrl
     }
 
-    fun addComment(userId: String, comment: String, createdAt: String) {
+    fun addComment(userId: String, comment: String): GoogleTask<DocumentReference> {
         val data =
-            mapOf<String, String>("userId" to userId, "text" to comment, "createdAt" to createdAt)
+            mapOf<String, Any>("userId" to userId, "text" to comment, "createdAt" to System.currentTimeMillis())
+        return firestore.collection("comments").add(data)
     }
 
     fun changeTaskCompleted(taskId: String, isCompleted: Boolean, completedById: String) {

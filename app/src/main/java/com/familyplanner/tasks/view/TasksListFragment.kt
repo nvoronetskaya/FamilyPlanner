@@ -56,7 +56,7 @@ class TasksListFragment : Fragment() {
         val userId = FamilyPlanner.userId
         val familyId = requireArguments().getString("familyId")
         viewModel = ViewModelProvider(this)[TasksListViewModel::class.java]
-        val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, true)
+        val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, LocalDate.now().toEpochDay())
         binding.rvTasks.layoutManager = LinearLayoutManager(activity)
         binding.rvTasks.adapter = tasksAdapter
         viewModel.setUser(userId)
@@ -120,7 +120,7 @@ class TasksListFragment : Fragment() {
                     calendar.get(Calendar.DAY_OF_MONTH)
                 )
                 viewModel.getTasksForDate(newDate)
-                tasksAdapter.canCheck = newDate.toEpochDay().equals(LocalDate.now().toEpochDay())
+                tasksAdapter.day = newDate.toEpochDay()
             }
             dialog.datePicker.minDate = calendar.timeInMillis
             dialog.show()

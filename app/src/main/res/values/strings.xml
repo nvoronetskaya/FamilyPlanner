@@ -44,9 +44,9 @@
     <string name="task_title">Название</string>
     <string name="deadline">Срок исполнения</string>
     <string name="continuous_task">Длительная задача</string>
-    <string name="start_time">Время начала:</string>
-    <string name="finish_time">Время окончания:</string>
-    <string name="repeat_task">Повторять задачу:</string>
+    <string name="start_time">Время начала: </string>
+    <string name="finish_time">Время окончания: </string>
+    <string name="repeat_task">Повторять задачу: </string>
     <string name="once">один раз</string>
     <string name="every_day">каждый день</string>
     <string name="every">каждые</string>

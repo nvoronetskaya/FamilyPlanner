@@ -5,22 +5,13 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.familyplanner.R
-import com.familyplanner.auth.data.DataUpdatesWorker
 import com.familyplanner.databinding.FragmentWelcomeBinding
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
-import java.util.concurrent.TimeUnit
 
 class WelcomeFragment : Fragment()  {
     private var _binding: FragmentWelcomeBinding? = null

@@ -50,7 +50,6 @@ class NewTaskInfoFragment : Fragment() {
     private val binding get() = _binding!!
     private val calendar = Calendar.getInstance()
     private lateinit var viewModel: NewTaskViewModel
-    private val dateFormatter = SimpleDateFormat("dd.MM.yyyy")
     private var bottomSheet: BottomSheetDialog? = null
     private val ATTACH_FILES = 10
     private lateinit var filesAdapter: FileAdapter

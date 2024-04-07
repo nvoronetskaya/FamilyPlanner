@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -21,6 +22,7 @@ import com.familyplanner.databinding.FragmentTaskInfoBinding
 import com.familyplanner.tasks.adapters.CommentsListAdapter
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import com.familyplanner.tasks.adapters.ObserversListAdapter
+import com.familyplanner.tasks.adapters.TaskAdapter
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
@@ -30,13 +32,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 
 class ShowTaskInfoFragment : Fragment() {
     private var _binding: FragmentTaskInfoBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: TaskInfoViewModel
-    private val formatter = SimpleDateFormat("dd.MM.yyyy")
     private lateinit var userId: String
 
     override fun onCreateView(
@@ -59,7 +61,7 @@ class ShowTaskInfoFragment : Fragment() {
         var task: Task? = null
         val commentsAdapter = CommentsListAdapter(::downloadFile, userId)
         val observersAdapter = ObserversListAdapter(userId)
-        //val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId)
+        val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, true)
         val filesAdapter = ObserveFilesAdapter(::downloadFile)
         binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
         binding.rvComment.adapter = commentsAdapter
@@ -83,9 +85,9 @@ class ShowTaskInfoFragment : Fragment() {
                 viewModel.getObservers().collect {
                     observersAdapter.setObservers(it)
                 }
-//                viewModel.getSubtasks().collect {
-//                    subtasksAdapter.setTasks(it)
-//                }
+                viewModel.getSubtasks().collect {
+                    subtasksAdapter.setTasks(it)
+                }
                 viewModel.getFiles().collect {
                     if (it == null) {
                         requireActivity().runOnUiThread {
@@ -131,15 +133,29 @@ class ShowTaskInfoFragment : Fragment() {
                 binding.etComment.error = "Текст комментария не может быть пустым"
                 return@setOnClickListener
             }
-            //viewModel.addComment(userId, comment.trim()).
+            viewModel.addComment(userId, comment.trim()).addOnCompleteListener {
+                if (it.isSuccessful) {
+                    binding.etComment.text?.clear()
+                } else {
+                    Toast.makeText(requireContext(), "Не удалось добавить комментарий. Проверьте подключение к сети", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
+    }
+
+    private fun onTaskClicked(taskId: String) {
+        findNavController().navigate(
+            R.id.action_tasksListFragment_to_showTaskInfoFragment,
+            bundleOf("taskId" to taskId)
+        )
     }
 
     private fun bindTask(task: Task) {
         binding.etName.setText(task.title)
         if (task.hasDeadline) {
             binding.tvDeadline.visibility = View.VISIBLE
-            binding.tvDeadlineDate.text = formatter.format(task.deadline)
+            binding.tvDeadlineDate.text = FamilyPlanner.uiDateFormatter.format(LocalDate.ofEpochDay(task.deadline!!))
         } else {
             binding.tvDeadline.visibility = View.GONE
             binding.tvDeadlineDate.visibility = View.GONE

@@ -135,7 +135,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="один раз"
+                    tools:text="один раз"
                     app:layout_constraintStart_toEndOf="@id/tv_repeat"
                     app:layout_constraintTop_toTopOf="@id/tv_repeat" />
 
@@ -154,8 +154,8 @@
                     style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:text="Москва, ул. Полянка, д. 10"
+                    android:gravity="start"
+                    tools:text="Москва, ул. Полянка, д. 10"
                     app:layout_constraintStart_toStartOf="@id/map"
                     app:layout_constraintTop_toBottomOf="@id/map" />
             </androidx.constraintlayout.widget.ConstraintLayout>
