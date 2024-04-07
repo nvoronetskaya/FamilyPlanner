@@ -17,7 +17,6 @@ data class Task(
     var importance: Importance,
     var hasLocation: Boolean,
     var location: GeoPoint?,
-    var isPrivate: Boolean,
     var createdBy: String,
     var familyId: String,
     var lastCompletionDate: Long?,
@@ -26,6 +25,6 @@ data class Task(
     constructor() : this(
         "", "", false, null, false, 0,
         0, RepeatType.ONCE, 0, 0, null, Importance.HIGH,
-        false, GeoPoint(0.0, 0.0), false, "", "", null, null
+        false, GeoPoint(0.0, 0.0), "", "", null, null
     )
 }

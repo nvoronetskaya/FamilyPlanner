@@ -2,6 +2,7 @@ package com.familyplanner.lists.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.repository.GroceryListRepository
 import kotlinx.coroutines.Dispatchers
@@ -10,12 +11,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class GroceryListsViewModel : ViewModel() {
-    private var userId = ""
+    private var userId = FamilyPlanner.userId
     private val listsRepository = GroceryListRepository()
     private val groceryLists = MutableSharedFlow<List<GroceryList>>(replay = 1)
 
-    fun setUser(userId: String) {
-        this.userId = userId
+    init {
         viewModelScope.launch(Dispatchers.IO) {
             listsRepository.getListsForUser(userId).collect {
                 groceryLists.emit(it)

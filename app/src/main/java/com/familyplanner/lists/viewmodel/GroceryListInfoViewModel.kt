@@ -2,6 +2,8 @@ package com.familyplanner.lists.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
+import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.model.ListObserver
 import com.familyplanner.lists.model.NonObserver
@@ -11,20 +13,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class GroceryListInfoViewModel : ViewModel() {
     private var listId = ""
-    private var familyId = ""
+    private var familyId: String = ""
     private val listsRepository = GroceryListRepository()
+    private val userRepository = UserRepository()
     private val listObservers = MutableSharedFlow<List<ListObserver>>(replay = 1)
     private val list = MutableSharedFlow<GroceryList?>(replay = 1)
     private val listProducts = MutableStateFlow(listOf<Product>())
     private val nonObservers = mutableListOf<NonObserver>()
 
-    fun setList(listId: String, familyId: String) {
+    init {
+        viewModelScope.launch {
+            userRepository.getUserById(FamilyPlanner.userId).collect {
+                familyId = it.familyId!!
+            }
+        }
+    }
+    fun setList(listId: String) {
         this.listId = listId
-        this.familyId = familyId
         viewModelScope.launch(Dispatchers.IO) {
             listsRepository.getListById(listId).collect {
                 list.emit(it)

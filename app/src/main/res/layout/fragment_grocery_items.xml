@@ -49,28 +49,23 @@
             app:srcCompat="@drawable/ic_spendings" />
     </androidx.appcompat.widget.Toolbar>
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/b_products"
+        style="@style/outlinedButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="?attr/colorPrimary"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        android:text="Товары" />
 
-        <com.google.android.material.tabs.TabItem
-            style="@style/textBody"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Товары" />
-
-        <com.google.android.material.tabs.TabItem
-            style="@style/textBody"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Участники" />
-
-    </com.google.android.material.tabs.TabLayout>
+    <Button
+        android:id="@+id/b_members"
+        style="@style/filledButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toEndOf="@id/b_products"
+        android:text="Участники" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_products"
@@ -80,7 +75,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabs"
+        app:layout_constraintTop_toBottomOf="@id/b_products"
         tools:listitem="@layout/viewholder_list_product" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -92,7 +87,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tabs"
+        app:layout_constraintTop_toBottomOf="@id/b_products"
         tools:listitem="@layout/viewholder_member" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

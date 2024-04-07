@@ -54,7 +54,6 @@ class NewTaskInfoFragment : Fragment() {
     private val ATTACH_FILES = 10
     private lateinit var filesAdapter: FileAdapter
     private var curPoint: Point? = null
-    private var isPrivate = false
     private lateinit var userId: String
     private lateinit var familyId: String
     private var parentId: String? = null
@@ -249,7 +248,6 @@ class NewTaskInfoFragment : Fragment() {
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
         binding.spImportance.setSelection(0)
 
-        isPrivate = requireArguments().getBoolean("isPrivate")
         userId = FamilyPlanner.userId
         familyId = requireArguments().getString("familyId")!!
         parentId = requireArguments().getString("parentId")
@@ -428,9 +426,8 @@ class NewTaskInfoFragment : Fragment() {
             Importance.values()[binding.spImportance.selectedItemPosition],
             binding.swHasLocation.isChecked,
             curPoint,
-            isPrivate,
             userId,
-            if (isPrivate) "" else familyId,
+            familyId,
             filesAdapter.getFiles(),
             parentId
         )
@@ -441,7 +438,7 @@ class NewTaskInfoFragment : Fragment() {
                 creationResult.collect {
                     requireActivity().runOnUiThread {
                         when (it) {
-                            TaskCreationStatus.SUCCESS -> if (parentId != null || isPrivate) {
+                            TaskCreationStatus.SUCCESS -> if (parentId != null) {
                                 findNavController().popBackStack()
                             } else {
                                 val bundle = Bundle()
@@ -459,17 +456,13 @@ class NewTaskInfoFragment : Fragment() {
                                     "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
                                     Toast.LENGTH_LONG
                                 ).show()
-                                if (isPrivate) {
-                                    findNavController().popBackStack()
-                                } else {
-                                    val bundle = Bundle()
+                                val bundle = Bundle()
                                     bundle.putString("taskId", viewModel.getCreatedTaskId())
                                     bundle.putString("familyId", familyId)
                                     findNavController().navigate(
                                         R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
                                         bundle
                                     )
-                                }
                             }
 
                             TaskCreationStatus.FAILED -> Toast.makeText(

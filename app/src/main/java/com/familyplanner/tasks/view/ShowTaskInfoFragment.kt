@@ -61,7 +61,7 @@ class ShowTaskInfoFragment : Fragment() {
         var task: Task? = null
         val commentsAdapter = CommentsListAdapter(::downloadFile, userId)
         val observersAdapter = ObserversListAdapter(userId)
-        val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, true)
+        val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, LocalDate.now().toEpochDay())
         val filesAdapter = ObserveFilesAdapter(::downloadFile)
         binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
         binding.rvComment.adapter = commentsAdapter
@@ -103,7 +103,6 @@ class ShowTaskInfoFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("parentId", taskId)
             bundle.putString("familyId", task!!.familyId)
-            bundle.putBoolean("isPrivate", task!!.isPrivate)
             bundle.putString("userId", userId)
             findNavController().navigate(R.id.action_showTaskInfoFragment_to_newTaskInfoFragment)
         }

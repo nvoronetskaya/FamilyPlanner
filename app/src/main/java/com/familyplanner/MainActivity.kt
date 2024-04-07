@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -21,13 +22,14 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: ActivityViewModel
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +47,41 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
         binding.bottomNavigation.visibility = View.GONE
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
-        val navController = navHostFragment.navController
-        val value = Firebase.auth.currentUser?.uid
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
+        navController = navHostFragment.navController
         if (Firebase.auth.currentUser != null) {
             navController.navigate(R.id.action_welcomeFragment_to_noFamilyFragment)
             binding.bottomNavigation.visibility = View.VISIBLE
         }
         binding.fragmentContainerView.visibility = View.VISIBLE
+        setUpBottomNavigation()
+    }
+
+    private fun setUpBottomNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.home -> navController.navigate(
+                    R.id.tasksListFragment,
+                    null,
+                    NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                )
+                R.id.map -> {
+
+                }
+
+                R.id.calendar -> {
+
+                }
+
+                R.id.lists -> navController.navigate(
+                    R.id.listsListFragment,
+                    null,
+                    NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                )
+            }
+            true
+        }
     }
 
     fun hideBottomNavigation() {

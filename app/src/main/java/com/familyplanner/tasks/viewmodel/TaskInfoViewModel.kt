@@ -83,9 +83,9 @@ class TaskInfoViewModel : ViewModel() {
             }
         }
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getSubtasks(taskId).collect {
-                subTasks.emit(it)
-            }
+//            repo.getSubtasks(taskId).collect {
+//                subTasks.emit(it)
+//            }
         }
         viewModelScope.launch(Dispatchers.IO) {
             repo.getFilesForTask(taskId).addOnCompleteListener {

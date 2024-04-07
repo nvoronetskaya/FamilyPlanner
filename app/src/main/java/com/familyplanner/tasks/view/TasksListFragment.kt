@@ -54,7 +54,6 @@ class TasksListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val userId = FamilyPlanner.userId
-        val familyId = requireArguments().getString("familyId")
         viewModel = ViewModelProvider(this)[TasksListViewModel::class.java]
         val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, LocalDate.now().toEpochDay())
         binding.rvTasks.layoutManager = LinearLayoutManager(activity)
@@ -83,9 +82,8 @@ class TasksListFragment : Fragment() {
         }
         binding.fabAdd.setOnClickListener {
             val bundle = Bundle()
-            bundle.putBoolean("isPrivate", false)
             bundle.putString("parentId", null)
-            bundle.putString("familyId", familyId)
+            bundle.putString("familyId", viewModel.getFamilyId())
             findNavController().navigate(
                 R.id.action_tasksListFragment_to_newTaskInfoFragment,
                 bundle

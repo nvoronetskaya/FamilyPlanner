@@ -86,7 +86,6 @@ class NewTaskViewModel : ViewModel() {
         importance: Importance,
         hasLocation: Boolean,
         location: Point?,
-        isPrivate: Boolean,
         userId: String,
         familyId: String,
         files: List<UserFile>?,
@@ -107,7 +106,6 @@ class NewTaskViewModel : ViewModel() {
         newTask.hasLocation = hasLocation
         newTask.location =
             if (location != null) GeoPoint(location.latitude, location.longitude) else null
-        newTask.isPrivate = isPrivate
         newTask.createdBy = userId
         newTask.familyId = familyId
         newTask.parentId = parentId

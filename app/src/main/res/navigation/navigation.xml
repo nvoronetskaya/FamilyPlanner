@@ -122,7 +122,9 @@
         android:label="NewTaskInfoFragment">
         <action
             android:id="@+id/action_newTaskInfoFragment_to_newTaskObserversFragment"
-            app:destination="@id/newTaskObserversFragment" />
+            app:destination="@id/newTaskObserversFragment"
+            app:popUpTo="@id/navigation"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_newTaskInfoFragment_to_tasksListFragment"
             app:destination="@id/tasksListFragment" />

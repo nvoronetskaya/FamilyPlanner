@@ -32,12 +32,14 @@ class TasksListViewModel : ViewModel() {
     private var importanceFilter: Importance? = null
     private var userFilterId: String? = null
     private var curDate: LocalDate = LocalDate.now()
+    private var familyId: String? = null
 
     fun setUser(userId: String) {
         this.userId = userId
         viewModelScope.launch(Dispatchers.IO) {
             userFilter.emit(userId)
             userRepo.getUserById(userId).collect {
+                familyId = it.familyId
                 familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
                     users.clear()
                     users.addAll(members)
@@ -54,6 +56,8 @@ class TasksListViewModel : ViewModel() {
             }
         }
     }
+
+    fun getFamilyId(): String? = familyId
 
     fun setUserFilter(filterUserId: String?) {
         userFilterId = filterUserId

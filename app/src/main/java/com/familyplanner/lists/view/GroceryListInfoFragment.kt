@@ -40,7 +40,7 @@ class GroceryListInfoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentGroceryItemsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -48,11 +48,14 @@ class GroceryListInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val listId = requireArguments().getString("listId", "")
-        val familyId = requireArguments().getString("familyId", "")
-        val isListCreator = true
+        val isListCreator = requireArguments().getBoolean("isCreator", false)
         viewModel = ViewModelProvider(this)[GroceryListInfoViewModel::class.java]
-         viewModel.setList(listId, familyId)
-        val productsAdapter = ProductAdapter(viewModel::editProduct, viewModel::changeProductPurchased, ::onProductDelete)
+        viewModel.setList(listId)
+        val productsAdapter = ProductAdapter(
+            viewModel::editProduct,
+            viewModel::changeProductPurchased,
+            ::onProductDelete
+        )
         val observerAdapter = ObserversAdapter(isListCreator, ::onObserverDelete)
         val bottomOffset = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -82,7 +85,7 @@ class GroceryListInfoFragment : Fragment() {
                             ).show()
                             findNavController().popBackStack()
                         } else {
-                            binding.tvListName.setText(it.name)
+                            binding.tvListName.text = it.name
                         }
                     }
                 }
@@ -94,21 +97,21 @@ class GroceryListInfoFragment : Fragment() {
                 }
             }
         }
-        binding.tabs[0].setOnClickListener {
-            binding.rvProducts.visibility = View.GONE
-            binding.rvObservers.visibility = View.VISIBLE
-        }
-        binding.tabs[1].setOnClickListener {
-            binding.rvObservers.visibility = View.GONE
-            binding.rvProducts.visibility = View.VISIBLE
-        }
+//        binding.tabs[0].setOnClickListener {
+//            binding.rvProducts.visibility = View.GONE
+//            binding.rvObservers.visibility = View.VISIBLE
+//        }
+//        binding.tabs[1].setOnClickListener {
+//            binding.rvObservers.visibility = View.GONE
+//            binding.rvProducts.visibility = View.VISIBLE
+//        }
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.fabAdd.setOnClickListener {
-            if (binding.tabs[0].isVisible) {
-                createAddProductDialog()
-            } else {
-                createAddObserversDialog()
-            }
+//            if (binding.tabs[0].isVisible) {
+//                createAddProductDialog()
+//            } else {
+//                createAddObserversDialog()
+//            }
         }
     }
 

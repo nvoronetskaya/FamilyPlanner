@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentGroceryListsBinding
@@ -40,21 +41,22 @@ class ListsListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val userId = requireArguments().getString("userId")!!
         binding.rvLists.layoutManager = LinearLayoutManager(activity)
         val bottomOffset = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             45f,
             requireContext().resources.displayMetrics
         )
-        binding.rvLists.addItemDecoration(ProductsListDecorator(bottomOffset.toInt()))
-        val listsAdapter = ListAdapter(viewModel::editList, viewModel::changeListStatus, ::openList, ::onListDelete, userId)
-        binding.rvLists.adapter = listsAdapter
         viewModel = ViewModelProvider(this)[GroceryListsViewModel::class.java]
+        binding.rvLists.addItemDecoration(ProductsListDecorator(bottomOffset.toInt()))
+        val listsAdapter = ListAdapter(viewModel::editList, viewModel::changeListStatus, ::openList, ::onListDelete, FamilyPlanner.userId)
+        binding.rvLists.adapter = listsAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getGroceryLists().collect {
-                    listsAdapter.updateData(it)
+                    requireActivity().runOnUiThread {
+                        listsAdapter.updateData(it)
+                    }
                 }
             }
         }
@@ -67,7 +69,7 @@ class ListsListFragment : Fragment() {
         val bundle = Bundle()
         bundle.putString("listId", listId)
         bundle.putBoolean("isListCreator", isCreator)
-        findNavController().navigate(R.id.action_listsListFragment_to_groceryListInfoFragment)
+        findNavController().navigate(R.id.action_listsListFragment_to_groceryListInfoFragment, bundle)
     }
 
     override fun onDestroyView() {

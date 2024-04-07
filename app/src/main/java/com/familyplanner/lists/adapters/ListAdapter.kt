@@ -61,7 +61,9 @@ class ListAdapter(
                 )
             }
             binding.cbList.isChecked = list.isCompleted
-            binding.root.setOnClickListener { onClick(list.id, userId.equals(list.createdBy)) }
+            binding.root.setOnClickListener {
+                onClick(list.id, userId.equals(list.createdBy))
+            }
             binding.ivDelete.setOnClickListener { onDelete(list) }
         }
     }
