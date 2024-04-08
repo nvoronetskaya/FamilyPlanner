@@ -1,6 +1,7 @@
 package com.familyplanner.lists.view
 
 import android.os.Bundle
+import android.text.InputFilter
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -81,6 +82,7 @@ class ListsListFragment : Fragment() {
         val name = EditText(activity)
         name.hint = "Название списка"
         name.textSize = 19F
+        name.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(19))
         AlertDialog.Builder(activity as MainActivity).setTitle("Добавление списка")
             .setView(name)
             .setPositiveButton("Готово") { _, _ ->

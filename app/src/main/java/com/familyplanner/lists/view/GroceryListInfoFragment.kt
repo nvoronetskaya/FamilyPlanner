@@ -93,12 +93,16 @@ class GroceryListInfoFragment : Fragment() {
                 }
                 launch {
                     viewModel.getListProducts().collect {
-                        productsAdapter.updateData(it)
+                        requireActivity().runOnUiThread {
+                            productsAdapter.updateData(it)
+                        }
                     }
                 }
                 launch {
                     viewModel.getListObservers().collect {
-                        observerAdapter.updateData(it)
+                        requireActivity().runOnUiThread {
+                            observerAdapter.updateData(it)
+                        }
                     }
                 }
             }

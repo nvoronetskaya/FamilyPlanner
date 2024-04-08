@@ -1,5 +1,6 @@
 package com.familyplanner.lists.repository
 
+import android.util.Log
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.model.ListObserver
 import com.familyplanner.lists.model.NonObserver
@@ -8,32 +9,45 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class GroceryListRepository {
     private val firestore = Firebase.firestore
+    private val userLists = MutableSharedFlow<List<GroceryList>>()
+    private val scope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun getListsForUser(userId: String): Flow<List<GroceryList>> {
-        val listIds =
-            firestore.collection("usersLists").whereEqualTo("userId", userId).get().await()
-                .map { it["listId"].toString() }
-        return firestore.collection("lists").whereIn(FieldPath.documentId(), listIds).snapshots()
-            .map { result ->
-                val queryLists = mutableListOf<GroceryList>()
-                for (doc in result.documents) {
-                    val list = GroceryList(
-                        doc.id,
-                        doc["name"].toString(),
-                        doc.getBoolean("isCompleted") ?: false,
-                        doc["createdBy"].toString()
-                    )
-                    queryLists.add(list)
+    fun getListsForUser(userId: String): Flow<List<GroceryList>> { 
+        scope.launch {
+            firestore.collection("usersLists").whereEqualTo("userId", userId).snapshots().collect {
+                val listIds = it.documents.map{ it["listId"].toString() }
+                launch {
+                    firestore.collection("lists").whereIn(FieldPath.documentId(), listIds)
+                        .snapshots()
+                        .collect { result ->
+                            val lists = mutableListOf<GroceryList>()
+                            Log.w("LISTD", lists.size.toString())
+                            for (doc in result.documents) {
+                                val list = GroceryList(
+                                    doc.id,
+                                    doc["name"].toString(),
+                                    doc.getBoolean("isCompleted") ?: false,
+                                    doc["createdBy"].toString()
+                                )
+                                lists.add(list)
+                            }
+                            userLists.emit(lists)
+                        }
                 }
-                queryLists
             }
+        }
+        return userLists
     }
 
     fun getListById(listId: String): Flow<GroceryList?> {
@@ -96,7 +110,11 @@ class GroceryListRepository {
 
     fun addProduct(productName: String, listId: String) {
         val product =
-            mapOf<String, Any>("name" to productName, "listId" to listId, "isPurchased" to false)
+            mapOf<String, Any>(
+                "name" to productName,
+                "listId" to listId,
+                "isPurchased" to false
+            )
         firestore.collection("products").add(product)
     }
 
@@ -128,7 +146,8 @@ class GroceryListRepository {
         val listData =
             mapOf<String, Any>("name" to name, "createdBy" to createdBy, "isCompleted" to false)
         firestore.collection("lists").add(listData).addOnSuccessListener {
-            firestore.collection("usersLists").add(mapOf("userId" to createdBy, "listId" to it.id))
+            firestore.collection("usersLists")
+                .add(mapOf("userId" to createdBy, "listId" to it.id))
         }
     }
 

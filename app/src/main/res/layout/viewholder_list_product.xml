@@ -15,7 +15,7 @@
 
     <EditText
         android:id="@+id/et_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="20dp"
@@ -25,9 +25,9 @@
         android:enabled="false"
         android:gravity="start|center_vertical"
         android:maxLines="1"
+        android:maxLength="19"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@id/cb_list"
-        app:layout_constraintEnd_toStartOf="@id/iv_delete"
         app:layout_constraintStart_toEndOf="@id/cb_list"
         app:layout_constraintTop_toTopOf="@id/cb_list" />
 
