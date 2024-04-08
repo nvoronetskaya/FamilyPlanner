@@ -75,25 +75,31 @@ class GroceryListInfoFragment : Fragment() {
         productsAdapter.updateData(products)
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getListInfo().collect {
-                    activity?.runOnUiThread {
-                        if (it == null) {
-                            Toast.makeText(
-                                requireContext(),
-                                "Не удалось найти список",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            findNavController().popBackStack()
-                        } else {
-                            binding.tvListName.text = it.name
+                launch {
+                    viewModel.getListInfo().collect {
+                        activity?.runOnUiThread {
+                            if (it == null) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось найти список",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                findNavController().popBackStack()
+                            } else {
+                                binding.tvListName.text = it.name
+                            }
                         }
                     }
                 }
-                viewModel.getListProducts().collect {
-                    productsAdapter.updateData(it)
+                launch {
+                    viewModel.getListProducts().collect {
+                        productsAdapter.updateData(it)
+                    }
                 }
-                viewModel.getListObservers().collect {
-                    observerAdapter.updateData(it)
+                launch {
+                    viewModel.getListObservers().collect {
+                        observerAdapter.updateData(it)
+                    }
                 }
             }
         }
