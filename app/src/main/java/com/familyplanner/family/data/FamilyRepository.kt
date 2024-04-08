@@ -151,7 +151,7 @@ class FamilyRepository {
         val data = HashMap<String, Any>()
         data["name"] = name
         data["createdBy"] = userId
-        // TODO("Добаввить код присоединения")
+        // TODO("Добавить код присоединения")
         return firestore.collection("families").add(data)
     }
 

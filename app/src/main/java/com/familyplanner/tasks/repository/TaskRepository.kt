@@ -17,53 +17,70 @@ import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.ListResult
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 
 class TaskRepository {
     private val firestore = Firebase.firestore
     private val storage = Firebase.storage
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val userTasks = MutableSharedFlow<List<Task>>()
 
     suspend fun getCommonTasksForUser(userId: String): Flow<List<Task>> {
-        val tasksIds = firestore.collection("observers")
-            .whereEqualTo("userId", userId).get()
-            .await().map { it["taskId"] }
-        return firestore.collection("tasks").whereEqualTo("parentId", null).whereIn(FieldPath.documentId(), tasksIds).snapshots()
-            .map { result ->
-                val queryTasks = mutableListOf<Task>()
-                for (doc in result.documents) {
-                    val task = doc.toObject(Task::class.java)!!
-                    task.id = doc.id
-                    queryTasks.add(task)
+        scope.launch {
+            firestore.collection("observers")
+                .whereEqualTo("userId", userId).snapshots().collect {
+                    val tasksIds = it.map { it["taskId"].toString() }
+                    launch {
+                        firestore.collection("tasks").whereEqualTo("parentId", null)
+                            .whereIn(FieldPath.documentId(), tasksIds).snapshots()
+                            .collect { result ->
+                                val queryTasks = mutableListOf<Task>()
+                                for (doc in result.documents) {
+                                    val task = doc.toObject(Task::class.java)!!
+                                    task.id = doc.id
+                                    queryTasks.add(task)
+                                }
+                                userTasks.emit(queryTasks)
+                            }
+                    }
                 }
-                queryTasks
-            }
+        }
+
+        return userTasks
     }
 
     suspend fun getSharedTasks(userId: String, executorId: String): Flow<List<Task>> {
         if (userId.equals(executorId)) {
             return getCommonTasksForUser(userId)
         }
-        val tasks = MutableSharedFlow<List<Task>>()
-        firestore.collection("observers").whereEqualTo("userId", userId).snapshots().map {
-            val ids = it.map { task -> task.id }
-            firestore.collection("observers").whereEqualTo("userId", executorId)
-                .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots().map { result ->
-                    val queryTasks = mutableListOf<Task>()
-                    for (doc in result.documents) {
-                        val task = doc.toObject(Task::class.java)!!
-                        task.id = doc.id
-                        if (task.parentId != null) {
-                            queryTasks.add(task)
+        scope.launch {
+            firestore.collection("observers").whereEqualTo("userId", userId).snapshots().collect {
+                val ids = it.map { it["taskId"].toString() }
+                launch {
+                    firestore.collection("observers").whereEqualTo("userId", executorId)
+                        .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots().collect { result ->
+                            val queryTasks = mutableListOf<Task>()
+                            for (doc in result.documents) {
+                                val task = doc.toObject(Task::class.java)!!
+                                task.id = doc.id
+                                if (task.parentId != null) {
+                                    queryTasks.add(task)
+                                }
+                            }
+                            userTasks.emit(queryTasks)
                         }
-                    }
-                    tasks.emit(queryTasks)
                 }
+            }
         }
-        return tasks
+        return userTasks
     }
 
     fun getTaskById(taskId: String): Flow<Task?> {
@@ -78,7 +95,9 @@ class TaskRepository {
         return firestore.collection("comments").whereEqualTo("taskId", taskId).snapshots().map {
             val comments = mutableListOf<CommentDto>()
             for (doc in it.documents) {
-                val userName = firestore.collection("users").document(doc["userId"].toString()).get().await()["name"].toString()
+                val userName =
+                    firestore.collection("users").document(doc["userId"].toString()).get()
+                        .await()["name"].toString()
                 val files = storage.reference.child(doc.id).listAll().await().items.map { it.path }
                 val comment = CommentDto(
                     doc.id,
@@ -170,7 +189,11 @@ class TaskRepository {
 
     fun addComment(userId: String, comment: String): GoogleTask<DocumentReference> {
         val data =
-            mapOf<String, Any>("userId" to userId, "text" to comment, "createdAt" to System.currentTimeMillis())
+            mapOf<String, Any>(
+                "userId" to userId,
+                "text" to comment,
+                "createdAt" to System.currentTimeMillis()
+            )
         return firestore.collection("comments").add(data)
     }
 

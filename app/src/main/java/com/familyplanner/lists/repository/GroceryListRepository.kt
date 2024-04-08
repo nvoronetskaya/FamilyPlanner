@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -23,7 +22,7 @@ class GroceryListRepository {
     private val userLists = MutableSharedFlow<List<GroceryList>>()
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun getListsForUser(userId: String): Flow<List<GroceryList>> { 
+    fun getListsForUser(userId: String): Flow<List<GroceryList>> {
         scope.launch {
             firestore.collection("usersLists").whereEqualTo("userId", userId).snapshots().collect {
                 val listIds = it.documents.map{ it["listId"].toString() }
@@ -153,12 +152,14 @@ class GroceryListRepository {
 
     fun changeListCompleted(listId: String, isCompleted: Boolean) {
         firestore.collection("lists").document(listId).update("isCompleted", isCompleted)
-        firestore.collection("products").whereEqualTo("listId", listId).get()
-            .addOnCompleteListener {
-                for (doc in it.result.documents) {
-                    doc.reference.update("isPurchased", true)
+        if (isCompleted) {
+            firestore.collection("products").whereEqualTo("listId", listId).get()
+                .addOnCompleteListener {
+                    for (doc in it.result.documents) {
+                        doc.reference.update("isPurchased", true)
+                    }
                 }
-            }
+        }
     }
 
     fun deleteList(listId: String) {
