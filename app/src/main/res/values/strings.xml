@@ -94,4 +94,8 @@
     <string name="has_deadline">Есть дедлайн</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="new_event">Новое мероприятие</string>
+    <string name="description">Описание</string>
+    <string name="who_sees_event">Кому доступно мероприятие</string>
+    <string name="date">Дата: </string>
 </resources>
