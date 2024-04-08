@@ -31,7 +31,6 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
 
@@ -61,7 +60,12 @@ class ShowTaskInfoFragment : Fragment() {
         var task: Task? = null
         val commentsAdapter = CommentsListAdapter(::downloadFile, userId)
         val observersAdapter = ObserversListAdapter(userId)
-        val subtasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, LocalDate.now().toEpochDay())
+        val subtasksAdapter = TaskAdapter(
+            viewModel::changeCompleted,
+            userId,
+            ::onTaskClicked,
+            LocalDate.now().toEpochDay()
+        )
         val filesAdapter = ObserveFilesAdapter(::downloadFile)
         binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
         binding.rvComment.adapter = commentsAdapter
@@ -69,33 +73,47 @@ class ShowTaskInfoFragment : Fragment() {
         binding.rvObservers.adapter = observersAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getTask().collect {
-                    if (it == null) {
-                        findNavController().popBackStack()
-                        return@collect
-                    }
-                    task = it
-                    requireActivity().runOnUiThread {
-                        bindTask(it)
-                    }
-                }
-                viewModel.getComments().collect {
-                    commentsAdapter.setComments(it)
-                }
-                viewModel.getObservers().collect {
-                    observersAdapter.setObservers(it)
-                }
-                viewModel.getSubtasks().collect {
-                    subtasksAdapter.setTasks(it)
-                }
-                viewModel.getFiles().collect {
-                    if (it == null) {
-                        requireActivity().runOnUiThread {
-                            Toast.makeText(requireContext(), "Не удалось получить файлы. Проверьте соединение", Toast.LENGTH_SHORT).show()
+                launch {
+                    viewModel.getTask().collect {
+                        if (it == null) {
+                            findNavController().popBackStack()
+                            return@collect
                         }
-                        return@collect
+                        task = it
+                        requireActivity().runOnUiThread {
+                            bindTask(it)
+                        }
                     }
-                    filesAdapter.addPaths(it)
+                }
+                launch {
+                    viewModel.getComments().collect {
+                        commentsAdapter.setComments(it)
+                    }
+                }
+                launch {
+                    viewModel.getObservers().collect {
+                        observersAdapter.setObservers(it)
+                    }
+                }
+                launch {
+                    viewModel.getSubtasks().collect {
+                        subtasksAdapter.setTasks(it)
+                    }
+                }
+                launch {
+                    viewModel.getFiles().collect {
+                        if (it == null) {
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось получить файлы. Проверьте соединение",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            return@collect
+                        }
+                        filesAdapter.addPaths(it)
+                    }
                 }
             }
         }
@@ -136,7 +154,11 @@ class ShowTaskInfoFragment : Fragment() {
                 if (it.isSuccessful) {
                     binding.etComment.text?.clear()
                 } else {
-                    Toast.makeText(requireContext(), "Не удалось добавить комментарий. Проверьте подключение к сети", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Не удалось добавить комментарий. Проверьте подключение к сети",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -154,7 +176,8 @@ class ShowTaskInfoFragment : Fragment() {
         binding.etName.setText(task.title)
         if (task.hasDeadline) {
             binding.tvDeadline.visibility = View.VISIBLE
-            binding.tvDeadlineDate.text = FamilyPlanner.uiDateFormatter.format(LocalDate.ofEpochDay(task.deadline!!))
+            binding.tvDeadlineDate.text =
+                FamilyPlanner.uiDateFormatter.format(LocalDate.ofEpochDay(task.deadline!!))
         } else {
             binding.tvDeadline.visibility = View.GONE
             binding.tvDeadlineDate.visibility = View.GONE
@@ -209,8 +232,12 @@ class ShowTaskInfoFragment : Fragment() {
     private fun downloadFile(path: String) {
         val request = DownloadManager.Request(viewModel.downloadFile(path))
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, Calendar.getInstance().timeInMillis.toString())
-        val downloadManager = requireContext().getSystemService(Service.DOWNLOAD_SERVICE) as DownloadManager
+            .setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                Calendar.getInstance().timeInMillis.toString()
+            )
+        val downloadManager =
+            requireContext().getSystemService(Service.DOWNLOAD_SERVICE) as DownloadManager
         downloadManager.enqueue(request)
         Toast.makeText(context, "Файл загружается... ", Toast.LENGTH_SHORT).show()
     }
