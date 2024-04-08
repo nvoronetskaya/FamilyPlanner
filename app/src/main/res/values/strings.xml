@@ -98,4 +98,8 @@
     <string name="description">Описание</string>
     <string name="who_sees_event">Кому доступно мероприятие</string>
     <string name="date">Дата: </string>
+    <string name="event">Мероприятие</string>
+    <string name="time">Время: </string>
+    <string name="event_participation">Участвую в мероприятии </string>
+    <string name="cancel_event">Отменить мероприятие </string>
 </resources>
