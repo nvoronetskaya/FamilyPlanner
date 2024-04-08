@@ -75,44 +75,50 @@ class ShowTaskInfoFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.getTask().collect {
-                        if (it == null) {
-                            findNavController().popBackStack()
-                            return@collect
-                        }
-                        task = it
                         requireActivity().runOnUiThread {
+                            if (it == null) {
+                                findNavController().popBackStack()
+                                return@runOnUiThread
+                            }
+                            task = it
                             bindTask(it)
                         }
                     }
                 }
                 launch {
                     viewModel.getComments().collect {
-                        commentsAdapter.setComments(it)
+                        requireActivity().runOnUiThread {
+                            commentsAdapter.setComments(it)
+                        }
                     }
                 }
                 launch {
                     viewModel.getObservers().collect {
-                        observersAdapter.setObservers(it)
+                        requireActivity().runOnUiThread {
+                            observersAdapter.setObservers(it)
+                        }
                     }
                 }
                 launch {
                     viewModel.getSubtasks().collect {
-                        subtasksAdapter.setTasks(it)
+                        requireActivity().runOnUiThread {
+                            subtasksAdapter.setTasks(it)
+                        }
                     }
                 }
                 launch {
                     viewModel.getFiles().collect {
-                        if (it == null) {
-                            requireActivity().runOnUiThread {
+                        requireActivity().runOnUiThread {
+                            if (it == null) {
                                 Toast.makeText(
                                     requireContext(),
                                     "Не удалось получить файлы. Проверьте соединение",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                return@runOnUiThread
                             }
-                            return@collect
+                            filesAdapter.addPaths(it)
                         }
-                        filesAdapter.addPaths(it)
                     }
                 }
             }

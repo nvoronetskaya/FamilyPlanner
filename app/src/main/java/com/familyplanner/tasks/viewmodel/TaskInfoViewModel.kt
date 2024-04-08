@@ -38,6 +38,7 @@ class TaskInfoViewModel : ViewModel() {
     private val repo = TaskRepository()
     private var subTasks: MutableSharedFlow<List<TaskWithDate>> = MutableSharedFlow(replay = 1)
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
+    private var taskId: String = ""
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
@@ -67,6 +68,7 @@ class TaskInfoViewModel : ViewModel() {
     }
 
     fun setTask(taskId: String) {
+        this.taskId = taskId
         viewModelScope.launch(Dispatchers.IO) {
             repo.getTaskById(taskId).collect {
                 task.emit(it)
@@ -119,5 +121,5 @@ class TaskInfoViewModel : ViewModel() {
         repo.changeTaskCompleted(taskId, isCompleted, completedById)
     }
 
-    fun addComment(userId: String, comment: String) = repo.addComment(userId, comment)
+    fun addComment(userId: String, comment: String) = repo.addComment(userId, comment, taskId)
 }

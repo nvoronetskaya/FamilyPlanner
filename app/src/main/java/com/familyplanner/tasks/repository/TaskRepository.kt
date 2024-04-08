@@ -187,12 +187,13 @@ class TaskRepository {
         return storage.reference.child(path).downloadUrl
     }
 
-    fun addComment(userId: String, comment: String): GoogleTask<DocumentReference> {
+    fun addComment(userId: String, comment: String, taskId: String): GoogleTask<DocumentReference> {
         val data =
             mapOf<String, Any>(
                 "userId" to userId,
                 "text" to comment,
-                "createdAt" to System.currentTimeMillis()
+                "createdAt" to System.currentTimeMillis(),
+                "taskId" to taskId
             )
         return firestore.collection("comments").add(data)
     }
