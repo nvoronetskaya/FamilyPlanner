@@ -5,8 +5,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 class EventRepository {
@@ -38,5 +41,17 @@ class EventRepository {
             }
         }
         return isSuccessful
+    }
+
+    fun getEventById(eventId: String): Flow<Event?> {
+        return firestore.collection("events").document(eventId).snapshots().map {
+            it.toObject(Event::class.java)
+        }
+    }
+
+    fun getEventAttendees(eventId: String): Flow<List<EventAttendee>> {
+        return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots().map {
+            it.toObjects(EventAttendee::class.java)
+        }
     }
 }
