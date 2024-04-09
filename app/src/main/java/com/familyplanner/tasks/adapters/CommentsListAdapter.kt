@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 
 class CommentsListAdapter(private val onFileClick: (String) -> Unit, private val userId: String) :
     RecyclerView.Adapter<CommentsListAdapter.BaseCommentViewHolder>() {
-    private val formatter = SimpleDateFormat("dd.MM.yyyy hh:mm")
+    private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm")
     private var comments = mutableListOf<CommentDto>()
 
     abstract inner class BaseCommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
