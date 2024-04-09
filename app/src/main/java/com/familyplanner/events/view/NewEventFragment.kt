@@ -11,15 +11,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewEventBinding
-import com.familyplanner.events.adapters.AttendeeAdapter
+import com.familyplanner.events.adapters.InvitationAdapter
 import com.familyplanner.events.viewmodel.NewEventViewModel
 import com.familyplanner.tasks.adapters.FileAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 
 class NewEventFragment : Fragment() {
@@ -28,7 +38,7 @@ class NewEventFragment : Fragment() {
     private lateinit var viewModel: NewEventViewModel
     private val calendar = Calendar.getInstance()
     private lateinit var filesAdapter: FileAdapter
-    private lateinit var attendeesAdapter: AttendeeAdapter
+    private lateinit var attendeesAdapter: InvitationAdapter
     private val ATTACH_FILES = 10
 
     override fun onCreateView(
@@ -43,41 +53,53 @@ class NewEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[NewEventViewModel::class.java]
-        val filesLayoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        val filesLayoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         filesAdapter = FileAdapter()
         binding.rvFiles.layoutManager = filesLayoutManager
         binding.rvFiles.adapter = filesAdapter
-        val attendeesLayoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-        attendeesAdapter = AttendeeAdapter()
+        val attendeesLayoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        attendeesAdapter = InvitationAdapter()
         binding.rvObservers.layoutManager = attendeesLayoutManager
         binding.rvObservers.adapter = attendeesAdapter
-        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
-        binding.tvDate.setOnClickListener {
-            setDate()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getAttendees().collect {
+                    requireActivity().runOnUiThread {
+                        if (it.isNotEmpty()) {
+                            attendeesAdapter.setData(it)
+                        }
+                    }
+                }
+            }
         }
+
+        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         val defaultDate = Calendar.getInstance()
         defaultDate.add(Calendar.HOUR_OF_DAY, 1)
-        binding.tvDate.text = String.format(
-            "%02d.%02d.%d",
+        binding.tvStartValue.text = String.format(
+            "%02d.%02d.%d %02d:%02d",
             defaultDate.get(Calendar.DAY_OF_MONTH),
             defaultDate.get(Calendar.MONTH) + 1,
-            defaultDate.get(Calendar.YEAR)
-        )
-        binding.tvStartValue.text = String.format(
-            "%02d:%02d",
+            defaultDate.get(Calendar.YEAR),
             defaultDate.get(Calendar.HOUR_OF_DAY),
             defaultDate.get(Calendar.MINUTE)
         )
         binding.tvFinishValue.text = String.format(
-            "%02d:%02d",
+            "%02d.%02d.%d %02d:%02d",
+            defaultDate.get(Calendar.DAY_OF_MONTH),
+            defaultDate.get(Calendar.MONTH) + 1,
+            defaultDate.get(Calendar.YEAR),
             defaultDate.get(Calendar.HOUR_OF_DAY),
             defaultDate.get(Calendar.MINUTE)
         )
         binding.tvStartValue.setOnClickListener {
-            setTime(true)
+            setDate(true)
         }
         binding.tvFinishValue.setOnClickListener {
-            setTime(false)
+            setDate(false)
         }
         binding.tvAttachFile.setOnClickListener {
             val openDocumentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
@@ -86,8 +108,25 @@ class NewEventFragment : Fragment() {
             startActivityForResult(openDocumentIntent, ATTACH_FILES)
         }
         binding.ivDone.setOnClickListener {
-
+            if (binding.etName.text.isNullOrBlank()) {
+                binding.tfName.error = "Название мероприятия не может быть пустым"
+            }
+            binding.tfName.isErrorEnabled = false
+            viewModel.createEvent(
+                binding.etName.text!!.toString().trim(),
+                binding.etDescription.text!!.toString().trim(),
+                getDateTimeFromString(binding.tvStartTime.text.toString()),
+                getDateTimeFromString(binding.tvFinishTime.text.toString()),
+                attendeesAdapter.getInvitations(),
+                filesAdapter.getFiles()
+            )
         }
+    }
+
+    private fun getDateTimeFromString(value: String): Long {
+        return LocalDateTime.parse(value, FamilyPlanner.dadteTimeFormatter)
+            .atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC)
+            .toInstant().epochSecond
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -112,12 +151,12 @@ class NewEventFragment : Fragment() {
         }
     }
 
-    private fun setDate() {
+    private fun setDate(isStartTime: Boolean) {
         val dialog = DatePickerDialog(
             activity as MainActivity,
             R.style.datePickerDialog,
             { _, year, month, day ->
-                binding.tvDate.text = String.format("%02d.%02d.%d", day, month + 1, year)
+                setTime(isStartTime, day, month + 1, year)
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -127,28 +166,38 @@ class NewEventFragment : Fragment() {
         dialog.show()
     }
 
-    private fun setTime(isStartTime: Boolean) {
-        val today = Calendar.getInstance()
+    private fun setTime(isStartTime: Boolean, day: Int, month: Int, year: Int) {
         val dialog = TimePickerDialog(
             activity,
             R.style.datePickerDialog,
             { _, chosenHour, chosenMinute ->
                 var hour = chosenHour
                 var minute = chosenMinute
-                if (isToday(today))
+                val today = Calendar.getInstance()
+                if (isToday(day, month, year))
                     if (hour < today.get(Calendar.HOUR_OF_DAY) || minute < today.get(Calendar.MINUTE)) {
                         hour = today.get(Calendar.HOUR_OF_DAY)
                         minute = today.get(Calendar.MINUTE)
                     }
                 if (isStartTime) {
-                    binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
-                    if (binding.tvFinishTime.text.isNullOrBlank() || getTimeFromString(binding.tvFinishValue.text.toString()) < hour * 60 + minute) {
-                        binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
+                    binding.tvStartValue.text =
+                        String.format("%02d.%02d.%d %02d:%02d", day, month, year, hour, minute)
+                    if (binding.tvFinishTime.text.isNullOrBlank() || getTimeFromString(
+                            binding.tvFinishValue.text.toString().split(' ')[1]
+                        ) < hour * 60 + minute
+                    ) {
+                        binding.tvFinishValue.text =
+                            String.format("%02d.%02d.%d %02d:%02d", day, month, year, hour, minute)
                     }
                 } else {
-                    binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
-                    if (binding.tvStartValue.text.isNullOrBlank() || getTimeFromString(binding.tvStartValue.text.toString()) > hour * 60 + minute) {
-                        binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
+                    binding.tvFinishValue.text =
+                        String.format("%02d.%02d.%d %02d:%02d", day, month, year, hour, minute)
+                    if (binding.tvStartValue.text.isNullOrBlank() || getTimeFromString(
+                            binding.tvStartValue.text.toString().split(' ')[1]
+                        ) > hour * 60 + minute
+                    ) {
+                        binding.tvStartValue.text =
+                            String.format("%02d.%02d.%d %02d:%02d", day, month, year, hour, minute)
                     }
                 }
             },
@@ -159,10 +208,11 @@ class NewEventFragment : Fragment() {
         dialog.show()
     }
 
-    private fun isToday(today: Calendar): Boolean {
-        return calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && calendar.get(Calendar.MONTH) == today.get(
-            Calendar.MONTH
-        ) && calendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH)
+    private fun isToday(day: Int, month: Int, year: Int): Boolean {
+        val today = Calendar.getInstance()
+        return year == today.get(Calendar.YEAR) && month == today.get(Calendar.MONTH) && day == today.get(
+            Calendar.DAY_OF_MONTH
+        )
     }
 
     private fun getTimeFromString(textTime: String): Int {

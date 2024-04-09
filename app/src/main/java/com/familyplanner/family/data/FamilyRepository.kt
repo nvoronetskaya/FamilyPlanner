@@ -12,6 +12,7 @@ import com.google.firebase.firestore.snapshots
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
 class FamilyRepository {
     private val firestore = Firebase.firestore
@@ -53,6 +54,18 @@ class FamilyRepository {
                 users.add(user)
             }
             users
+        }
+
+    suspend fun getFamilyMembersOnce(familyId: String): List<User> =
+        firestore.collection("users").whereEqualTo("familyId", familyId).get().await().map {
+            User(
+                it.id,
+                it["name"].toString(),
+                it["birthday"].toString(),
+                it["hasFamily"] as Boolean,
+                it["familyId"].toString(),
+                it["email"].toString()
+            )
         }
 
     fun getApplicationsToFamily(familyId: String): Flow<List<Application>> =

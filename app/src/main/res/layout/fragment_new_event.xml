@@ -96,31 +96,13 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/tv_date"
-                style="@style/textBody"
-                android:text="@string/date"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/tf_description"
-                app:layout_constraintTop_toBottomOf="@id/tf_description" />
-
-            <TextView
-                android:id="@+id/tv_date_value"
-                style="@style/textBody"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/tv_date"
-                app:layout_constraintStart_toEndOf="@id/tv_date" />
-
-            <TextView
                 android:id="@+id/tv_start_time"
                 style="@style/textBody"
                 android:layout_width="wrap_content"
-                android:text="@string/start_time"
+                android:text="@string/start_date"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/tv_date"
-                app:layout_constraintTop_toBottomOf="@id/tv_date" />
+                app:layout_constraintStart_toStartOf="@id/tf_description"
+                app:layout_constraintTop_toBottomOf="@id/tf_description" />
 
             <TextView
                 android:id="@+id/tv_start_value"
@@ -133,7 +115,7 @@
             <TextView
                 android:id="@+id/tv_finish_time"
                 style="@style/textBody"
-                android:text="@string/finish_time"
+                android:text="@string/finish_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/tv_start_time"

@@ -102,4 +102,6 @@
     <string name="time">Время: </string>
     <string name="event_participation">Участвую в мероприятии </string>
     <string name="cancel_event">Отменить мероприятие </string>
+    <string name="start_date">Начало: </string>
+    <string name="finish_date">Окончание: </string>
 </resources>

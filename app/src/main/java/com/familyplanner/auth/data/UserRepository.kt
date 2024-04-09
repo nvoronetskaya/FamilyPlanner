@@ -8,6 +8,7 @@ import com.google.firebase.firestore.snapshots
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 
 class UserRepository {
     private val firestore = Firebase.firestore
@@ -41,6 +42,18 @@ class UserRepository {
     ).snapshots().map {
         val doc = it.documents[0]
         User(
+            doc.id,
+            doc["name"].toString(),
+            doc["birthday"].toString(),
+            doc["hasFamily"] as Boolean,
+            doc["familyId"].toString(),
+            doc["email"].toString()
+        )
+    }
+
+    suspend fun getUserByIdOnce(userId: String): User {
+        val doc = firestore.collection("users").document(userId).get().await()
+        return User(
             doc.id,
             doc["name"].toString(),
             doc["birthday"].toString(),
