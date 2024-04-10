@@ -36,10 +36,14 @@ class EventInfoViewModel : ViewModel() {
     fun getAttendees(): Flow<List<EventAttendee>> = attendees
 
     fun changeComing(userId: String, eventId: String, isComing: Boolean) {
-        eventRepo.changeComing(userId, eventId, isComing)
+        viewModelScope.launch(Dispatchers.IO) {
+            eventRepo.changeComing(userId, eventId, isComing)
+        }
     }
 
     fun deleteEvent(eventId: String) {
-        eventRepo.deleteEvent(eventId)
+        viewModelScope.launch(Dispatchers.IO) {
+            eventRepo.deleteEvent(eventId)
+        }
     }
 }

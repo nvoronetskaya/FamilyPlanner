@@ -50,8 +50,24 @@ class EventRepository {
     }
 
     fun getEventAttendees(eventId: String): Flow<List<EventAttendee>> {
-        return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots().map {
-            it.toObjects(EventAttendee::class.java)
+        return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots()
+            .map {
+                it.toObjects(EventAttendee::class.java)
+            }
+    }
+
+    suspend fun changeComing(userId: String, eventId: String, isComing: Boolean) {
+        firestore.collection("eventAttendees").whereEqualTo("userId", userId)
+            .whereEqualTo("eventId", eventId).get()
+            .await().documents.forEach { it.reference.delete() }
+    }
+
+    fun deleteEvent(eventId: String) {
+        firestore.collection("events").document(eventId).delete().addOnSuccessListener {
+            firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).get()
+                .addOnCompleteListener {
+                    it.result.documents.forEach { it.reference.delete() }
+                }
         }
     }
 }
