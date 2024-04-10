@@ -1,5 +1,6 @@
 package com.familyplanner.events.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.events.data.Event
@@ -9,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 
 class EventInfoViewModel : ViewModel() {
     private var eventId: String = ""
@@ -45,5 +48,9 @@ class EventInfoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             eventRepo.deleteEvent(eventId)
         }
+    }
+
+    fun downloadFile(taskId: String, path: String): Uri {
+        return runBlocking { eventRepo.downloadFile("$taskId/$path").await() }
     }
 }

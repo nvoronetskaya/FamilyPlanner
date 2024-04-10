@@ -1,6 +1,9 @@
 package com.familyplanner.events.view
 
+import android.app.DownloadManager
+import android.app.Service
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +31,7 @@ class EventInfoFragment : Fragment() {
     private var _binding: FragmentEventInfoBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: EventInfoViewModel
+    private lateinit var eventId: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +45,7 @@ class EventInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EventInfoViewModel::class.java]
-        val eventId = requireArguments().getString("eventId")!!
+        eventId = requireArguments().getString("eventId")!!
         viewModel.setEvent(eventId)
         val attendeeAdapter = AttendeeAdapter()
         val attendeeLayoutManager = LinearLayoutManager(context)
@@ -71,7 +75,8 @@ class EventInfoFragment : Fragment() {
                                     ZoneId.systemDefault()
                                 ).format(FamilyPlanner.dateTimeFormatter)
                                 binding.ivEdit.isVisible = FamilyPlanner.userId.equals(it.createdBy)
-                                binding.tvCancel.isVisible = FamilyPlanner.userId.equals(it.createdBy)
+                                binding.tvCancel.isVisible =
+                                    FamilyPlanner.userId.equals(it.createdBy)
                                 binding.ivEdit.setOnClickListener {
                                     TODO()
                                 }
@@ -80,7 +85,11 @@ class EventInfoFragment : Fragment() {
                                     findNavController().popBackStack()
                                 }
                                 binding.cbParticipate.setOnClickListener {
-                                    viewModel.changeComing(FamilyPlanner.userId, eventId, binding.cbParticipate.isChecked)
+                                    viewModel.changeComing(
+                                        FamilyPlanner.userId,
+                                        eventId,
+                                        binding.cbParticipate.isChecked
+                                    )
                                 }
                             }
                         }
@@ -95,6 +104,19 @@ class EventInfoFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun downloadFile(path: String) {
+        val request = DownloadManager.Request(viewModel.downloadFile(eventId, path))
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                path
+            )
+        val downloadManager =
+            requireContext().getSystemService(Service.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
+        Toast.makeText(context, "Файл загружается... ", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

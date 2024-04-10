@@ -66,7 +66,8 @@ class TaskRepository {
                 val ids = it.map { it["taskId"].toString() }
                 launch {
                     firestore.collection("observers").whereEqualTo("userId", executorId)
-                        .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots().collect { result ->
+                        .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots()
+                        .collect { result ->
                             val queryTasks = mutableListOf<Task>()
                             for (doc in result.documents) {
                                 val task = doc.toObject(Task::class.java)!!
@@ -139,7 +140,7 @@ class TaskRepository {
 
     suspend fun tryUploadFiles(files: List<UserFile>, taskId: String): Boolean {
         var isSuccessful = true
-        val filesRef = storage.reference.child(taskId)
+        val filesRef = storage.reference.child("task-$taskId")
         for (file in files) {
             val metadata = storageMetadata { setCustomMetadata("name", file.name) }
             if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {

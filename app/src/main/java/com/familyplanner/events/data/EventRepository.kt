@@ -1,5 +1,6 @@
 package com.familyplanner.events.data
 
+import android.net.Uri
 import com.familyplanner.tasks.model.UserFile
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
@@ -33,7 +34,7 @@ class EventRepository {
 
     suspend fun tryUploadFiles(files: List<UserFile>, eventId: String): Boolean {
         var isSuccessful = true
-        val filesRef = storage.reference.child(eventId)
+        val filesRef = storage.reference.child("event-$eventId")
         for (file in files) {
             val metadata = storageMetadata { setCustomMetadata("name", file.name) }
             if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
@@ -69,5 +70,9 @@ class EventRepository {
                     it.result.documents.forEach { it.reference.delete() }
                 }
         }
+    }
+
+    fun downloadFile(path: String): Task<Uri> {
+        return storage.reference.child(path).downloadUrl
     }
 }
