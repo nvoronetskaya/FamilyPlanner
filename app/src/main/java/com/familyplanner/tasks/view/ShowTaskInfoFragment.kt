@@ -39,6 +39,7 @@ class ShowTaskInfoFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: TaskInfoViewModel
     private lateinit var userId: String
+    private lateinit var taskId: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +53,7 @@ class ShowTaskInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val taskId = requireArguments().getString("taskId")!!
+        taskId = requireArguments().getString("taskId")!!
         userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[TaskInfoViewModel::class.java]
         viewModel.setTask(taskId)
@@ -71,6 +72,8 @@ class ShowTaskInfoFragment : Fragment() {
         binding.rvComment.adapter = commentsAdapter
         binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvObservers.adapter = observersAdapter
+        binding.rvFiles.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFiles.adapter = filesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -236,11 +239,11 @@ class ShowTaskInfoFragment : Fragment() {
     private fun timeToString(time: Int): String = "${time / 60}:${time % 60}"
 
     private fun downloadFile(path: String) {
-        val request = DownloadManager.Request(viewModel.downloadFile(path))
+        val request = DownloadManager.Request(viewModel.downloadFile(taskId, path))
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
-                Calendar.getInstance().timeInMillis.toString()
+                path
             )
         val downloadManager =
             requireContext().getSystemService(Service.DOWNLOAD_SERVICE) as DownloadManager

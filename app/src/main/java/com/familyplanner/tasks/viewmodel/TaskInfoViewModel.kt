@@ -92,7 +92,7 @@ class TaskInfoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.getFilesForTask(taskId).addOnCompleteListener {
                 val curFiles = if (it.isSuccessful) {
-                    it.result.prefixes.map { it.path }
+                    it.result.items.map { it.name }
                 } else {
                     null
                 }
@@ -113,8 +113,8 @@ class TaskInfoViewModel : ViewModel() {
 
     fun getFiles(): Flow<List<String>?> = files
 
-    fun downloadFile(path: String): Uri {
-        return runBlocking { repo.downloadFile(path).await() }
+    fun downloadFile(taskId: String, path: String): Uri {
+        return runBlocking { repo.downloadFile("$taskId/$path").await() }
     }
 
     fun changeCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
