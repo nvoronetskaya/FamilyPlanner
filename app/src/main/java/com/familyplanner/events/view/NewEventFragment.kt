@@ -26,7 +26,6 @@ import com.familyplanner.events.viewmodel.NewEventViewModel
 import com.familyplanner.tasks.adapters.FileAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -124,7 +123,7 @@ class NewEventFragment : Fragment() {
     }
 
     private fun getDateTimeFromString(value: String): Long {
-        return LocalDateTime.parse(value, FamilyPlanner.dadteTimeFormatter)
+        return LocalDateTime.parse(value, FamilyPlanner.dateTimeFormatter)
             .atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC)
             .toInstant().epochSecond
     }

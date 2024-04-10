@@ -3,7 +3,6 @@ package com.familyplanner
 import android.app.Application
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 
 class FamilyPlanner: Application() {
@@ -11,7 +10,7 @@ class FamilyPlanner: Application() {
         var isInit = false
         var userId = Firebase.auth.currentUser?.uid ?: ""
         val uiDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-        val dadteTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
     }
     override fun onCreate() {
         super.onCreate()

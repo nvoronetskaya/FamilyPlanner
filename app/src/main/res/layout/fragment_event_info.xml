@@ -100,45 +100,45 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
-                    android:id="@+id/tv_date"
+                    android:id="@+id/tv_start"
                     style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical|start"
-                    android:text="@string/date"
+                    android:text="@string/start_date"
                     app:layout_constraintStart_toStartOf="@id/tf_description"
                     app:layout_constraintTop_toBottomOf="@id/tf_description" />
 
                 <TextView
-                    android:id="@+id/tv_date_value"
+                    android:id="@+id/tv_start_value"
                     style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical|start"
-                    tools:text="22.01.2024"
-                    app:layout_constraintBottom_toBottomOf="@id/tv_date"
-                    app:layout_constraintStart_toEndOf="@id/tv_date" />
+                    app:layout_constraintBottom_toBottomOf="@id/tv_start"
+                    app:layout_constraintStart_toEndOf="@id/tv_start"
+                    tools:text="22.01.2024" />
 
                 <TextView
-                    android:id="@+id/tv_time"
+                    android:id="@+id/tv_finish"
                     style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:text="@string/time"
-                    app:layout_constraintStart_toStartOf="@id/tv_date"
-                    app:layout_constraintTop_toBottomOf="@id/tv_date" />
+                    android:text="@string/finish_date"
+                    app:layout_constraintStart_toStartOf="@id/tv_start"
+                    app:layout_constraintTop_toBottomOf="@id/tv_start" />
 
                 <TextView
-                    android:id="@+id/tv_time_value"
+                    android:id="@+id/tv_finish_value"
                     style="@style/textBody"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:gravity="center_vertical"
-                    app:layout_constraintStart_toEndOf="@id/tv_time"
-                    app:layout_constraintBottom_toBottomOf="@id/tv_time" />
+                    app:layout_constraintBottom_toBottomOf="@id/tv_finish"
+                    app:layout_constraintStart_toEndOf="@id/tv_finish" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
@@ -226,11 +226,11 @@
             <TextView
                 android:id="@+id/tv_cancel"
                 style="@style/textBody"
-                android:layout_marginTop="30dp"
-                android:textColor="@color/red"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
                 android:text="@string/cancel_event"
+                android:textColor="@color/red"
                 app:drawableStartCompat="@drawable/cancel_event" />
         </LinearLayout>
     </ScrollView>
