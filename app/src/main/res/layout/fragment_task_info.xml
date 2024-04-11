@@ -303,6 +303,16 @@
                 android:layout_height="match_parent"
                 android:text="@string/become_executor" />
 
+            <TextView
+                android:id="@+id/tv_delete"
+                style="@style/textBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/delete_task"
+                android:textColor="@color/red"
+                app:drawableStartCompat="@drawable/delete" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

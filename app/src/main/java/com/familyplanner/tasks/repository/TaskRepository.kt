@@ -1,11 +1,9 @@
 package com.familyplanner.tasks.repository
 
 import android.net.Uri
-import com.familyplanner.FamilyPlanner
 import com.familyplanner.common.User
 import com.familyplanner.tasks.dto.CommentDto
 import com.google.android.gms.tasks.Task as GoogleTask
-import com.familyplanner.tasks.model.Comment
 import com.familyplanner.tasks.model.Observer
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.model.UserFile
@@ -21,11 +19,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.time.LocalDate
 
 class TaskRepository {
     private val firestore = Firebase.firestore
@@ -138,7 +134,11 @@ class TaskRepository {
         firestore.collection("observers").add(observer)
     }
 
-    suspend fun tryUploadFiles(files: List<UserFile>, taskId: String, prefix: String = "task"): Boolean {
+    suspend fun tryUploadFiles(
+        files: List<UserFile>,
+        taskId: String,
+        prefix: String = "task"
+    ): Boolean {
         var isSuccessful = true
         val filesRef = storage.reference.child("$prefix-$taskId")
         for (file in files) {
@@ -204,7 +204,25 @@ class TaskRepository {
     }
 
     fun deleteTask(taskId: String) {
-        TODO()
-        storage.reference.child("task-$taskId").delete()
+        val result = firestore.collection("tasks").document(taskId).delete().addOnSuccessListener {
+            scope.launch {
+                firestore.collection("observers").whereEqualTo("taskId", taskId).get()
+                    .await().documents.forEach { it.reference.delete() }
+                storage.reference.child("task-$taskId").delete()
+            }
+        }
+    }
+
+    fun getObserver(taskId: String, userId: String): Flow<Observer?> {
+        return firestore.collection("observers").whereEqualTo("userId", userId)
+            .whereEqualTo("taskId", taskId).limit(1).snapshots().map {
+                it.documents.firstOrNull()?.toObject(Observer::class.java)
+            }
+    }
+
+    suspend fun changeExecutorStatus(userId: String, taskId: String, isExecutor: Boolean) {
+        firestore.collection("observers").whereEqualTo("userId", userId)
+            .whereEqualTo("taskId", taskId).get().await()
+            .forEach { it.reference.update("isExecutor", isExecutor) }
     }
 }

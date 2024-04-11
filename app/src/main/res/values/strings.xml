@@ -104,4 +104,5 @@
     <string name="cancel_event">Отменить мероприятие </string>
     <string name="start_date">Начало: </string>
     <string name="finish_date">Окончание: </string>
+    <string name="delete_task">Удалить задачу</string>
 </resources>

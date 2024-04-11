@@ -10,8 +10,11 @@ import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +23,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
+import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentTaskInfoBinding
 import com.familyplanner.tasks.adapters.CommentsListAdapter
@@ -34,6 +38,7 @@ import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.yandex.mapkit.geometry.Point
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.time.LocalDate
@@ -91,6 +96,11 @@ class ShowTaskInfoFragment : Fragment() {
                     viewModel.getTask().collect {
                         requireActivity().runOnUiThread {
                             if (it == null) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Задача недоступна",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 findNavController().popBackStack()
                                 return@runOnUiThread
                             }
@@ -162,6 +172,21 @@ class ShowTaskInfoFragment : Fragment() {
                         }
                     }
                 }
+                launch {
+                    viewModel.getCurObserver().collect {
+                        requireActivity().runOnUiThread {
+                            if (it == null) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Задача недоступна",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                binding.cbBecomeExecutor.isChecked = it.isExecutor
+                            }
+                        }
+                    }
+                }
             }
         }
         binding.ivAddSubtask.setOnClickListener {
@@ -205,6 +230,33 @@ class ShowTaskInfoFragment : Fragment() {
                 type = "*/*"
             }
             startActivityForResult(openDocumentIntent, ATTACH_FILES)
+        }
+        binding.cbBecomeExecutor.setOnClickListener {
+            if (!binding.cbBecomeExecutor.isChecked) {
+                val reason = EditText(activity)
+                reason.hint = "Причина"
+                reason.textSize = 19F
+                AlertDialog.Builder(activity as MainActivity).setView(reason)
+                    .setMessage("Укажите причину, по которой Вы не сможете выполнить задачу: ")
+                    .setPositiveButton("Готово") { _, _ ->
+                        if (reason.text.isNullOrBlank()) {
+                            reason.error = "Введите название"
+                        } else {
+                            viewModel.addComment(
+                                userId,
+                                "Не могу выполнить задачу. Причина: ${reason.text.trim()}",
+                                listOf()
+                            )
+                        }
+                    }
+                    .setNegativeButton("Не указывать") { dialog, _ ->
+                        dialog.cancel()
+                    }.show()
+            }
+            viewModel.changeExecutorStatus(userId, taskId, binding.cbBecomeExecutor.isChecked)
+        }
+        binding.tvDelete.setOnClickListener {
+            viewModel.deleteTask(taskId)
         }
     }
 
@@ -270,6 +322,8 @@ class ShowTaskInfoFragment : Fragment() {
         } else {
             binding.map.visibility = View.GONE
         }
+        binding.ivEdit.isVisible = task.createdBy.equals(userId)
+        binding.tvDelete.isVisible = task.createdBy.equals(userId)
     }
 
     private fun getRepeatFromDays(daysOfWeek: Int): String {

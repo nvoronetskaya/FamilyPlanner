@@ -3,6 +3,7 @@ package com.familyplanner.tasks.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.tasks.dto.CommentDto
 import com.familyplanner.tasks.dto.ObserverDto
 import com.familyplanner.tasks.dto.TaskWithDate
@@ -42,6 +43,7 @@ class TaskInfoViewModel : ViewModel() {
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
     private var taskId: String = ""
     private val addComment = MutableSharedFlow<TaskCreationStatus>()
+    private val curObserver = MutableSharedFlow<Observer?>()
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
@@ -73,34 +75,41 @@ class TaskInfoViewModel : ViewModel() {
     fun setTask(taskId: String) {
         this.taskId = taskId
         viewModelScope.launch(Dispatchers.IO) {
-            repo.getTaskById(taskId).collect {
-                task.emit(it)
+            launch {
+                repo.getTaskById(taskId).collect {
+                    task.emit(it)
+                }
             }
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            repo.getTaskComments(taskId).collect {
-                comments.emit(it)
+            launch {
+                repo.getTaskComments(taskId).collect {
+                    comments.emit(it)
+                }
             }
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            repo.getTaskObservers(taskId).collect {
-                executors.emit(it)
+            launch {
+                repo.getTaskObservers(taskId).collect {
+                    executors.emit(it)
+                }
             }
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-//            repo.getSubtasks(taskId).collect {
+            launch {
+                //            repo.getSubtasks(taskId).collect {
 //                subTasks.emit(it)
 //            }
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            repo.getFilesForTask(taskId).addOnCompleteListener {
-                val curFiles = if (it.isSuccessful) {
-                    it.result.items.map { it.name }
-                } else {
-                    null
+            }
+            launch {
+                repo.getFilesForTask(taskId).addOnCompleteListener {
+                    val curFiles = if (it.isSuccessful) {
+                        it.result.items.map { it.name }
+                    } else {
+                        null
+                    }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        files.emit(curFiles)
+                    }
                 }
-                viewModelScope.launch(Dispatchers.IO) {
-                    files.emit(curFiles)
+            }
+            launch {
+                repo.getObserver(taskId, FamilyPlanner.userId).collect {
+                    curObserver.emit(it)
                 }
             }
         }
@@ -148,4 +157,16 @@ class TaskInfoViewModel : ViewModel() {
     }
 
     fun getCreationStatus(): Flow<TaskCreationStatus> = addComment
+
+    fun getCurObserver(): Flow<Observer?> = curObserver
+
+    fun changeExecutorStatus(userId: String, taskId: String, isExecutor: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.changeExecutorStatus(userId, taskId, isExecutor)
+        }
+    }
+
+    fun deleteTask(taskId: String) {
+        repo.deleteTask(taskId)
+    }
 }
