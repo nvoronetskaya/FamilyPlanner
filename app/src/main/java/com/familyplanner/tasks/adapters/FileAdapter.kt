@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderFileBinding
 import com.familyplanner.tasks.model.UserFile
 
-class FileAdapter :
+class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
     private val files = mutableListOf<UserFile>()
 
@@ -18,6 +18,7 @@ class FileAdapter :
             binding.ivRemove.setOnClickListener {
                 val position = files.indexOf(file)
                 files.removeAt(position)
+                onRemove?.invoke(file.name)
                 notifyItemRemoved(position)
             }
         }
@@ -35,8 +36,8 @@ class FileAdapter :
         holder.onBind(files[position])
     }
 
-    fun addFile(uri: Uri, fileName: String, size: Double) {
-        files.add(UserFile(uri, fileName, size))
+    fun addFile(file: UserFile) {
+        files.add(file)
         notifyItemInserted(files.size - 1)
     }
 
@@ -45,5 +46,10 @@ class FileAdapter :
     fun clearFiles() {
         files.clear()
         notifyDataSetChanged()
+    }
+
+    fun setData(files: List<UserFile>) {
+        this.files.clear()
+        this.files.addAll(files)
     }
 }

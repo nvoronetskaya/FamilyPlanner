@@ -25,6 +25,7 @@ import com.familyplanner.events.adapters.InvitationAdapter
 import com.familyplanner.events.viewmodel.NewEventViewModel
 import com.familyplanner.tasks.adapters.FileAdapter
 import com.familyplanner.tasks.model.TaskCreationStatus
+import com.familyplanner.tasks.model.UserFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -54,15 +55,15 @@ class NewEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[NewEventViewModel::class.java]
-        val filesLayoutManager =
-            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+
         filesAdapter = FileAdapter()
-        binding.rvFiles.layoutManager = filesLayoutManager
+        binding.rvFiles.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvFiles.adapter = filesAdapter
-        val attendeesLayoutManager =
-            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+
         attendeesAdapter = InvitationAdapter()
-        binding.rvObservers.layoutManager = attendeesLayoutManager
+        binding.rvObservers.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         binding.rvObservers.adapter = attendeesAdapter
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -136,6 +137,7 @@ class NewEventFragment : Fragment() {
         binding.ivDone.setOnClickListener {
             if (binding.etName.text.isNullOrBlank()) {
                 binding.tfName.error = "Название мероприятия не может быть пустым"
+                return@setOnClickListener
             }
             binding.tfName.isErrorEnabled = false
             viewModel.createEvent(
@@ -171,7 +173,7 @@ class NewEventFragment : Fragment() {
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
-                    filesAdapter.addFile(uri, name, size)
+                    filesAdapter.addFile(UserFile(uri, name, size))
                 }
             }
         }

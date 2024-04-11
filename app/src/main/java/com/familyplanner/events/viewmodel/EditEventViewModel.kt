@@ -1,11 +1,14 @@
 package com.familyplanner.events.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.familyplanner.events.data.Event
 import com.familyplanner.events.data.EventRepository
 import com.familyplanner.events.data.Invitation
 import com.familyplanner.family.data.FamilyRepository
 import com.familyplanner.tasks.model.UserFile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class EditEventViewModel : ViewModel() {
@@ -13,8 +16,9 @@ class EditEventViewModel : ViewModel() {
     private var event: Event? = null
     private val eventRepo = EventRepository()
     private val familyRepo = FamilyRepository()
-    private var files = mutableListOf<String>()
+    private var files = mutableListOf<UserFile>()
     private var attendees = mutableMapOf<String, Invitation>()
+    private var isFileUploadSuccessful: Boolean = true
 
     suspend fun prepareData(eventId: String, familyId: String) {
         if (eventId == this.eventId) {
@@ -34,7 +38,13 @@ class EditEventViewModel : ViewModel() {
                 invitations.firstOrNull { it.userId == user.id } != null)
         })
         files.clear()
-        files.addAll(eventRepo.getFilesForEvent(eventId).await().items.map { it.name })
+        files.addAll(eventRepo.getFilesForEvent(eventId).await().items.map {
+            UserFile(
+                Uri.EMPTY,
+                it.name,
+                0.0
+            )
+        })
     }
 
     fun getEvent(): Event? = event
@@ -43,13 +53,27 @@ class EditEventViewModel : ViewModel() {
         eventRepo.removeFile(eventId, fileName)
     }
 
-    suspend fun addFile(file: UserFile): Boolean {
-        return eventRepo.addFile(eventId, file)
+    fun addFile(file: UserFile) {
+        viewModelScope.launch {
+            if (!eventRepo.addFile(eventId, file)) {
+                isFileUploadSuccessful = false
+            }
+        }
     }
 
     fun getAttendees(): List<Invitation> = attendees.values.toList()
 
-    fun updateEventInfo(name: String, description: String, start: Long, finish: Long, newInvitations: List<Invitation>) {
+    fun updateEventInfo(
+        name: String,
+        description: String,
+        start: Long,
+        finish: Long,
+        newInvitations: List<Invitation>
+    ) {
         eventRepo.updateEvent(eventId, name, description, start, finish, newInvitations, attendees)
     }
+
+    fun getIsFilesUploadSuccessful() = isFileUploadSuccessful
+
+    fun getFiles(): List<UserFile> = files
 }

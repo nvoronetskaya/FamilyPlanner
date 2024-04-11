@@ -29,6 +29,7 @@ import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.model.TaskCreationStatus
+import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.viewmodel.NewTaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.yandex.mapkit.MapKitFactory
@@ -269,7 +270,7 @@ class NewTaskInfoFragment : Fragment() {
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
-                    filesAdapter.addFile(uri, name, size)
+                    filesAdapter.addFile(UserFile(uri, name, size))
                 }
             }
         }

@@ -34,6 +34,7 @@ import com.familyplanner.tasks.adapters.TaskAdapter
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.model.TaskCreationStatus
+import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.yandex.mapkit.geometry.Point
 import com.yandex.runtime.image.ImageProvider
@@ -276,7 +277,7 @@ class ShowTaskInfoFragment : Fragment() {
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
-                    commentFilesAdapter.addFile(uri, name, size)
+                    commentFilesAdapter.addFile(UserFile(uri, name, size))
                 }
             }
         }
