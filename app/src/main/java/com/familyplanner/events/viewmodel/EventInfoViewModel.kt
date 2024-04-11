@@ -3,6 +3,8 @@ package com.familyplanner.events.viewmodel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
+import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.events.data.Event
 import com.familyplanner.events.data.EventAttendee
 import com.familyplanner.events.data.EventRepository
@@ -15,9 +17,11 @@ import kotlinx.coroutines.tasks.await
 
 class EventInfoViewModel : ViewModel() {
     private var eventId: String = ""
+    private var familyId: String = ""
     private val event = MutableSharedFlow<Event?>()
     private val attendees = MutableSharedFlow<List<EventAttendee>>()
     private val eventRepo = EventRepository()
+    private val userRepo = UserRepository()
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
 
     fun setEvent(eventId: String) {
@@ -26,6 +30,10 @@ class EventInfoViewModel : ViewModel() {
         }
         this.eventId = eventId
         viewModelScope.launch(Dispatchers.IO) {
+            launch {
+                this@EventInfoViewModel.familyId =
+                    userRepo.getUserByIdOnce(FamilyPlanner.userId).familyId ?: ""
+            }
             launch {
                 eventRepo.getEventById(eventId).collect {
                     event.emit(it)
@@ -73,4 +81,5 @@ class EventInfoViewModel : ViewModel() {
 
     fun getFiles(): Flow<List<String>?> = files
 
+    fun getFamilyId() = familyId
 }

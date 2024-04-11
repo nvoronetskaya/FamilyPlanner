@@ -159,4 +159,20 @@
         android:id="@+id/groceryListInfoFragment"
         android:name="com.familyplanner.lists.view.GroceryListInfoFragment"
         android:label="GroceryListInfoFragment"/>
+    <fragment
+        android:id="@+id/newEventFragment"
+        android:name="com.familyplanner.events.view.NewEventFragment"
+        android:label="NewEventFragment" />
+    <fragment
+        android:id="@+id/eventInfoFragment"
+        android:name="com.familyplanner.events.view.EventInfoFragment"
+        android:label="EventInfoFragment" >
+        <action
+            android:id="@+id/action_eventInfoFragment_to_editEventFragment"
+            app:destination="@id/editEventFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/editEventFragment"
+        android:name="com.familyplanner.events.view.EditEventFragment"
+        android:label="EditEventFragment" />
 </navigation>

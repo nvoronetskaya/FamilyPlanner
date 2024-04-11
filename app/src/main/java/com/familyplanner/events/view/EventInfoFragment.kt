@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
+import com.familyplanner.R
 import com.familyplanner.databinding.FragmentEventInfoBinding
 import com.familyplanner.events.adapters.AttendeeAdapter
 import com.familyplanner.events.viewmodel.EventInfoViewModel
@@ -82,7 +83,13 @@ class EventInfoFragment : Fragment() {
                                 binding.tvCancel.isVisible =
                                     FamilyPlanner.userId.equals(it.createdBy)
                                 binding.ivEdit.setOnClickListener {
-                                    TODO()
+                                    val bundle = Bundle()
+                                    bundle.putString("eventId", eventId)
+                                    bundle.putString("familyId", viewModel.getFamilyId())
+                                    findNavController().navigate(
+                                        R.id.action_eventInfoFragment_to_editEventFragment,
+                                        bundle
+                                    )
                                 }
                                 binding.tvCancel.setOnClickListener {
                                     viewModel.deleteEvent(eventId)
