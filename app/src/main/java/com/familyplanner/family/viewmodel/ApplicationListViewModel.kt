@@ -2,6 +2,7 @@ package com.familyplanner.family.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
 import com.familyplanner.family.model.Family
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 
 class ApplicationListViewModel : ViewModel() {
-    private var userId: String = ""
+    private val userId: String = FamilyPlanner.userId
     private val errors = MutableSharedFlow<String>()
     private val repository = FamilyRepository()
     private var family = MutableSharedFlow<Family?>()
@@ -20,9 +21,7 @@ class ApplicationListViewModel : ViewModel() {
 
     fun getErrors(): Flow<String> = errors
 
-    fun setUserId(userId: String) {
-        this.userId = userId
-
+    init {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getUserById(userId).collect { user ->
                 val familyId = user.familyId

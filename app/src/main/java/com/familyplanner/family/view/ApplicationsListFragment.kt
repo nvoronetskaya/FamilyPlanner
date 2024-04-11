@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.databinding.FragmentApplicantsBinding
 import com.familyplanner.family.adapters.ApplicationAdapter
@@ -39,9 +40,8 @@ class ApplicationsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val isAdmin = requireArguments().getBoolean("isAdmin")
-        val userId = requireArguments().getString("userId")!!
+        val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[ApplicationListViewModel::class.java]
-        viewModel.setUserId(userId)
         adapter = ApplicationAdapter(isAdmin, activity as MainActivity, viewModel)
 
         val manager = LinearLayoutManager(activity)

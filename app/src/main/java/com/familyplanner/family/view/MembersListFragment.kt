@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentMembersBinding
@@ -41,9 +42,8 @@ class MembersListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val isAdmin = requireArguments().getBoolean("isAdmin")
-        val userId = requireArguments().getString("userId")!!
+        val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[MembersListViewModel::class.java]
-        viewModel.setUserId(userId)
         adapter = MemberAdapter(isAdmin, activity as MainActivity, viewModel)
 
         val manager = LinearLayoutManager(activity)

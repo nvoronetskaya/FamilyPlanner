@@ -73,6 +73,9 @@ class TaskInfoViewModel : ViewModel() {
     }
 
     fun setTask(taskId: String) {
+        if (taskId == this.taskId) {
+            return
+        }
         this.taskId = taskId
         viewModelScope.launch(Dispatchers.IO) {
             launch {

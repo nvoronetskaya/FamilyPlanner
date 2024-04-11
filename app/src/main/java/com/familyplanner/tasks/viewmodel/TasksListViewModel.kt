@@ -37,6 +37,9 @@ class TasksListViewModel : ViewModel() {
     private var familyId: String? = null
 
     fun setUser(userId: String) {
+        if (userId == this.userId) {
+            return
+        }
         this.userId = userId
         viewModelScope.launch(Dispatchers.IO) {
             userFilter.emit(userId)

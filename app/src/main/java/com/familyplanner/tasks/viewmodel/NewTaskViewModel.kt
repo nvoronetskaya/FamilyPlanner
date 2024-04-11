@@ -34,12 +34,7 @@ class NewTaskViewModel : ViewModel() {
     private var curAddress = ""
     private val familyRepo = FamilyRepository()
     private val tasksRepo = TaskRepository()
-    private var familyId = ""
     private var createdTaskId: String? = null
-
-    fun setFamilyId(familyId: String) {
-        this.familyId = familyId
-    }
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {

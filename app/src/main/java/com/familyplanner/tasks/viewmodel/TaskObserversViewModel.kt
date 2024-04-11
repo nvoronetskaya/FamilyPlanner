@@ -14,10 +14,15 @@ class TaskObserversViewModel : ViewModel() {
     private var members: MutableSharedFlow<List<User>> = MutableSharedFlow<List<User>>(replay = 1)
     private val familyRepo = FamilyRepository()
     private val tasksRepo = TaskRepository()
+    private var familyId: String = ""
 
     fun getMembers(): Flow<List<User>> = members
 
     fun setFamily(familyId: String) {
+        if (familyId != this.familyId) {
+            return
+        }
+        this.familyId = familyId
         viewModelScope.launch(Dispatchers.IO) {
             familyRepo.getFamilyMembers(familyId).collect {
                 members.emit(it)
@@ -25,7 +30,12 @@ class TaskObserversViewModel : ViewModel() {
         }
     }
 
-    fun setObserversAndExecutors(members: List<User>, observers: BooleanArray, executors: BooleanArray, taskId: String) {
+    fun setObserversAndExecutors(
+        members: List<User>,
+        observers: BooleanArray,
+        executors: BooleanArray,
+        taskId: String
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepo.updateTaskObservers(taskId, members, observers, executors)
         }

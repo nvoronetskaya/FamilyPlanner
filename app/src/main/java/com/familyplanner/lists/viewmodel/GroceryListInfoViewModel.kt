@@ -34,6 +34,9 @@ class GroceryListInfoViewModel : ViewModel() {
         }
     }
     fun setList(listId: String) {
+        if (listId == this.listId) {
+            return
+        }
         this.listId = listId
         viewModelScope.launch(Dispatchers.IO) {
             listsRepository.getListById(listId).collect {

@@ -181,7 +181,7 @@ class TaskRepository {
     }
 
     fun getFilesForTask(taskId: String): GoogleTask<ListResult> {
-        return storage.reference.child(taskId).listAll()
+        return storage.reference.child("task-$taskId").listAll()
     }
 
     fun downloadFile(path: String): GoogleTask<Uri> {
