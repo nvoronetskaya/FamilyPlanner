@@ -8,6 +8,7 @@ import com.familyplanner.tasks.dto.CommentDto
 import com.familyplanner.tasks.dto.ObserverDto
 import com.familyplanner.tasks.dto.TaskWithDate
 import com.familyplanner.tasks.model.Observer
+import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.model.TaskCreationStatus
@@ -27,13 +28,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import kotlin.math.pow
 
 class TaskInfoViewModel : ViewModel() {
     private val searchManager =
         SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
-    private val session = searchManager.createSuggestSession()
     private val searchStatus = MutableSharedFlow<Status>()
-    private var curAddress = ""
+    private var curAddress = MutableSharedFlow<String>()
     private var task: MutableSharedFlow<Task?> = MutableSharedFlow(replay = 1)
     private var comments: MutableSharedFlow<List<CommentDto>> = MutableSharedFlow(replay = 1)
     private var observers: MutableSharedFlow<List<ObserverDto>> = MutableSharedFlow(replay = 1)
@@ -52,7 +54,9 @@ class TaskInfoViewModel : ViewModel() {
                     ?: it.obj?.metadataContainer?.getItem(BusinessObjectMetadata::class.java)?.address?.formattedAddress
             }
 
-            curAddress = items[0]
+            viewModelScope.launch(Dispatchers.IO) {
+                curAddress.emit(items[0])
+            }
             viewModelScope.launch(Dispatchers.IO) {
                 searchStatus.emit(Status.SUCCESS)
             }
@@ -72,6 +76,8 @@ class TaskInfoViewModel : ViewModel() {
         return searchStatus
     }
 
+    fun getAddress(): Flow<String> = curAddress
+
     fun setTask(taskId: String) {
         if (taskId == this.taskId) {
             return
@@ -80,6 +86,12 @@ class TaskInfoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
                 repo.getTaskById(taskId).collect {
+                    getAddressByGeo(
+                        Point(
+                            it?.location?.latitude ?: 0.0,
+                            it?.location?.longitude ?: 0.0
+                        )
+                    )
                     task.emit(it)
                 }
             }
@@ -94,9 +106,9 @@ class TaskInfoViewModel : ViewModel() {
                 }
             }
             launch {
-                //            repo.getSubtasks(taskId).collect {
-//                subTasks.emit(it)
-//            }
+                repo.getSubtasks(taskId).collect {
+                    subTasks.emit(getTasksWithDate(it))
+                }
             }
             launch {
                 repo.getFilesForTask(taskId).addOnCompleteListener {
@@ -167,6 +179,45 @@ class TaskInfoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             repo.changeExecutorStatus(userId, taskId, isExecutor)
         }
+    }
+
+    fun getTasksWithDate(tasks: List<Task>): List<TaskWithDate> {
+        val tasksForDate = mutableListOf<TaskWithDate>()
+        for (task in tasks) {
+            val taskWithDate = TaskWithDate(task, null)
+            when (task.repeatType) {
+                RepeatType.ONCE -> taskWithDate.date = task.deadline
+
+                RepeatType.EVERY_DAY -> taskWithDate.date =
+                    if (task.lastCompletionDate == null) task.repeatStart else task.lastCompletionDate!! + 1
+
+                RepeatType.DAYS_OF_WEEK -> {
+                    var startDate =
+                        if (task.lastCompletionDate != null) task.lastCompletionDate!! + 1 else task.repeatStart
+
+                    while (true) {
+                        if (task.daysOfWeek and 2.0.pow(LocalDate.ofEpochDay(startDate!!).dayOfWeek.value)
+                                .toInt() > 0
+                        ) {
+                            taskWithDate.date = startDate
+                            break
+                        }
+                        ++startDate
+                    }
+                }
+
+                RepeatType.EACH_N_DAYS -> {
+                    taskWithDate.date = if (task.lastCompletionDate == null) {
+                        task.repeatStart
+                    } else {
+                        task.repeatStart!! + ((task.lastCompletionDate!! - task.repeatStart!!) / task.nDays + 1) * task.nDays
+                    }
+                }
+            }
+            tasksForDate.add(taskWithDate)
+
+        }
+        return tasksForDate
     }
 
     fun deleteTask(taskId: String) {

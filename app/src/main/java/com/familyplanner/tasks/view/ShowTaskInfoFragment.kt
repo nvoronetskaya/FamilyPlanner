@@ -39,7 +39,6 @@ import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.yandex.mapkit.geometry.Point
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.time.LocalDate
@@ -188,6 +187,13 @@ class ShowTaskInfoFragment : Fragment() {
                         }
                     }
                 }
+                launch {
+                    viewModel.getAddress().collect {
+                        requireActivity().runOnUiThread {
+                            binding.tvAddress.text = it
+                        }
+                    }
+                }
             }
         }
         binding.ivAddSubtask.setOnClickListener {
@@ -322,6 +328,7 @@ class ShowTaskInfoFragment : Fragment() {
             binding.map.visibility = View.VISIBLE
         } else {
             binding.map.visibility = View.GONE
+            binding.tvAddress.visibility = View.GONE
         }
         binding.ivEdit.isVisible = task.createdBy.equals(userId)
         binding.tvDelete.isVisible = task.createdBy.equals(userId)

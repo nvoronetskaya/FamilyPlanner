@@ -23,7 +23,6 @@ import com.familyplanner.events.adapters.AttendeeAdapter
 import com.familyplanner.events.viewmodel.EventInfoViewModel
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
