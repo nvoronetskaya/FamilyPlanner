@@ -1,0 +1,55 @@
+package com.familyplanner.events.viewmodel
+
+import androidx.lifecycle.ViewModel
+import com.familyplanner.events.data.Event
+import com.familyplanner.events.data.EventRepository
+import com.familyplanner.events.data.Invitation
+import com.familyplanner.family.data.FamilyRepository
+import com.familyplanner.tasks.model.UserFile
+import kotlinx.coroutines.tasks.await
+
+class EditEventViewModel : ViewModel() {
+    private var eventId: String = ""
+    private var event: Event? = null
+    private val eventRepo = EventRepository()
+    private val familyRepo = FamilyRepository()
+    private var files = mutableListOf<String>()
+    private var attendees = mutableMapOf<String, Invitation>()
+
+    suspend fun prepareData(eventId: String, familyId: String) {
+        if (eventId == this.eventId) {
+            return
+        }
+
+        this.eventId = eventId
+        event = eventRepo.getEventByIdOnce(eventId)
+        val allMembers = familyRepo.getFamilyMembersOnce(familyId)
+        val invitations = eventRepo.getEventAttendeesOnce(eventId)
+        attendees.clear()
+        attendees.putAll(allMembers.map { user ->
+            user.id to Invitation(
+                user.id,
+                user.name,
+                user.birthday,
+                invitations.firstOrNull { it.userId == user.id } != null)
+        })
+        files.clear()
+        files.addAll(eventRepo.getFilesForEvent(eventId).await().items.map { it.name })
+    }
+
+    fun getEvent(): Event? = event
+
+    fun removeFile(fileName: String) {
+        eventRepo.removeFile(eventId, fileName)
+    }
+
+    suspend fun addFile(file: UserFile): Boolean {
+        return eventRepo.addFile(eventId, file)
+    }
+
+    fun getAttendees(): List<Invitation> = attendees.values.toList()
+
+    fun updateEventInfo(name: String, description: String, start: Long, finish: Long, newInvitations: List<Invitation>) {
+        eventRepo.updateEvent(eventId, name, description, start, finish, newInvitations, attendees)
+    }
+}

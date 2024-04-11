@@ -20,6 +20,7 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.FragmentEventInfoBinding
 import com.familyplanner.events.adapters.AttendeeAdapter
 import com.familyplanner.events.viewmodel.EventInfoViewModel
+import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -51,6 +52,9 @@ class EventInfoFragment : Fragment() {
         val attendeeLayoutManager = LinearLayoutManager(context)
         binding.rvObservers.layoutManager = attendeeLayoutManager
         binding.rvObservers.adapter = attendeeAdapter
+        val filesAdapter = ObserveFilesAdapter(::downloadFile)
+        binding.rvFiles.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFiles.adapter = filesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -99,6 +103,21 @@ class EventInfoFragment : Fragment() {
                     viewModel.getAttendees().collect {
                         requireActivity().runOnUiThread {
                             attendeeAdapter.setData(it)
+                        }
+                    }
+                }
+                launch {
+                    viewModel.getFiles().collect {
+                        requireActivity().runOnUiThread {
+                            if (it == null) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось получить файлы. Проверьте соединение",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@runOnUiThread
+                            }
+                            filesAdapter.addPaths(it)
                         }
                     }
                 }

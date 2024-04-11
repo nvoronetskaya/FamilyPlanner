@@ -7,6 +7,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
+import com.google.firebase.storage.ListResult
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
 import kotlinx.coroutines.flow.Flow
@@ -50,10 +51,22 @@ class EventRepository {
         }
     }
 
+    suspend fun getEventByIdOnce(eventId: String): Event? {
+        return firestore.collection("events").document(eventId).get().await()
+            .toObject(Event::class.java)
+    }
+
     fun getEventAttendees(eventId: String): Flow<List<EventAttendee>> {
         return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots()
             .map {
                 it.toObjects(EventAttendee::class.java)
+            }
+    }
+
+    suspend fun getEventAttendeesOnce(eventId: String): List<EventAttendee> {
+        return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).get().await()
+            .map {
+                it.toObject(EventAttendee::class.java)
             }
     }
 
@@ -75,5 +88,57 @@ class EventRepository {
 
     fun downloadFile(path: String): Task<Uri> {
         return storage.reference.child(path).downloadUrl
+    }
+
+    fun getFilesForEvent(eventId: String): Task<ListResult> {
+        return storage.reference.child("event-$eventId").listAll()
+    }
+
+    suspend fun addFile(eventId: String, file: UserFile): Boolean {
+        val filesRef = storage.reference.child("event-$eventId")
+        val metadata = storageMetadata { setCustomMetadata("name", file.name) }
+        if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
+            return false
+        }
+        return true
+    }
+
+    fun removeFile(eventId: String, fileName: String): Task<Void> {
+        return storage.reference.child("event-$eventId").child(fileName).delete()
+    }
+
+    fun updateEvent(
+        eventId: String,
+        name: String,
+        description: String,
+        start: Long,
+        finish: Long,
+        newInvitations: List<Invitation>,
+        attendees: Map<String, Invitation>
+    ) {
+        val data = mapOf<String, Any>(
+            "name" to name,
+            "description" to description,
+            "start" to start,
+            "finish" to finish
+        )
+        firestore.collection("events").document(eventId).update(data).addOnSuccessListener {
+            for (invitation in newInvitations) {
+                if (invitation.isInvited != attendees[invitation.userId]?.isInvited) {
+                    firestore.collection("eventAttendees").whereEqualTo("userId", invitation.userId)
+                        .whereEqualTo("eventId", eventId).get().addOnSuccessListener {
+                            it.documents.forEach { it.reference.delete() }
+                            if (invitation.isInvited) {
+                                val newInvitation = mapOf<String, Any>(
+                                    "eventId" to eventId,
+                                    "userId" to invitation.userId,
+                                    "status" to EventAttendeeStatus.UNKNOWN
+                                )
+                                firestore.collection("eventAttendees").add(newInvitation)
+                            }
+                        }
+                }
+            }
+        }
     }
 }
