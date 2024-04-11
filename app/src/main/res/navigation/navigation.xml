@@ -146,6 +146,9 @@
         <action
             android:id="@+id/action_showTaskInfoFragment_to_newTaskInfoFragment"
             app:destination="@id/newTaskInfoFragment" />
+        <action
+            android:id="@+id/action_showTaskInfoFragment_to_editTaskFragment"
+            app:destination="@id/editTaskFragment" />
     </fragment>
     <fragment
         android:id="@+id/listsListFragment"
@@ -175,4 +178,8 @@
         android:id="@+id/editEventFragment"
         android:name="com.familyplanner.events.view.EditEventFragment"
         android:label="EditEventFragment" />
+    <fragment
+        android:id="@+id/editTaskFragment"
+        android:name="com.familyplanner.tasks.view.EditTaskFragment"
+        android:label="EditTaskFragment" />
 </navigation>
