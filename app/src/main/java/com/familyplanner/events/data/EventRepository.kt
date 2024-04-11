@@ -69,6 +69,7 @@ class EventRepository {
                 .addOnCompleteListener {
                     it.result.documents.forEach { it.reference.delete() }
                 }
+            storage.reference.child("event-$eventId").delete()
         }
     }
 

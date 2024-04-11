@@ -41,4 +41,9 @@ class FileAdapter :
     }
 
     fun getFiles(): List<UserFile> = files
+
+    fun clearFiles() {
+        files.clear()
+        notifyDataSetChanged()
+    }
 }

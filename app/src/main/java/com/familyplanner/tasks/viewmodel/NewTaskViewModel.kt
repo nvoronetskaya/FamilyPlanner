@@ -24,9 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import java.time.LocalDate
-import java.util.Date
 
 class NewTaskViewModel : ViewModel() {
     private val searchManager =
@@ -38,7 +35,6 @@ class NewTaskViewModel : ViewModel() {
     private val familyRepo = FamilyRepository()
     private val tasksRepo = TaskRepository()
     private var familyId = ""
-    private var uploadTasks = listOf<UploadTask>()
     private var createdTaskId: String? = null
 
     fun setFamilyId(familyId: String) {

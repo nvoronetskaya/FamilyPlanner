@@ -1,9 +1,12 @@
 package com.familyplanner.tasks.view
 
+import android.app.Activity
 import android.app.DownloadManager
 import android.app.Service
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,11 +23,13 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentTaskInfoBinding
 import com.familyplanner.tasks.adapters.CommentsListAdapter
+import com.familyplanner.tasks.adapters.FileAdapter
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import com.familyplanner.tasks.adapters.ObserversListAdapter
 import com.familyplanner.tasks.adapters.TaskAdapter
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
+import com.familyplanner.tasks.model.TaskCreationStatus
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.yandex.mapkit.geometry.Point
 import com.yandex.runtime.image.ImageProvider
@@ -32,14 +37,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 import java.time.LocalDate
-import java.util.Calendar
 
 class ShowTaskInfoFragment : Fragment() {
     private var _binding: FragmentTaskInfoBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: TaskInfoViewModel
     private lateinit var userId: String
+    private val ATTACH_FILES = 10
     private lateinit var taskId: String
+    private lateinit var commentFilesAdapter: FileAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,6 +80,11 @@ class ShowTaskInfoFragment : Fragment() {
         binding.rvObservers.adapter = observersAdapter
         binding.rvFiles.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFiles.adapter = filesAdapter
+
+        commentFilesAdapter = FileAdapter()
+        binding.rvCommentFiles.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvCommentFiles.adapter = commentFilesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -124,6 +135,33 @@ class ShowTaskInfoFragment : Fragment() {
                         }
                     }
                 }
+                launch {
+                    val creationStatus = viewModel.getCreationStatus()
+                    creationStatus.collect {
+                        when (it) {
+                            TaskCreationStatus.SUCCESS -> {
+                                commentFilesAdapter.clearFiles()
+                                binding.etComment.text?.clear()
+                            }
+
+                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось прикрепить некоторые файлы",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                commentFilesAdapter.clearFiles()
+                                binding.etComment.text?.clear()
+                            }
+
+                            TaskCreationStatus.FAILED -> Toast.makeText(
+                                requireContext(),
+                                "Ошибка. Проверьте подключение к сети и повторите позднее",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
             }
         }
         binding.ivAddSubtask.setOnClickListener {
@@ -159,19 +197,37 @@ class ShowTaskInfoFragment : Fragment() {
                 binding.etComment.error = "Текст комментария не может быть пустым"
                 return@setOnClickListener
             }
-            viewModel.addComment(userId, comment.trim()).addOnCompleteListener {
-                if (it.isSuccessful) {
-                    binding.etComment.text?.clear()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Не удалось добавить комментарий. Проверьте подключение к сети",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            viewModel.addComment(userId, comment.trim(), commentFilesAdapter.getFiles())
+        }
+        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
+        binding.ivAttach.setOnClickListener {
+            val openDocumentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "*/*"
+            }
+            startActivityForResult(openDocumentIntent, ATTACH_FILES)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ATTACH_FILES) {
+            if (resultCode == Activity.RESULT_OK) {
+                val uri = data?.data
+                if (uri == null) {
+                    Toast.makeText(activity, "Не удалось прикрепить файл", Toast.LENGTH_SHORT)
+                        .show()
+                    return
+                }
+                requireActivity().contentResolver.query(uri, null, null, null, null).use { cursor ->
+                    val nameIndex = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    val sizeIndex = cursor!!.getColumnIndex(OpenableColumns.SIZE)
+                    cursor.moveToFirst()
+                    val name = cursor.getString(nameIndex)
+                    val size = cursor.getDouble(sizeIndex)
+                    commentFilesAdapter.addFile(uri, name, size)
                 }
             }
         }
-        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
     }
 
     private fun onTaskClicked(taskId: String) {

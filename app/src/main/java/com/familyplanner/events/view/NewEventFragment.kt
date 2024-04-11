@@ -24,7 +24,9 @@ import com.familyplanner.databinding.FragmentNewEventBinding
 import com.familyplanner.events.adapters.InvitationAdapter
 import com.familyplanner.events.viewmodel.NewEventViewModel
 import com.familyplanner.tasks.adapters.FileAdapter
+import com.familyplanner.tasks.model.TaskCreationStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -65,10 +67,35 @@ class NewEventFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getAttendees().collect {
-                    requireActivity().runOnUiThread {
-                        if (it.isNotEmpty()) {
-                            attendeesAdapter.setData(it)
+                launch {
+                    viewModel.getAttendees().collect {
+                        requireActivity().runOnUiThread {
+                            if (it.isNotEmpty()) {
+                                attendeesAdapter.setData(it)
+                            }
+                        }
+                    }
+                }
+                launch {
+                    val creationResult = viewModel.getCreationStatus()
+                    creationResult.collect {
+                        when (it) {
+                            TaskCreationStatus.SUCCESS -> findNavController().popBackStack()
+
+                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось прикрепить некоторые файлы. Вы можете отредактировать мероприятие позднее",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                findNavController().popBackStack()
+                            }
+
+                            TaskCreationStatus.FAILED -> Toast.makeText(
+                                requireContext(),
+                                "Ошибка. Проверьте подключение к сети и повторите позднее",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }

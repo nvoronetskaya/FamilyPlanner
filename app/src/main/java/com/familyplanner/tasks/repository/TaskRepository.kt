@@ -138,9 +138,9 @@ class TaskRepository {
         firestore.collection("observers").add(observer)
     }
 
-    suspend fun tryUploadFiles(files: List<UserFile>, taskId: String): Boolean {
+    suspend fun tryUploadFiles(files: List<UserFile>, taskId: String, prefix: String = "task"): Boolean {
         var isSuccessful = true
-        val filesRef = storage.reference.child("task-$taskId")
+        val filesRef = storage.reference.child("$prefix-$taskId")
         for (file in files) {
             val metadata = storageMetadata { setCustomMetadata("name", file.name) }
             if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
@@ -201,5 +201,10 @@ class TaskRepository {
 
     fun changeTaskCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
         //TODO()
+    }
+
+    fun deleteTask(taskId: String) {
+        TODO()
+        storage.reference.child("task-$taskId").delete()
     }
 }

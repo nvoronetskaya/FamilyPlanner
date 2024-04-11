@@ -135,9 +135,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    tools:text="один раз"
                     app:layout_constraintStart_toEndOf="@id/tv_repeat"
-                    app:layout_constraintTop_toTopOf="@id/tv_repeat" />
+                    app:layout_constraintTop_toTopOf="@id/tv_repeat"
+                    tools:text="один раз" />
 
                 <com.yandex.mapkit.mapview.MapView
                     android:id="@+id/map"
@@ -155,9 +155,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
-                    tools:text="Москва, ул. Полянка, д. 10"
                     app:layout_constraintStart_toStartOf="@id/map"
-                    app:layout_constraintTop_toBottomOf="@id/map" />
+                    app:layout_constraintTop_toBottomOf="@id/map"
+                    tools:text="Москва, ул. Полянка, д. 10" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -340,6 +340,19 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tf_comment"
                     app:srcCompat="@drawable/attach_file" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_comment_files"
+                    style="@style/textBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintBottom_toTopOf="@id/tf_comment"
+                    app:layout_constraintEnd_toEndOf="@id/tf_comment"
+                    app:layout_constraintStart_toStartOf="@id/tf_comment"
+                    tools:listitem="@layout/viewholder_file" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tf_comment"

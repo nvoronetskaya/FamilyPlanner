@@ -65,4 +65,6 @@ class NewEventViewModel : ViewModel() {
             }
         }
     }
+
+    fun getCreationStatus(): Flow<TaskCreationStatus> = addEvent
 }

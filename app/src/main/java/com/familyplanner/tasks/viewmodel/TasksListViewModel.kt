@@ -10,6 +10,8 @@ import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.SortingType
 import com.familyplanner.tasks.repository.TaskRepository
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +42,7 @@ class TasksListViewModel : ViewModel() {
             userFilter.emit(userId)
             userRepo.getUserById(userId).collect {
                 familyId = it.familyId
+                Firebase.messaging.subscribeToTopic(familyId ?: "")
                 familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
                     users.clear()
                     users.addAll(members)

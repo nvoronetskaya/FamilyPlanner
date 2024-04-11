@@ -9,6 +9,8 @@ import com.familyplanner.tasks.dto.TaskWithDate
 import com.familyplanner.tasks.model.Observer
 import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.model.Task
+import com.familyplanner.tasks.model.TaskCreationStatus
+import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.repository.TaskRepository
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.search.BusinessObjectMetadata
@@ -39,6 +41,7 @@ class TaskInfoViewModel : ViewModel() {
     private var subTasks: MutableSharedFlow<List<TaskWithDate>> = MutableSharedFlow(replay = 1)
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
     private var taskId: String = ""
+    private val addComment = MutableSharedFlow<TaskCreationStatus>()
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
@@ -121,5 +124,28 @@ class TaskInfoViewModel : ViewModel() {
         repo.changeTaskCompleted(taskId, isCompleted, completedById)
     }
 
-    fun addComment(userId: String, comment: String) = repo.addComment(userId, comment, taskId)
+    fun addComment(userId: String, comment: String, files: List<UserFile>) {
+        repo.addComment(userId, comment, taskId).addOnCompleteListener {
+            viewModelScope.launch(Dispatchers.IO) {
+                val result: TaskCreationStatus
+                if (!it.isSuccessful) {
+                    result = TaskCreationStatus.FAILED
+                } else {
+                    val createdCommentId = it.result.id
+                    result = if (files.isNotEmpty()) {
+                        if (!repo.tryUploadFiles(files, createdCommentId, "comment")) {
+                            TaskCreationStatus.FILE_UPLOAD_FAILED
+                        } else {
+                            TaskCreationStatus.SUCCESS
+                        }
+                    } else {
+                        TaskCreationStatus.SUCCESS
+                    }
+                }
+                addComment.emit(result)
+            }
+        }
+    }
+
+    fun getCreationStatus(): Flow<TaskCreationStatus> = addComment
 }
