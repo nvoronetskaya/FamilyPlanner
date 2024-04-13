@@ -103,12 +103,17 @@ class TasksListViewModel : ViewModel() {
         val today = LocalDate.now().toEpochDay()
         val tasksForDate = mutableListOf<TaskWithDate>()
         for (task in curAllTasks) {
+            if (task.task.lastCompletionDate == today) {
+                task.date = null
+                tasksForDate.add(task)
+                continue 
+            }
             when (task.task.repeatType) {
                 RepeatType.ONCE -> {
-                    if (task.task.deadline != null && task.task.deadline!! <= dateEpochDay || task.task.deadline == null) {
-                        if (task.task.hasDeadline) {
-                            task.date = task.task.deadline
-                        }
+                    val shouldDoToday =
+                        task.task.deadline != null && task.task.deadline!! <= dateEpochDay || task.task.deadline == null
+                    if (task.task.deadline != null && task.task.deadline!! == dateEpochDay || shouldDoToday && today == dateEpochDay) {
+                        task.date = if (task.task.hasDeadline) task.task.deadline else null
                         tasksForDate.add(task)
                     }
                 }
@@ -138,16 +143,6 @@ class TasksListViewModel : ViewModel() {
                             date.dayOfWeek.value
                         ).toInt() > 0)
                     ) {
-                        val startDay =
-                            if (task.task.lastCompletionDate == null) task.task.repeatStart else task.task.lastCompletionDate!! + 1
-                        for (i in startDay!!..dateEpochDay) {
-                            if (task.task.daysOfWeek and 2.0.pow(LocalDate.ofEpochDay(i).dayOfWeek.value)
-                                    .toInt() > 0
-                            ) {
-                                task.date = i
-                                break
-                            }
-                        }
                         tasksForDate.add(task)
                     }
                 }

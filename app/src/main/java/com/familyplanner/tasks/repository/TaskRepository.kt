@@ -64,15 +64,20 @@ class TaskRepository {
                     firestore.collection("observers").whereEqualTo("userId", executorId)
                         .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots()
                         .collect { result ->
-                            val queryTasks = mutableListOf<Task>()
-                            for (doc in result.documents) {
-                                val task = doc.toObject(Task::class.java)!!
-                                task.id = doc.id
-                                if (task.parentId != null) {
-                                    queryTasks.add(task)
-                                }
+                            val tasksIds = result.map { it["taskId"].toString() }
+                            launch {
+                                firestore.collection("tasks").whereEqualTo("parentId", null)
+                                    .whereIn(FieldPath.documentId(), tasksIds).snapshots()
+                                    .collect { result ->
+                                        val queryTasks = mutableListOf<Task>()
+                                        for (doc in result.documents) {
+                                            val task = doc.toObject(Task::class.java)!!
+                                            task.id = doc.id
+                                            queryTasks.add(task)
+                                        }
+                                        userTasks.emit(queryTasks)
+                                    }
                             }
-                            userTasks.emit(queryTasks)
                         }
                 }
             }
