@@ -41,6 +41,7 @@ class TasksListFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: TasksListViewModel
     private val calendar = Calendar.getInstance()
+    private val lastChosen = Calendar.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,7 +56,12 @@ class TasksListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[TasksListViewModel::class.java]
-        val tasksAdapter = TaskAdapter(viewModel::changeCompleted, userId, ::onTaskClicked, LocalDate.now().toEpochDay())
+        val tasksAdapter = TaskAdapter(
+            viewModel::changeCompleted,
+            userId,
+            ::onTaskClicked,
+            LocalDate.now().toEpochDay()
+        )
         binding.rvTasks.layoutManager = LinearLayoutManager(activity)
         binding.rvTasks.adapter = tasksAdapter
         viewModel.setUser(userId)
@@ -104,22 +110,21 @@ class TasksListFragment : Fragment() {
                 R.style.datePickerDialog,
                 { _, year, month, day ->
                     binding.tvDate.text = String.format("%02d.%02d.%d", day, month + 1, year)
+                    val newDate = LocalDate.of(
+                        year,
+                        month + 1,
+                        day
+                    )
+                    viewModel.updateDate(newDate)
+                    tasksAdapter.day = newDate.toEpochDay()
+                    lastChosen.set(Calendar.YEAR, year)
+                    lastChosen.set(Calendar.MONTH, month)
+                    lastChosen.set(Calendar.DAY_OF_MONTH, day)
                 },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
+                lastChosen.get(Calendar.YEAR),
+                lastChosen.get(Calendar.MONTH),
+                lastChosen.get(Calendar.DAY_OF_MONTH)
             )
-            dialog.setButton(
-                DialogInterface.BUTTON_POSITIVE, "Ок"
-            ) { _, _ ->
-                val newDate = LocalDate.of(
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH) + 1,
-                    calendar.get(Calendar.DAY_OF_MONTH)
-                )
-                viewModel.getTasksForDate(newDate)
-                tasksAdapter.day = newDate.toEpochDay()
-            }
             dialog.datePicker.minDate = calendar.timeInMillis
             dialog.show()
         }

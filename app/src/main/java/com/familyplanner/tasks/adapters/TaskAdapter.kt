@@ -2,6 +2,7 @@ package com.familyplanner.tasks.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderTaskBinding
@@ -25,6 +26,7 @@ class TaskAdapter(
             binding.cbIsDone.isChecked =
                 task.task.lastCompletionDate != null && (task.task.repeatType == RepeatType.ONCE || task.task.lastCompletionDate == LocalDate.now()
                     .toEpochDay())
+            binding.tvDeadline.isVisible = task.date != null 
             binding.tvDeadline.text = if (task.date != null) FamilyPlanner.uiDateFormatter.format(
                 LocalDate.ofEpochDay(task.date!!)
             ) else ""

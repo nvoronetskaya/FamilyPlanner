@@ -20,7 +20,7 @@ import java.time.LocalDate
 import kotlin.math.pow
 
 class TasksListViewModel : ViewModel() {
-    private val filteredTasks = MutableSharedFlow<List<TaskWithDate>>()
+    private val filteredTasks = MutableSharedFlow<List<TaskWithDate>>(replay = 1)
     private val allTasks = mutableListOf<TaskWithDate>()
     private var userId: String = ""
     private val users = mutableListOf<User>()
@@ -93,6 +93,12 @@ class TasksListViewModel : ViewModel() {
         }
     }
 
+    fun updateDate(date: LocalDate) {
+        viewModelScope.launch(Dispatchers.IO) {
+            filteredTasks.emit(getTasksForDate(date, applyFilters()))
+        }
+    }
+
     fun getTasksForDate(
         date: LocalDate,
         curAllTasks: List<TaskWithDate>? = filteredTasks.replayCache.lastOrNull()
@@ -106,12 +112,12 @@ class TasksListViewModel : ViewModel() {
             if (task.task.lastCompletionDate == today) {
                 task.date = null
                 tasksForDate.add(task)
-                continue 
+                continue
             }
             when (task.task.repeatType) {
                 RepeatType.ONCE -> {
                     val shouldDoToday =
-                        task.task.deadline != null && task.task.deadline!! <= dateEpochDay || task.task.deadline == null
+                        (task.task.deadline != null && task.task.deadline!! <= dateEpochDay || task.task.deadline == null) && (task.task.lastCompletionDate == today || task.task.lastCompletionDate == null)
                     if (task.task.deadline != null && task.task.deadline!! == dateEpochDay || shouldDoToday && today == dateEpochDay) {
                         task.date = if (task.task.hasDeadline) task.task.deadline else null
                         tasksForDate.add(task)
