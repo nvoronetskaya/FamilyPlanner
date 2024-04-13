@@ -45,7 +45,7 @@ class TaskInfoViewModel : ViewModel() {
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
     private var taskId: String = ""
     private val addComment = MutableSharedFlow<TaskCreationStatus>()
-    private val curObserver = MutableSharedFlow<Observer?>()
+    private val curObserver = MutableSharedFlow<Observer?>(replay = 1)
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {

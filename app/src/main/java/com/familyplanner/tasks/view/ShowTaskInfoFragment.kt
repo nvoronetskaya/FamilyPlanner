@@ -148,27 +148,29 @@ class ShowTaskInfoFragment : Fragment() {
                 launch {
                     val creationStatus = viewModel.getCreationStatus()
                     creationStatus.collect {
-                        when (it) {
-                            TaskCreationStatus.SUCCESS -> {
-                                commentFilesAdapter.clearFiles()
-                                binding.etComment.text?.clear()
-                            }
+                        requireActivity().runOnUiThread {
+                            when (it) {
+                                TaskCreationStatus.SUCCESS -> {
+                                    commentFilesAdapter.clearFiles()
+                                    binding.etComment.text?.clear()
+                                }
 
-                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
-                                Toast.makeText(
+                                TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Не удалось прикрепить некоторые файлы",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    commentFilesAdapter.clearFiles()
+                                    binding.etComment.text?.clear()
+                                }
+
+                                TaskCreationStatus.FAILED -> Toast.makeText(
                                     requireContext(),
-                                    "Не удалось прикрепить некоторые файлы",
+                                    "Ошибка. Проверьте подключение к сети и повторите позднее",
                                     Toast.LENGTH_LONG
                                 ).show()
-                                commentFilesAdapter.clearFiles()
-                                binding.etComment.text?.clear()
                             }
-
-                            TaskCreationStatus.FAILED -> Toast.makeText(
-                                requireContext(),
-                                "Ошибка. Проверьте подключение к сети и повторите позднее",
-                                Toast.LENGTH_LONG
-                            ).show()
                         }
                     }
                 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class TaskObserversViewModel : ViewModel() {
-    private var members: MutableSharedFlow<List<User>> = MutableSharedFlow<List<User>>(replay = 1)
+    private var members = MutableSharedFlow<List<User>>(replay = 1)
     private val familyRepo = FamilyRepository()
     private val tasksRepo = TaskRepository()
     private var familyId: String = ""
@@ -19,7 +19,7 @@ class TaskObserversViewModel : ViewModel() {
     fun getMembers(): Flow<List<User>> = members
 
     fun setFamily(familyId: String) {
-        if (familyId != this.familyId) {
+        if (familyId == this.familyId) {
             return
         }
         this.familyId = familyId

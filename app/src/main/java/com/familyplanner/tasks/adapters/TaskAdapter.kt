@@ -26,7 +26,7 @@ class TaskAdapter(
             binding.cbIsDone.isChecked =
                 task.task.lastCompletionDate != null && (task.task.repeatType == RepeatType.ONCE || task.task.lastCompletionDate == LocalDate.now()
                     .toEpochDay())
-            binding.tvDeadline.isVisible = task.date != null 
+            binding.tvDeadline.isVisible = task.date != null
             binding.tvDeadline.text = if (task.date != null) FamilyPlanner.uiDateFormatter.format(
                 LocalDate.ofEpochDay(task.date!!)
             ) else ""
