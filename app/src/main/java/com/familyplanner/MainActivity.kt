@@ -66,12 +66,17 @@ class MainActivity : AppCompatActivity() {
                     null,
                     NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
                 )
+
                 R.id.map -> {
 
                 }
 
                 R.id.calendar -> {
-
+                    navController.navigate(
+                        R.id.eventsListFragment,
+                        null,
+                        NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                    )
                 }
 
                 R.id.lists -> navController.navigate(

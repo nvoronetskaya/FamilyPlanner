@@ -15,7 +15,7 @@
         android:id="@+id/calendar"
         android:enabled="true"
         android:icon="@drawable/calendar"
-        android:title="@string/map"/>
+        android:title="@string/calendar"/>
 
     <item
         android:id="@+id/lists"
