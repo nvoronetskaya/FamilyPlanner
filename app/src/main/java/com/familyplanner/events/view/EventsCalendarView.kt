@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.text.TextPaint
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import com.familyplanner.R
@@ -15,15 +17,19 @@ import java.util.Calendar
 
 class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var textPaint: Paint
-    private var eventTitlePaint: Paint
+    private var eventTitlePaint: TextPaint
     private var curDayPaint: Paint
     private var eventBackgroundPaint: Paint
+    private var boundsPaint: Paint
     private var textColor = 0
     private var boundsColor = 0
     private var currentDayColor = 0
-    private var eventColor = 0
+    private var eventTextColor = 0
+    private var eventFillColor: Int
     private var dateTextSize = 0
     private var eventTextSize = 0
+    private var boundsWidth = 0
+    private var eventsGap = 0
     private var cellWidth = 0f
     private var cellHeight = 0f
     private var rowCount = 0
@@ -33,19 +39,26 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     private var monthStart = Calendar.getInstance()
     private var monthEnd = Calendar.getInstance()
     private val events = mutableListOf<Event>()
-    private val eventsByDate = Array(31) { i -> mutableListOf<Event>() }
+    private val eventsByDate = Array(31) { _ -> mutableListOf<Event>() }
 
     init {
         val attrsValues = context.obtainStyledAttributes(attrs, R.styleable.EventsCalendarView)
         textColor = attrsValues.getColor(R.styleable.EventsCalendarView_textColor, Color.BLACK)
-        boundsColor = attrsValues.getColor(R.styleable.EventsCalendarView_textColor, Color.GRAY)
+        boundsColor = attrsValues.getColor(R.styleable.EventsCalendarView_boundsColor, Color.GRAY)
         currentDayColor =
-            attrsValues.getColor(R.styleable.EventsCalendarView_textColor, Color.MAGENTA)
-        eventColor = attrsValues.getColor(R.styleable.EventsCalendarView_textColor, Color.GREEN)
+            attrsValues.getColor(R.styleable.EventsCalendarView_currentDayColor, Color.MAGENTA)
+        eventTextColor =
+            attrsValues.getColor(R.styleable.EventsCalendarView_eventTextColor, Color.BLACK)
+        eventFillColor =
+            attrsValues.getColor(R.styleable.EventsCalendarView_eventFillColor, Color.GRAY)
         dateTextSize =
-            attrsValues.getDimensionPixelSize(R.styleable.EventsCalendarView_dateTextSize, 0)
+            attrsValues.getDimensionPixelSize(R.styleable.EventsCalendarView_dateTextSize, 24)
         eventTextSize =
-            attrsValues.getDimensionPixelSize(R.styleable.EventsCalendarView_eventTextSize, 0)
+            attrsValues.getDimensionPixelSize(R.styleable.EventsCalendarView_eventTextSize, 24)
+        boundsWidth =
+            attrsValues.getDimensionPixelSize(R.styleable.EventsCalendarView_boundsWidth, 1)
+        eventsGap =
+            attrsValues.getDimensionPixelSize(R.styleable.EventsCalendarView_eventsGap, 1)
         attrsValues.recycle()
         rowCount = currentDate.getActualMaximum(Calendar.WEEK_OF_MONTH)
         textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -53,21 +66,27 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             textSize = dateTextSize.toFloat()
             textAlign = Paint.Align.CENTER
         }
-        eventTitlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = eventColor
+        eventTitlePaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = eventTextColor
             textSize = eventTextSize.toFloat()
-            textAlign = Paint.Align.CENTER
+            textAlign = Paint.Align.LEFT
         }
         curDayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = currentDayColor
             style = Paint.Style.FILL
         }
         eventBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = eventColor
+            color = eventFillColor
             style = Paint.Style.FILL
         }
-        monthStart.set(Calendar.DAY_OF_MONTH, 1)
-        monthEnd.set(Calendar.DAY_OF_MONTH, monthStart.getActualMaximum(Calendar.DAY_OF_MONTH))
+        boundsPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = boundsColor
+        }
+        monthStart.add(Calendar.DAY_OF_MONTH, -monthStart.get(Calendar.DAY_OF_MONTH) + 1)
+        monthEnd.add(
+            Calendar.DAY_OF_MONTH,
+            monthEnd.getActualMaximum(Calendar.DAY_OF_MONTH) - monthEnd.get(Calendar.DAY_OF_MONTH)
+        )
     }
 
     private fun updateEvents(newEvents: List<Event>, date: Calendar) {
@@ -97,7 +116,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
 
     private fun measureCellSize(canvas: Canvas) {
         cellWidth = 1f * canvas.width / columnCount
-        cellHeight = 1f * canvas.height / rowCount
+        cellHeight = (canvas.height - dateTextSize * 1.5f) / rowCount
     }
 
     private fun drawDaysNames(canvas: Canvas) {
@@ -107,12 +126,32 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         }
     }
 
+    private fun drawGrid(canvas: Canvas) {
+        for (i in 0 until columnCount) {
+            val x = i * cellWidth
+            canvas.drawLine(x, 0f, x + boundsWidth, canvas.height.toFloat(), boundsPaint)
+        }
+        canvas.drawLine(0f, 0f, canvas.width.toFloat(), boundsWidth.toFloat(), boundsPaint)
+        for (i in 0 until rowCount) {
+            val y = i * cellHeight + dateTextSize * 1.5f
+            canvas.drawLine(0f, y, canvas.width.toFloat(), y + boundsWidth, boundsPaint)
+        }
+        canvas.drawLine(
+            0f,
+            canvas.height.toFloat() - boundsWidth,
+            canvas.width.toFloat(),
+            canvas.height.toFloat(),
+            boundsPaint
+        )
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         measureCellSize(canvas)
         drawDaysNames(canvas)
+        drawGrid(canvas)
         var curInd = 0
-        if (monthStart.get(Calendar.DAY_OF_WEEK) != 0) {
+        if ((monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7 != 0) {
             val previousMonth = Calendar.getInstance()
             previousMonth.add(Calendar.MONTH, -1)
             val previousMonthDaysCount = previousMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
@@ -131,11 +170,12 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             }
             curInd = curMonthStartWeekday
         }
+        val yOffset = dateTextSize * 1.5f
         for (curDayOfMonth in 1..monthEnd.get(Calendar.DAY_OF_MONTH)) {
             val x = curInd % columnCount
             val y = curInd / columnCount
             val xPos = x * cellWidth
-            val yPos = y * cellHeight
+            val yPos = y * cellHeight + yOffset
             val xPosCenter = xPos + cellWidth / 2
             canvas.drawText(
                 curDayOfMonth.toString(),
@@ -143,24 +183,38 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 yPos + textPaint.textSize,
                 textPaint
             )
-            var verticalOffset = dateTextSize * 2
+            var verticalOffset = dateTextSize * 2f
             for (event in eventsByDate[curDayOfMonth - 1]) {
-                if (verticalOffset - eventTextSize * 2 > cellHeight) {
+                if (verticalOffset + eventTextSize * 2 > cellHeight) {
                     canvas.drawText("...", xPosCenter, yPos + verticalOffset, textPaint)
-                    return
+                    break
                 }
                 canvas.drawRoundRect(
-                    xPos,
+                    xPos + boundsWidth,
                     yPos + verticalOffset,
-                    xPos + cellWidth,
-                    yPos + verticalOffset + eventTextSize * 2f,
+                    xPos + cellWidth - boundsWidth,
+                    yPos + verticalOffset + eventTextSize * 1.5f,
                     8f,
                     8f,
                     eventBackgroundPaint
                 )
-                canvas.drawText(event.name, 0, cellWidth.toInt(), xPos, yPos + verticalOffset + eventTextSize / 2f, eventTitlePaint)
-                verticalOffset += eventTextSize * 2
+                val text = TextUtils.ellipsize(
+                    event.name,
+                    eventTitlePaint,
+                    cellWidth - 6 * boundsWidth,
+                    TextUtils.TruncateAt.END
+                )
+                canvas.drawText(
+                    event.name,
+                    0,
+                    text.length,
+                    xPos + boundsWidth * 3,
+                    yPos + verticalOffset + eventTextSize * 1.5f - eventTextSize / 2f,
+                    eventTitlePaint
+                )
+                verticalOffset += eventTextSize * 1.5f + eventsGap
             }
+            ++curInd
         }
     }
 }

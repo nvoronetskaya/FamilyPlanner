@@ -81,7 +81,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginVertical="10dp"
+        app:boundsColor="@color/black"
+        app:boundsWidth="1dp"
+        app:currentDayColor="@color/light_orange"
+        app:dateTextSize="16sp"
+        app:eventFillColor="@color/dark_orange"
+        app:eventTextColor="@color/white"
+        app:eventTextSize="14sp"
+        app:eventsGap="2dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_cur_month" />
+        app:layout_constraintTop_toBottomOf="@id/tv_cur_month"
+        app:textColor="@color/black" />
 </androidx.constraintlayout.widget.ConstraintLayout>
