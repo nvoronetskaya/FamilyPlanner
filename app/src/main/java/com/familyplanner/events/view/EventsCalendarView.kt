@@ -7,9 +7,14 @@ import android.graphics.Paint
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.R
 import com.familyplanner.events.data.Event
+import com.familyplanner.events.data.EventAdapter
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -40,6 +45,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     private var monthEnd = Calendar.getInstance()
     private val events = mutableListOf<Event>()
     private val eventsByDate = Array(31) { _ -> mutableListOf<Event>() }
+    private var onEventClicked: ((String) -> Unit)? = null
 
     init {
         val attrsValues = context.obtainStyledAttributes(attrs, R.styleable.EventsCalendarView)
@@ -89,8 +95,15 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         )
     }
 
-    private fun updateEvents(newEvents: List<Event>, date: Calendar) {
-        rowCount = date.getActualMaximum(Calendar.WEEK_OF_MONTH)
+    fun setOnEventChosen(onEventClicked: (String) -> Unit) {
+        this.onEventClicked = onEventClicked
+    }
+
+    fun updateEvents(newEvents: List<Event>, date: LocalDateTime) {
+        currentDate =
+            Calendar.Builder().set(Calendar.YEAR, date.year).set(Calendar.MONTH, date.monthValue)
+                .set(Calendar.DAY_OF_MONTH, date.dayOfMonth).build()
+        rowCount = currentDate.getActualMaximum(Calendar.WEEK_OF_MONTH)
         this.events.clear()
         this.events.addAll(newEvents)
         groupEvents()
@@ -100,14 +113,30 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     private fun groupEvents() {
         eventsByDate.forEach { it.clear() }
         for (event in events) {
-            val start = LocalDateTime.ofInstant(
+            val startDate = LocalDateTime.ofInstant(
                 Instant.ofEpochSecond(event.start),
                 ZoneId.systemDefault()
-            ).dayOfMonth
-            val finish = LocalDateTime.ofInstant(
+            )
+            val finishDate = LocalDateTime.ofInstant(
                 Instant.ofEpochSecond(event.finish),
                 ZoneId.systemDefault()
-            ).dayOfMonth
+            )
+            if (startDate.month.value > currentDate.get(Calendar.MONTH) + 1) {
+                continue
+            }
+            if (finishDate.month.value < currentDate.get(Calendar.MONTH) + 1) {
+                continue
+            }
+            val start =
+                if (startDate.month.value < currentDate.get(Calendar.MONTH) + 1) 0 else startDate.dayOfMonth
+            val finish =
+                if (finishDate.month.value > currentDate.get(Calendar.MONTH) + 1) {
+                    monthEnd.get(
+                        Calendar.DAY_OF_MONTH
+                    )
+                } else {
+                    finishDate.dayOfMonth
+                }
             for (i in start..finish) {
                 eventsByDate[i].add(event)
             }
@@ -184,11 +213,9 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 textPaint
             )
             var verticalOffset = dateTextSize * 2f
-            for (event in eventsByDate[curDayOfMonth - 1]) {
-                if (verticalOffset + eventTextSize * 2 > cellHeight) {
-                    canvas.drawText("...", xPosCenter, yPos + verticalOffset, textPaint)
-                    break
-                }
+            val totalEvents = eventsByDate[curDayOfMonth - 1].size
+            for (i in 0 until totalEvents) {
+                val event = eventsByDate[curDayOfMonth - 1][i]
                 canvas.drawRoundRect(
                     xPos + boundsWidth,
                     yPos + verticalOffset,
@@ -198,6 +225,15 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                     8f,
                     eventBackgroundPaint
                 )
+                if (verticalOffset + (eventTextSize * 1.5f + eventsGap) * 2 > cellHeight) {
+                    canvas.drawText(
+                        "ещё ${totalEvents - i}",
+                        xPos + boundsWidth * 3,
+                        yPos + verticalOffset + eventTextSize * 1.5f - eventTextSize / 2f,
+                        textPaint
+                    )
+                    break
+                }
                 val text = TextUtils.ellipsize(
                     event.name,
                     eventTitlePaint,
@@ -216,5 +252,28 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             }
             ++curInd
         }
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event?.action == MotionEvent.ACTION_UP) {
+            val column = (event.x / cellWidth).toInt()
+            val row = ((event.y - dateTextSize * 1.5f) / cellHeight).toInt()
+            val date = row * 7 + column - (monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7
+            showEventsForDay(date)
+            return true
+        }
+        return super.onTouchEvent(event)
+    }
+
+    private fun showEventsForDay(date: Int) {
+        val bottomSheet = BottomSheetDialog(context)
+        bottomSheet.setContentView(R.layout.bottomsheet_events_list)
+        bottomSheet.behavior.isDraggable = false
+        val eventsRecycler = bottomSheet.findViewById<RecyclerView>(R.id.events_list)
+        val eventsAdapter = EventAdapter(onEventClicked)
+        eventsRecycler?.layoutManager = LinearLayoutManager(context)
+        eventsRecycler?.adapter = eventsAdapter
+        eventsAdapter.setData(eventsByDate[date])
+        bottomSheet.show()
     }
 }

@@ -73,7 +73,11 @@ class EventRepository {
     suspend fun changeComing(userId: String, eventId: String, isComing: Boolean) {
         firestore.collection("eventAttendees").whereEqualTo("userId", userId)
             .whereEqualTo("eventId", eventId).get()
-            .await().documents.forEach { it.reference.delete() }
+            .await().documents.forEach {
+                val status =
+                    if (isComing) EventAttendeeStatus.COMING else EventAttendeeStatus.NOT_COMING
+                it.reference.update("status", status)
+            }
     }
 
     fun deleteEvent(eventId: String) {
@@ -140,5 +144,12 @@ class EventRepository {
                 }
             }
         }
+    }
+
+    fun getEventsForPeriod(start: Long, finish: Long): Flow<List<Event>> {
+        return firestore.collection("events").whereGreaterThanOrEqualTo("finish", start)
+            .whereLessThanOrEqualTo("start", finish).snapshots().map {
+                it.toObjects(Event::class.java)
+            }
     }
 }
