@@ -6,10 +6,7 @@ import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.dataObjects
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,7 +39,6 @@ class NoFamilyViewModel : ViewModel() {
             familyRepo.createFamily(name, userId).addOnCompleteListener {
                 if (it.isSuccessful) {
                     familyRepo.setUserToAdmin(userId, it.result.id)
-                    Firebase.messaging.subscribeToTopic(it.result.id)
                 } else {
                     viewModelScope.launch(Dispatchers.IO) {
                         errors.emit("Не удалось создать семью, попробуйте позднее")

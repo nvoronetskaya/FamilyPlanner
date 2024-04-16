@@ -45,7 +45,6 @@ class TasksListViewModel : ViewModel() {
             userFilter.emit(userId)
             userRepo.getUserById(userId).collect {
                 familyId = it.familyId
-                Firebase.messaging.subscribeToTopic(familyId ?: "")
                 familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
                     users.clear()
                     users.addAll(members)

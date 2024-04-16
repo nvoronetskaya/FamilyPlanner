@@ -20,6 +20,7 @@ class UserRepository {
         data["email"] = email
         data["familyId"] = ""
         data["hasFamily"] = false
+        data["fcmToken"] = ""
         firestore.collection("users").document(uid).set(data)
     }
 
@@ -72,5 +73,9 @@ class UserRepository {
                     }
                 }
             }
+    }
+
+    fun setFcmToken(userId: String, token: String) {
+        firestore.collection("users").document(userId).update("fcmToken", token)
     }
 }

@@ -37,7 +37,7 @@
                 android:value="TASK_UPDATES" />
         </activity>
         <service
-            android:name=".tasks.background.NewTaskNotificationService"
+            android:name=".common.background.NewTaskNotificationService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

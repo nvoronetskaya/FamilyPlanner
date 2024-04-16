@@ -42,6 +42,7 @@ class TasksListFragment : Fragment() {
     private lateinit var viewModel: TasksListViewModel
     private val calendar = Calendar.getInstance()
     private val lastChosen = Calendar.getInstance()
+    private var askedForNotification = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -128,6 +129,9 @@ class TasksListFragment : Fragment() {
             dialog.datePicker.minDate = calendar.timeInMillis
             dialog.show()
         }
+        if (!askedForNotification) {
+            askNotificationPermission()
+        }
     }
 
     private fun onTaskClicked(taskId: String) {
@@ -148,9 +152,10 @@ class TasksListFragment : Fragment() {
                 registerForActivityResult(
                     ActivityResultContracts.RequestPermission(),
                 ) { isGranted: Boolean ->
+                    askedForNotification = true
                     if (!isGranted) {
                         AlertDialog.Builder(requireContext()).setTitle("Важно")
-                            .setMessage("Вы не будете получать уведомления о новых задачах")
+                            .setMessage("Вы не будете получать уведомления")
                             .create().show()
                     }
                 }
