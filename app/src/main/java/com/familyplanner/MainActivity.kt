@@ -1,6 +1,10 @@
 package com.familyplanner
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.SearchManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +60,9 @@ class MainActivity : AppCompatActivity() {
         }
         binding.fragmentContainerView.visibility = View.VISIBLE
         setUpBottomNavigation()
+        val notChan = NotificationChannel("10", "CHANNEL", NotificationManager.IMPORTANCE_HIGH)
+        val nManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nManager.createNotificationChannel(notChan)
     }
 
     private fun setUpBottomNavigation() {
