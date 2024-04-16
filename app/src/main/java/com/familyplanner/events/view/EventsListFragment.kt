@@ -39,9 +39,11 @@ class EventsListFragment : Fragment() {
         binding.tvCurMonth.text = viewModel.currentMonthString()
         binding.ivPrevMonth.setOnClickListener {
             binding.tvCurMonth.text = viewModel.previousMonth()
+            binding.calendar.clearEvents()
         }
         binding.ivNextMonth.setOnClickListener {
             binding.tvCurMonth.text = viewModel.nextMonth()
+            binding.calendar.clearEvents()
         }
         binding.ivAdd.setOnClickListener {
             findNavController().navigate(R.id.action_eventsListFragment_to_newEventFragment)

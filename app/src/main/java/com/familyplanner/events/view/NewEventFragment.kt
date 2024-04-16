@@ -80,23 +80,25 @@ class NewEventFragment : Fragment() {
                 launch {
                     val creationResult = viewModel.getCreationStatus()
                     creationResult.collect {
-                        when (it) {
-                            TaskCreationStatus.SUCCESS -> findNavController().popBackStack()
+                        requireActivity().runOnUiThread {
+                            when (it) {
+                                TaskCreationStatus.SUCCESS -> findNavController().popBackStack()
 
-                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
-                                Toast.makeText(
+                                TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Не удалось прикрепить некоторые файлы. Вы можете отредактировать мероприятие позднее",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    findNavController().popBackStack()
+                                }
+
+                                TaskCreationStatus.FAILED -> Toast.makeText(
                                     requireContext(),
-                                    "Не удалось прикрепить некоторые файлы. Вы можете отредактировать мероприятие позднее",
+                                    "Ошибка. Проверьте подключение к сети и повторите позднее",
                                     Toast.LENGTH_LONG
                                 ).show()
-                                findNavController().popBackStack()
                             }
-
-                            TaskCreationStatus.FAILED -> Toast.makeText(
-                                requireContext(),
-                                "Ошибка. Проверьте подключение к сети и повторите позднее",
-                                Toast.LENGTH_LONG
-                            ).show()
                         }
                     }
                 }
@@ -143,8 +145,8 @@ class NewEventFragment : Fragment() {
             viewModel.createEvent(
                 binding.etName.text!!.toString().trim(),
                 binding.etDescription.text!!.toString().trim(),
-                getDateTimeFromString(binding.tvStartTime.text.toString()),
-                getDateTimeFromString(binding.tvFinishTime.text.toString()),
+                getDateTimeFromString(binding.tvStartValue.text.toString()),
+                getDateTimeFromString(binding.tvFinishValue.text.toString()),
                 attendeesAdapter.getInvitations(),
                 filesAdapter.getFiles()
             )

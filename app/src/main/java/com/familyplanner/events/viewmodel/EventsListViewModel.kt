@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 class EventsListViewModel : ViewModel() {
-    private val curDate = LocalDateTime.now()
+    private var curDate = LocalDateTime.now()
     private val curDateFlow = MutableSharedFlow<LocalDateTime>(replay = 1)
     private val events = MutableSharedFlow<List<Event>>(replay = 1)
     private val repo = EventRepository()
@@ -32,37 +32,44 @@ class EventsListViewModel : ViewModel() {
     )
 
     init {
+        setData()
+    }
+
+    private fun setData() {
         viewModelScope.launch(Dispatchers.IO) {
+            curDateFlow.emit(curDate)
             curDateFlow.collect {
-                val start = curDate.minusDays(curDate.dayOfMonth.toLong())
-                val finish = curDate.minusDays(curDate.dayOfMonth.toLong() - 1).plusMonths(1)
-                repo.getEventsForPeriod(
-                    start.atZone(ZoneId.systemDefault()).toEpochSecond(),
-                    finish.atZone(ZoneId.systemDefault()).toEpochSecond()
-                ).collect {
-                    events.emit(it)
+                launch {
+                    val start = curDate.minusDays(curDate.dayOfMonth.toLong())
+                    val finish = curDate.minusDays(curDate.dayOfMonth.toLong() - 1).plusMonths(1)
+                    repo.getEventsForPeriod(
+                        start.atZone(ZoneId.systemDefault()).toEpochSecond(),
+                        finish.atZone(ZoneId.systemDefault()).toEpochSecond()
+                    ).collect {
+                        events.emit(it)
+                    }
                 }
             }
         }
     }
 
     fun previousMonth(): String {
-        curDate.minusMonths(1)
+        curDate = curDate.minusMonths(1)
         viewModelScope.launch(Dispatchers.IO) {
             curDateFlow.emit(curDate)
         }
-        return "${months[curDate.monthValue]} ${curDate.year}"
+        return "${months[curDate.monthValue - 1]} ${curDate.year}"
     }
 
     fun nextMonth(): String {
-        curDate.plusMonths(1)
+        curDate = curDate.plusMonths(1)
         viewModelScope.launch(Dispatchers.IO) {
             curDateFlow.emit(curDate)
         }
-        return "${months[curDate.monthValue]} ${curDate.year}"
+        return "${months[curDate.monthValue - 1]} ${curDate.year}"
     }
 
-    fun currentMonthString(): String = "${months[curDate.monthValue]} ${curDate.year}"
+    fun currentMonthString(): String = "${months[curDate.monthValue - 1]} ${curDate.year}"
 
     fun currentMonth() = curDate
 

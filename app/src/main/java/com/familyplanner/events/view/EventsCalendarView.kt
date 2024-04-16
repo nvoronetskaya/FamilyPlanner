@@ -99,9 +99,16 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         this.onEventClicked = onEventClicked
     }
 
+    fun clearEvents() {
+        this.events.clear()
+        groupEvents()
+        invalidate()
+    }
+
     fun updateEvents(newEvents: List<Event>, date: LocalDateTime) {
         currentDate =
-            Calendar.Builder().set(Calendar.YEAR, date.year).set(Calendar.MONTH, date.monthValue)
+            Calendar.Builder().set(Calendar.YEAR, date.year)
+                .set(Calendar.MONTH, date.monthValue - 1)
                 .set(Calendar.DAY_OF_MONTH, date.dayOfMonth).build()
         rowCount = currentDate.getActualMaximum(Calendar.WEEK_OF_MONTH)
         this.events.clear()
@@ -255,7 +262,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event?.action == MotionEvent.ACTION_UP) {
+        if (event?.action == MotionEvent.ACTION_DOWN) {
             val column = (event.x / cellWidth).toInt()
             val row = ((event.y - dateTextSize * 1.5f) / cellHeight).toInt()
             val date = row * 7 + column - (monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7
