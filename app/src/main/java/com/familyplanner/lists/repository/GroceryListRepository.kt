@@ -25,7 +25,7 @@ class GroceryListRepository {
     fun getListsForUser(userId: String): Flow<List<GroceryList>> {
         scope.launch {
             firestore.collection("usersLists").whereEqualTo("userId", userId).snapshots().collect {
-                val listIds = it.documents.map{ it["listId"].toString() }
+                val listIds = it.documents.map { it["listId"].toString() }
                 launch {
                     firestore.collection("lists").whereIn(FieldPath.documentId(), listIds)
                         .snapshots()
@@ -107,22 +107,26 @@ class GroceryListRepository {
             }
     }
 
-    fun addProduct(productName: String, listId: String) {
+    suspend fun addProduct(productName: String, listId: String) {
         val product =
             mapOf<String, Any>(
                 "name" to productName,
                 "listId" to listId,
                 "isPurchased" to false
             )
-        firestore.collection("products").add(product)
+        firestore.collection("products").add(product).await()
+        changeListCompleted(listId)
     }
 
-    fun changeProductPurchased(productId: String, isPurchased: Boolean) {
+    suspend fun changeProductPurchased(productId: String, isPurchased: Boolean, listId: String) {
         firestore.collection("products").document(productId).update("isPurchased", isPurchased)
+            .await()
+        changeListCompleted(listId)
     }
 
-    fun deleteProduct(id: String) {
-        firestore.collection("products").document(id).delete()
+    suspend fun deleteProduct(id: String, listId: String) {
+        firestore.collection("products").document(id).delete().await()
+        changeListCompleted(listId)
     }
 
     fun addObservers(observersId: List<String>, listId: String) {
@@ -148,6 +152,12 @@ class GroceryListRepository {
             firestore.collection("usersLists")
                 .add(mapOf("userId" to createdBy, "listId" to it.id))
         }
+    }
+
+    suspend fun changeListCompleted(listId: String) {
+        val products = firestore.collection("products").whereEqualTo("listId", listId).get().await()
+        val isCompleted = products.documents.all { it.getBoolean("isPurchased") ?: true }
+        changeListCompleted(listId, isCompleted)
     }
 
     fun changeListCompleted(listId: String, isCompleted: Boolean) {

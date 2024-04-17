@@ -48,15 +48,18 @@ class ProductAdapter(
                 binding.ivDone.visibility = View.GONE
                 onEdited(product, binding.etName.text.trim().toString())
             }
-            binding.cbList.setOnCheckedChangeListener { _, isChecked ->
-                binding.etName.paintFlags =
-                    binding.etName.paintFlags xor Paint.STRIKE_THRU_TEXT_FLAG
+            binding.cbList.setOnClickListener {
                 onStatusChanged(
                     product,
-                    isChecked
+                    binding.cbList.isChecked
                 )
             }
+            binding.etName.paintFlags =
+                binding.etName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             binding.cbList.isChecked = product.isPurchased
+            if (!product.isPurchased) {
+                binding.etName.paintFlags = binding.etName.paintFlags xor Paint.STRIKE_THRU_TEXT_FLAG
+            }
             binding.ivDelete.setOnClickListener { onDelete(product) }
         }
     }

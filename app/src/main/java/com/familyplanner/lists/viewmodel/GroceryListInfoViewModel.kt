@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class GroceryListInfoViewModel : ViewModel() {
@@ -33,24 +32,33 @@ class GroceryListInfoViewModel : ViewModel() {
             }
         }
     }
+
     fun setList(listId: String) {
         if (listId == this.listId) {
             return
         }
         this.listId = listId
         viewModelScope.launch(Dispatchers.IO) {
-            listsRepository.getListById(listId).collect {
-                list.emit(it)
+            launch {
+                listsRepository.getListById(listId).collect {
+                    list.emit(it)
+                }
             }
-            listsRepository.getObserversForList(listId).collect {
-                listObservers.emit(it)
+            launch {
+                listsRepository.getObserversForList(listId).collect {
+                    listObservers.emit(it)
+                }
             }
-            listsRepository.getProductsForList(listId).collect {
-                listProducts.emit(it)
+            launch {
+                listsRepository.getProductsForList(listId).collect {
+                    listProducts.emit(it)
+                }
             }
-            listsRepository.getNonObservers(listId, familyId).collect {
-                nonObservers.clear()
-                nonObservers.addAll(it)
+            launch {
+                listsRepository.getNonObservers(listId, familyId).collect {
+                    nonObservers.clear()
+                    nonObservers.addAll(it)
+                }
             }
         }
     }
@@ -66,17 +74,21 @@ class GroceryListInfoViewModel : ViewModel() {
     fun getListProducts(): Flow<List<Product>> = listProducts
 
     fun addProduct(name: String) {
-        listsRepository.addProduct(name, listId)
-        listsRepository.changeListCompleted(listId, false)
+        viewModelScope.launch(Dispatchers.IO) {
+            listsRepository.addProduct(name, listId)
+        }
     }
 
     fun deleteProduct(product: Product) {
-        listsRepository.deleteProduct(product.id)
+        viewModelScope.launch(Dispatchers.IO) {
+            listsRepository.deleteProduct(product.id, listId)
+        }
     }
 
     fun changeProductPurchased(product: Product, isPurchased: Boolean) {
-        listsRepository.changeProductPurchased(product.id, isPurchased)
-        listsRepository.changeListCompleted(listId, listProducts.value.all { it.isPurchased })
+        viewModelScope.launch(Dispatchers.IO) {
+            listsRepository.changeProductPurchased(product.id, isPurchased, listId)
+        }
     }
 
     fun addObservers(newObservers: List<NonObserver>) {
@@ -85,7 +97,6 @@ class GroceryListInfoViewModel : ViewModel() {
 
     fun deleteObserver(observer: ListObserver) {
         listsRepository.deleteObserver(observer.userId, listId)
-        listsRepository.changeListCompleted(listId, listProducts.value.all { it.isPurchased })
     }
 
     fun getNonObservers(): List<NonObserver> = nonObservers

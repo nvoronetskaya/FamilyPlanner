@@ -28,6 +28,7 @@ import com.familyplanner.lists.adapters.ProductsListDecorator
 import com.familyplanner.lists.model.ListObserver
 import com.familyplanner.lists.model.Product
 import com.familyplanner.lists.viewmodel.GroceryListInfoViewModel
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -107,21 +108,26 @@ class GroceryListInfoFragment : Fragment() {
                 }
             }
         }
-//        binding.tabs[0].setOnClickListener {
-//            binding.rvProducts.visibility = View.GONE
-//            binding.rvObservers.visibility = View.VISIBLE
-//        }
-//        binding.tabs[1].setOnClickListener {
-//            binding.rvObservers.visibility = View.GONE
-//            binding.rvProducts.visibility = View.VISIBLE
-//        }
+        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val isProducts = binding.tabs.getTabAt(0)!!.equals(tab)
+                binding.rvProducts.isVisible = isProducts
+                binding.rvObservers.isVisible = !isProducts
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.fabAdd.setOnClickListener {
-//            if (binding.tabs[0].isVisible) {
-//                createAddProductDialog()
-//            } else {
-//                createAddObserversDialog()
-//            }
+            if (binding.tabs[0].isVisible) {
+                createAddProductDialog()
+            } else {
+                createAddObserversDialog()
+            }
         }
     }
 
