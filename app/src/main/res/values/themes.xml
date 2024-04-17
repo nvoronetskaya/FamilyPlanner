@@ -53,6 +53,11 @@
         <item name="android:fontFamily">@font/roboto_serif</item>
     </style>
 
+    <style name="tabText" parent="textBody">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnSurface">@color/white</item>
+    </style>
+
     <style name="subText">
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">@font/roboto_serif</item>
