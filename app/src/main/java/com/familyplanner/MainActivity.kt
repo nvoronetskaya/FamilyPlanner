@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -21,6 +22,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.familyplanner.auth.view.WelcomeFragment
 import com.familyplanner.databinding.ActivityMainBinding
 import com.familyplanner.family.view.NoFamilyFragment
+import com.familyplanner.location.data.LocationService
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
@@ -60,9 +62,14 @@ class MainActivity : AppCompatActivity() {
         }
         binding.fragmentContainerView.visibility = View.VISIBLE
         setUpBottomNavigation()
-        val notChan = NotificationChannel("10", "CHANNEL", NotificationManager.IMPORTANCE_HIGH)
+        val notChan =
+            NotificationChannel("DATA_UPDATES", "New data", NotificationManager.IMPORTANCE_DEFAULT)
         val nManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nManager.createNotificationChannel(notChan)
+        val locationChan =
+            NotificationChannel("LOCATION", "Location updates", NotificationManager.IMPORTANCE_DEFAULT)
+        nManager.createNotificationChannel(locationChan)
+        startService(Intent(applicationContext, LocationService::class.java))
     }
 
     private fun setUpBottomNavigation() {

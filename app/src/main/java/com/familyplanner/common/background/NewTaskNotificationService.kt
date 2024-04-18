@@ -51,7 +51,7 @@ class NewTaskNotificationService : FirebaseMessagingService() {
                 .setGraph(R.navigation.navigation).setDestination(navigateTo)
                 .setArguments(bundleOf(key to sourceId)).createPendingIntent()
             val notification =
-                NotificationCompat.Builder(this, "10").setContentTitle(title).setSmallIcon(R.drawable.notifications)
+                NotificationCompat.Builder(this, "DATA_UPDATES").setContentTitle(title).setSmallIcon(R.drawable.notifications)
                     .setContentText(body)
                     .setContentIntent(link).build()
             val manager = NotificationManagerCompat.from(this)
