@@ -3,13 +3,16 @@ package com.familyplanner.tasks.repository
 import android.net.Uri
 import com.familyplanner.common.User
 import com.familyplanner.tasks.dto.CommentDto
+import com.familyplanner.tasks.model.Importance
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.familyplanner.tasks.model.Observer
+import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.model.UserFile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.ListResult
@@ -83,6 +86,11 @@ class TaskRepository {
             }
         }
         return userTasks
+    }
+
+    suspend fun getTaskByIdOnce(taskId: String): Task? {
+        return firestore.collection("tasks").document(taskId).get().await()
+            .toObject(Task::class.java)
     }
 
     fun getTaskById(taskId: String): Flow<Task?> {
@@ -229,5 +237,36 @@ class TaskRepository {
         firestore.collection("observers").whereEqualTo("userId", userId)
             .whereEqualTo("taskId", taskId).get().await()
             .forEach { it.reference.update("isExecutor", isExecutor) }
+    }
+
+    suspend fun addFile(taskId: String, file: UserFile): Boolean {
+        val filesRef = storage.reference.child("task-$taskId")
+        val metadata = storageMetadata { setCustomMetadata("name", file.name) }
+        if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
+            return false
+        }
+        return true
+    }
+
+    fun removeFile(taskId: String, fileName: String): com.google.android.gms.tasks.Task<Void> {
+        return storage.reference.child("task-$taskId").child(fileName).delete()
+    }
+
+    fun updateTask(taskId: String, taskData: Task) {
+        val newValues = mutableMapOf<String, Any?>()
+        newValues["title"] = taskData.title
+        newValues["hasDeadline"] = taskData.hasDeadline
+        newValues["deadline"] = taskData.deadline
+        newValues["isContinuous"] = taskData.isContinuous
+        newValues["startTime"] = taskData.startTime
+        newValues["finishTime"] = taskData.finishTime
+        newValues["repeatType"] = taskData.repeatType
+        newValues["nDays"] = taskData.nDays
+        newValues["daysOfWeek"] = taskData.daysOfWeek
+        newValues["repeatStart"] = taskData.repeatStart
+        newValues["importance"] = taskData.importance
+        newValues["hasLocation"] = taskData.hasLocation
+        newValues["location"] = taskData.location
+        firestore.collection("tasks").document(taskId).update(newValues)
     }
 }

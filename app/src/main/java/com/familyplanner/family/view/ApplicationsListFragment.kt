@@ -31,7 +31,7 @@ class ApplicationsListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentApplicantsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -50,31 +50,37 @@ class ApplicationsListFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getErrors().collect {
-                    Toast.makeText(
-                        activity,
-                        it,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                viewModel.getFamily().collect {
-                    if (it == null) {
-                        AlertDialog.Builder(activity as MainActivity)
-                            .setMessage("Вы больше не являетесь участником данной семьи")
-                            .setCancelable(false)
-                            .setNeutralButton("Ок") { _, _ ->
-                                parentFragmentManager.popBackStack()
-                                parentFragmentManager.popBackStack()
-                            }.create().show()
-                    } else {
-                        binding.tvFamily.text = it.name
-                        binding.tvCode.text = it.code
+                launch {
+                    viewModel.getErrors().collect {
+                        Toast.makeText(
+                            activity,
+                            it,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
-                viewModel.getApplicants().collect {
-                    adapter.setData(it)
+                launch {
+                    viewModel.getFamily().collect {
+                        if (it == null) {
+                            AlertDialog.Builder(activity as MainActivity)
+                                .setMessage("Вы больше не являетесь участником данной семьи")
+                                .setCancelable(false)
+                                .setNeutralButton("Ок") { _, _ ->
+                                    parentFragmentManager.popBackStack()
+                                    parentFragmentManager.popBackStack()
+                                }.create().show()
+                        } else {
+                            binding.tvFamily.text = it.name
+                            binding.tvCode.text = it.id
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.getApplicants().collect {
+                        adapter.setData(it)
+                    }
                 }
             }
         }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.common.User
 import com.familyplanner.databinding.ViewholderApplicantBinding
 import com.familyplanner.family.viewmodel.ApplicationListViewModel
+import com.google.firebase.firestore.GeoPoint
 
 class ApplicationAdapter(
     val isAdmin: Boolean,
