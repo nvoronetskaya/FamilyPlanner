@@ -49,7 +49,8 @@ class FamilyRepository {
                     doc["birthday"].toString(),
                     doc["hasFamily"] as Boolean,
                     doc["familyId"].toString(),
-                    doc["email"].toString()
+                    doc["email"].toString(),
+                    doc.getGeoPoint("location")
                 )
                 users.add(user)
             }

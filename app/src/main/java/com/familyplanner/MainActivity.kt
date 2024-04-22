@@ -67,7 +67,11 @@ class MainActivity : AppCompatActivity() {
         val nManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nManager.createNotificationChannel(notChan)
         val locationChan =
-            NotificationChannel("LOCATION", "Location updates", NotificationManager.IMPORTANCE_DEFAULT)
+            NotificationChannel(
+                "LOCATION",
+                "Location updates",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
         nManager.createNotificationChannel(locationChan)
         startService(Intent(applicationContext, LocationService::class.java))
     }
@@ -82,7 +86,11 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 R.id.map -> {
-
+                    navController.navigate(
+                        R.id.familyLocationFragment,
+                        null,
+                        NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                    )
                 }
 
                 R.id.calendar -> {

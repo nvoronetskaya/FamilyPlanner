@@ -2,6 +2,7 @@ package com.familyplanner.auth.data
 
 import com.familyplanner.common.User
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.dataObjects
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.snapshots
@@ -34,7 +35,8 @@ class UserRepository {
                     doc["birthday"].toString(),
                     doc["hasFamily"] as Boolean,
                     doc["familyId"].toString(),
-                    doc["email"].toString()
+                    doc["email"].toString(),
+                    doc.getGeoPoint("location")
                 )
             }
 
@@ -48,7 +50,8 @@ class UserRepository {
             doc["birthday"].toString(),
             doc["hasFamily"] as Boolean,
             doc["familyId"].toString(),
-            doc["email"].toString()
+            doc["email"].toString(),
+            doc.getGeoPoint("location")
         )
     }
 
@@ -60,7 +63,8 @@ class UserRepository {
             doc["birthday"].toString(),
             doc["hasFamily"] as Boolean,
             doc["familyId"].toString(),
-            doc["email"].toString()
+            doc["email"].toString(),
+            doc.getGeoPoint("location")
         )
     }
 

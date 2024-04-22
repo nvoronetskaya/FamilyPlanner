@@ -21,7 +21,7 @@ import com.google.firebase.firestore.firestore
 
 
 class LocationService : Service() {
-    private val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 3000
+    private val UPDATE_INTERVAL_IN_MILLISECONDS: Long = 10000
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private val firestore = Firebase.firestore

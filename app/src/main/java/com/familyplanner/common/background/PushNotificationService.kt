@@ -1,12 +1,7 @@
 package com.familyplanner.common.background
 
 import android.Manifest
-import android.app.AlertDialog
-import android.app.Notification
 import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -19,10 +14,8 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-class NewTaskNotificationService : FirebaseMessagingService() {
-    private val auth = Firebase.auth
+class PushNotificationService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
-        val userId = auth.currentUser?.uid ?: return
         if (message.data.isEmpty()) {
             return
         }
@@ -57,5 +50,10 @@ class NewTaskNotificationService : FirebaseMessagingService() {
             val manager = NotificationManagerCompat.from(this)
             manager.notify(System.currentTimeMillis().toInt(), notification)
         }
+    }
+
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        TODO()
     }
 }

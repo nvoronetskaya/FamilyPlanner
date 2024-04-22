@@ -1,4 +1,4 @@
-# Welcome to Cloud Functions for Firebase for Python!
+
 # To get started, simply uncomment the below code or create your own.
 # Deploy with `firebase deploy`
 
@@ -53,7 +53,6 @@ def notify_task_observers(observer: Event[DocumentSnapshot]) -> None:
     }
     message = messaging.Message(token=user['fcmToken'], data=data)
     messaging.send(message)
-    print("!!!")
 
 
 @on_document_updated(document="observers/{Id}")

@@ -237,7 +237,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                         "ещё ${totalEvents - i}",
                         xPos + boundsWidth * 3,
                         yPos + verticalOffset + eventTextSize * 1.5f - eventTextSize / 2f,
-                        textPaint
+                        eventTitlePaint
                     )
                     break
                 }
@@ -273,6 +273,9 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     }
 
     private fun showEventsForDay(date: Int) {
+        if (eventsByDate[date].size == 0) {
+            return
+        }
         val bottomSheet = BottomSheetDialog(context)
         bottomSheet.setContentView(R.layout.bottomsheet_events_list)
         bottomSheet.behavior.isDraggable = false
