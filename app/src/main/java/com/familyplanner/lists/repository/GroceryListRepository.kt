@@ -1,6 +1,8 @@
 package com.familyplanner.lists.repository
 
 import android.util.Log
+import com.familyplanner.FamilyPlanner
+import com.familyplanner.lists.model.BudgetDto
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.model.ListObserver
 import com.familyplanner.lists.model.NonObserver
@@ -16,6 +18,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 class GroceryListRepository {
     private val firestore = Firebase.firestore
@@ -184,5 +190,73 @@ class GroceryListRepository {
 
     fun changeListName(listId: String, newName: String) {
         firestore.collection("lists").document(listId).update("name", newName)
+    }
+
+    fun addSpending(userId: String, listId: String, value: Double) {
+        val addedAt =
+            LocalDateTime.now().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC)
+                .toInstant().epochSecond
+        firestore.collection("spending").add(
+            mapOf(
+                "userId" to userId,
+                "listId" to listId,
+                "sumSpent" to value,
+                "addedAt" to addedAt
+            )
+        )
+    }
+
+    suspend fun getSpending(familyId: String): List<BudgetDto> {
+        val listIds = firestore.collection("lists").whereEqualTo("familyId", familyId).get().await()
+            .map { it.id }
+        val result = mutableListOf<BudgetDto>()
+        val documents = firestore.collection("spending").whereIn("listId", listIds).get().await()
+        for (spending in documents) {
+            val userId = spending["userId"].toString()
+            val userName =
+                firestore.collection("users").document(userId).get().await().get("name")?.toString()
+                    ?: ""
+            val addedAt = LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(spending.getLong("addedAt") ?: 0),
+                ZoneId.systemDefault()
+            )
+            val listName =
+                firestore.collection("lists").document(spending["listId"].toString()).get()
+                    .await()["name"].toString()
+            result.add(
+                BudgetDto(
+                    addedAt,
+                    listName,
+                    userName,
+                    spending.getDouble("sumSpent") ?: 0.0
+                )
+            )
+        }
+        return result
+    }
+
+    suspend fun getListSpending(listId: String): List<BudgetDto> {
+        val result = mutableListOf<BudgetDto>()
+        val documents =
+            firestore.collection("spending").whereEqualTo("listId", listId).get().await()
+        for (spending in documents) {
+            val userId = spending["userId"].toString()
+            val userName =
+                firestore.collection("users").document(userId).get().await().get("name")?.toString()
+                    ?: ""
+            val addedAt = LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(spending.getLong("addedAt") ?: 0),
+                ZoneId.systemDefault()
+            )
+            result.add(
+                BudgetDto(
+                    addedAt,
+                    null,
+                    userName,
+                    spending.getDouble("sumSpent") ?: 0.0
+                )
+            )
+        }
+        return result
     }
 }

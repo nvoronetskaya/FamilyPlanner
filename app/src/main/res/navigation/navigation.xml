@@ -157,11 +157,18 @@
         <action
             android:id="@+id/action_listsListFragment_to_groceryListInfoFragment"
             app:destination="@id/groceryListInfoFragment" />
+        <action
+            android:id="@+id/action_listsListFragment_to_allListsBudgetFragment"
+            app:destination="@id/allListsBudgetFragment" />
     </fragment>
     <fragment
         android:id="@+id/groceryListInfoFragment"
         android:name="com.familyplanner.lists.view.GroceryListInfoFragment"
-        android:label="GroceryListInfoFragment"/>
+        android:label="GroceryListInfoFragment">
+        <action
+            android:id="@+id/action_groceryListInfoFragment_to_listBudgetFragment"
+            app:destination="@id/listBudgetFragment" />
+    </fragment>
     <fragment
         android:id="@+id/newEventFragment"
         android:name="com.familyplanner.events.view.NewEventFragment"
@@ -193,4 +200,16 @@
             android:id="@+id/action_eventsListFragment_to_eventInfoFragment"
             app:destination="@id/eventInfoFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/familyLocationFragment"
+        android:name="com.familyplanner.location.view.FamilyLocationFragment"
+        android:label="FamilyLocationFragment" />
+    <fragment
+        android:id="@+id/allListsBudgetFragment"
+        android:name="com.familyplanner.lists.view.AllListsBudgetFragment"
+        android:label="AllListsBudgetFragment" />
+    <fragment
+        android:id="@+id/listBudgetFragment"
+        android:name="com.familyplanner.lists.view.ListBudgetFragment"
+        android:label="ListBudgetFragment" />
 </navigation>
