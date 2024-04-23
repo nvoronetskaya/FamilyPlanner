@@ -2,6 +2,7 @@ package com.familyplanner.family.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
@@ -50,7 +51,7 @@ class NoFamilyViewModel : ViewModel() {
 
     fun joinFamily(code: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            familyRepo.applyToFamily(user.last().id, code)
+            familyRepo.applyToFamily(FamilyPlanner.userId, code)
         }
     }
 }

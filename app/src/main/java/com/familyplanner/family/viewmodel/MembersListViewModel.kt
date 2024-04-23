@@ -101,7 +101,7 @@ class MembersListViewModel : ViewModel() {
     fun approve(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                repository.approveApplication(userId, family.last()!!.id)
+                repository.approveApplication(userId, familyId)
             } catch (e: Exception) {
                 errors.emit("Не удалось одобрить заявку, попробуйте позднее")
             }
@@ -111,7 +111,7 @@ class MembersListViewModel : ViewModel() {
     fun reject(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                repository.rejectApplication(userId, family.last()!!.id)
+                repository.rejectApplication(userId, familyId)
             } catch (e: Exception) {
                 errors.emit("Не удалось отменить заявку, попробуйте позднее")
             }

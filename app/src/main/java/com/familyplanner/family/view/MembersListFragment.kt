@@ -84,6 +84,7 @@ class MembersListFragment : Fragment() {
                                     }.create().show()
                             } else {
                                 binding.tvFamily.text = it.name
+                                binding.tvCode.text = it.id
                             }
                         }
                     }
@@ -100,7 +101,7 @@ class MembersListFragment : Fragment() {
                 launch {
                     viewModel.getApplicants().collect {
                         requireActivity().runOnUiThread {
-                            applicationsAdapter.setData(it) 
+                            applicationsAdapter.setData(it)
                         }
                     }
                 }
@@ -182,7 +183,7 @@ class MembersListFragment : Fragment() {
         }
 
         binding.ivBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            findNavController().popBackStack()
         }
     }
 

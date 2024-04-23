@@ -40,28 +40,32 @@ class NoFamilyFragment : Fragment() {
         (requireActivity() as MainActivity).showBottomNavigation()
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getUser().collect {
-                    if (it.hasFamily) {
-                        activity?.runOnUiThread {
-                            binding.pbLoading.visibility = View.GONE
-                            val bundle = Bundle()
-                            bundle.putString("familyId", it.familyId)
-                            findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment, bundle)
-                        }
-                    } else {
-                        activity?.runOnUiThread {
-                            binding.pbLoading.visibility = View.GONE
-                            binding.animNothingFound.visibility = View.VISIBLE
-                            binding.tvNoFamily.visibility = View.VISIBLE
-                            binding.bJoin.visibility = View.VISIBLE
-                            binding.bCreate.visibility = View.VISIBLE
+                launch {
+                    viewModel.getUser().collect {
+                        if (it.hasFamily) {
+                            activity?.runOnUiThread {
+                                binding.pbLoading.visibility = View.GONE
+                                val bundle = Bundle()
+                                bundle.putString("familyId", it.familyId)
+                                findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment, bundle)
+                            }
+                        } else {
+                            activity?.runOnUiThread {
+                                binding.pbLoading.visibility = View.GONE
+                                binding.animNothingFound.visibility = View.VISIBLE
+                                binding.tvNoFamily.visibility = View.VISIBLE
+                                binding.bJoin.visibility = View.VISIBLE
+                                binding.bCreate.visibility = View.VISIBLE
+                            }
                         }
                     }
                 }
 
-                viewModel.getErrors().collect {
-                    activity?.runOnUiThread {
-                        Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                launch {
+                    viewModel.getErrors().collect {
+                        activity?.runOnUiThread {
+                            Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

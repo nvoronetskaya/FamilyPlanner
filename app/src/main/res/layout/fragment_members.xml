@@ -58,8 +58,31 @@
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:text="@string/applications" />
-
     </com.google.android.material.tabs.TabLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginVertical="20dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_apply_by"
+            style="@style/textBody"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="@string/family_code" />
+
+        <TextView
+            android:id="@+id/tv_code"
+            style="@style/textBody"
+            android:textIsSelectable="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/code"  />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_members"
