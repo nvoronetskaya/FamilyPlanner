@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -18,8 +19,10 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentMembersBinding
+import com.familyplanner.family.adapters.ApplicationAdapter
 import com.familyplanner.family.adapters.MemberAdapter
 import com.familyplanner.family.viewmodel.MembersListViewModel
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -28,6 +31,7 @@ class MembersListFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: MembersListViewModel
     private lateinit var adapter: MemberAdapter
+    private lateinit var applicationsAdapter: ApplicationAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,32 +53,56 @@ class MembersListFragment : Fragment() {
         val manager = LinearLayoutManager(activity)
         binding.rvMembers.layoutManager = manager
         binding.rvMembers.adapter = adapter
+        applicationsAdapter = ApplicationAdapter(isAdmin, activity as MainActivity, viewModel)
 
+        val applicationsManager = LinearLayoutManager(activity)
+        binding.rvApplicants.layoutManager = applicationsManager
+        binding.rvApplicants.adapter = applicationsAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getErrors().collect {
-                    Toast.makeText(
-                        activity,
-                        it,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                viewModel.getFamily().collect {
-                    if (it == null) {
-                        AlertDialog.Builder(activity as MainActivity)
-                            .setMessage("Вы больше не являетесь участником данной семьи")
-                            .setCancelable(false)
-                            .setNeutralButton("Ок") { _, _ ->
-                                parentFragmentManager.popBackStack()
-                            }.create().show()
-                    } else {
-                        binding.tvFamily.text = it.name
+                launch {
+                    viewModel.getErrors().collect {
+                        requireActivity().runOnUiThread {
+                            Toast.makeText(
+                                activity,
+                                it,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
 
-                viewModel.getMembers().collect {
-                    adapter.setData(it)
+                launch {
+                    viewModel.getFamily().collect {
+                        requireActivity().runOnUiThread {
+                            if (it == null) {
+                                AlertDialog.Builder(activity as MainActivity)
+                                    .setMessage("Вы больше не являетесь участником данной семьи")
+                                    .setCancelable(false)
+                                    .setNeutralButton("Ок") { _, _ ->
+                                        findNavController().popBackStack()
+                                    }.create().show()
+                            } else {
+                                binding.tvFamily.text = it.name
+                            }
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.getMembers().collect {
+                        requireActivity().runOnUiThread {
+                            adapter.setData(it)
+                        }
+                    }
+                }
+
+                launch {
+                    viewModel.getApplicants().collect {
+                        requireActivity().runOnUiThread {
+                            applicationsAdapter.setData(it) 
+                        }
+                    }
                 }
             }
         }
@@ -85,11 +113,19 @@ class MembersListFragment : Fragment() {
             binding.llDelete.visibility = View.VISIBLE
         }
 
-        binding.itemApplications.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putBoolean("isAdmin", isAdmin)
-            findNavController().navigate(R.id.action_membersListFragment_to_applicationsListFragment)
-        }
+        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val isMembers = binding.tabs.getTabAt(0)!!.equals(tab)
+                binding.rvMembers.isVisible = isMembers
+                binding.rvApplicants.isVisible = !isMembers
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
 
         binding.ivEdit.setOnClickListener {
             val familyName = EditText(activity)

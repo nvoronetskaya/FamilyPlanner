@@ -129,6 +129,9 @@ class TasksListFragment : Fragment() {
             dialog.datePicker.minDate = calendar.timeInMillis
             dialog.show()
         }
+        binding.ivMore.setOnClickListener {
+            findNavController().navigate(R.id.action_tasksListFragment_to_membersListFragment, bundleOf("isAdmin" to true))
+        }
         if (!askedForNotification) {
             askNotificationPermission()
         }

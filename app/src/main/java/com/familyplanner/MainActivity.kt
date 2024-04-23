@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
     fun showBottomNavigation() {
         binding.bottomNavigation.isVisible = true
-        setUpBottomNavigation() 
+        setUpBottomNavigation()
     }
 
     private fun setUpBottomNavigation() {

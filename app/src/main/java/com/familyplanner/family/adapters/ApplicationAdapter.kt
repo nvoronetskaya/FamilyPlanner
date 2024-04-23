@@ -9,12 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.common.User
 import com.familyplanner.databinding.ViewholderApplicantBinding
 import com.familyplanner.family.viewmodel.ApplicationListViewModel
+import com.familyplanner.family.viewmodel.MembersListViewModel
 import com.google.firebase.firestore.GeoPoint
 
 class ApplicationAdapter(
     val isAdmin: Boolean,
     val activity: Context,
-    val viewModel: ApplicationListViewModel
+    val viewModel: MembersListViewModel
 ) :
     RecyclerView.Adapter<ApplicationAdapter.ApplicationViewHolder>() {
     private val applications = MutableList<User>(0)

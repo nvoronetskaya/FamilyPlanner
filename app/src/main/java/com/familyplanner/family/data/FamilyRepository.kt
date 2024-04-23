@@ -28,15 +28,8 @@ class FamilyRepository {
                 )
             }
 
-    fun updateFamily(familyId: String, newName: String) {
-        firestore.collection("families").whereEqualTo(FieldPath.documentId(), familyId).get()
-            .addOnCompleteListener {
-                if (!it.result.isEmpty) {
-                    for (doc in it.result) {
-                        doc.reference.update(mapOf("name" to newName))
-                    }
-                }
-            }
+    suspend fun updateFamily(familyId: String, newName: String) {
+        firestore.collection("families").document(familyId).get().await().reference.update(mapOf("name" to newName))
     }
 
     fun getFamilyMembers(familyId: String): Flow<List<User>> =
@@ -73,8 +66,10 @@ class FamilyRepository {
         firestore.collection("applications").whereEqualTo("familyId", familyId)
             .whereEqualTo("status", ApplicationStatus.NEW).dataObjects()
 
-    fun getApplicants(ids: List<String>): Flow<List<User>> =
-        firestore.collection("users").whereIn(FieldPath.documentId(), ids).snapshots().map {
+    fun getApplicants(ids: List<String>): Flow<List<User>> {
+        val newIds = mutableListOf("1")
+        newIds.addAll(ids)
+        return firestore.collection("users").whereIn(FieldPath.documentId(), newIds).snapshots().map {
             val users = mutableListOf<User>()
             for (doc in it.documents) {
                 val user = User(
@@ -89,6 +84,7 @@ class FamilyRepository {
             }
             users
         }
+    }
 
     fun approveApplication(userId: String, familyId: String) {
         firestore.collection("applications").whereEqualTo("userId", userId)

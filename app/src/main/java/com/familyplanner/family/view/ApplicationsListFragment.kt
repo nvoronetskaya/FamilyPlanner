@@ -18,13 +18,14 @@ import com.familyplanner.MainActivity
 import com.familyplanner.databinding.FragmentApplicantsBinding
 import com.familyplanner.family.adapters.ApplicationAdapter
 import com.familyplanner.family.viewmodel.ApplicationListViewModel
+import com.familyplanner.family.viewmodel.MembersListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ApplicationsListFragment : Fragment() {
     private var _binding: FragmentApplicantsBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: ApplicationListViewModel
+    private lateinit var viewModel: MembersListViewModel
     private lateinit var adapter: ApplicationAdapter
 
     override fun onCreateView(
@@ -41,7 +42,7 @@ class ApplicationsListFragment : Fragment() {
 
         val isAdmin = requireArguments().getBoolean("isAdmin")
         val userId = FamilyPlanner.userId
-        viewModel = ViewModelProvider(this)[ApplicationListViewModel::class.java]
+        viewModel = ViewModelProvider(this)[MembersListViewModel::class.java]
         adapter = ApplicationAdapter(isAdmin, activity as MainActivity, viewModel)
 
         val manager = LinearLayoutManager(activity)

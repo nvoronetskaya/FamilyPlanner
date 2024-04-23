@@ -40,26 +40,26 @@
     </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="55dp"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="#D8D8D8"
         android:backgroundTint="?attr/colorPrimary">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/item_members"
             style="@style/textBody"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:text="@string/members" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/item_applications"
             style="@style/textBody"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:text="@string/applications" />
 
     </com.google.android.material.tabs.TabLayout>
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_members"

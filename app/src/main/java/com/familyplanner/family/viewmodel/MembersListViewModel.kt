@@ -14,27 +14,40 @@ import kotlinx.coroutines.launch
 
 class MembersListViewModel : ViewModel() {
     private val userId: String = FamilyPlanner.userId
+    private var familyId = ""
     private val errors = MutableSharedFlow<String>()
     private val repository = FamilyRepository()
-    private var family = MutableSharedFlow<Family?>()
-    private var members = MutableSharedFlow<List<User>>()
+    private var family = MutableSharedFlow<Family?>(replay = 1)
+    private var members = MutableSharedFlow<List<User>>(replay = 1)
+    private var applicants = MutableSharedFlow<List<User>>(replay = 1)
 
     fun getErrors(): Flow<String> = errors
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getUserById(userId).collect { user ->
-                val familyId = user.familyId
+                this@MembersListViewModel.familyId = user.familyId ?: ""
 
                 if (familyId.isNullOrBlank()) {
                     family.emit(null)
                 } else {
-                    repository.getFamilyById(familyId).collect {
-                        family.emit(it)
+                    launch {
+                        repository.getFamilyById(familyId).collect {
+                            family.emit(it)
+                        }
                     }
-
-                    repository.getFamilyMembers(familyId).collect {
-                        members.emit(it)
+                    launch {
+                        repository.getFamilyMembers(familyId).collect {
+                            members.emit(it)
+                        }
+                    }
+                    launch {
+                        repository.getApplicationsToFamily(familyId).collect {
+                            repository.getApplicants(it.map { application -> application.userId })
+                                .collect { users ->
+                                    applicants.emit(users)
+                                }
+                        }
                     }
                 }
             }
@@ -44,7 +57,7 @@ class MembersListViewModel : ViewModel() {
     fun updateFamilyName(newName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                repository.updateFamily(family.last()!!.id, newName)
+                repository.updateFamily(familyId, newName)
             } catch (e: Exception) {
                 errors.emit("Не удалось изменить название, попробуйте позднее")
             }
@@ -81,5 +94,27 @@ class MembersListViewModel : ViewModel() {
             }
         }
         return isSuccessful
+    }
+
+    fun getApplicants(): Flow<List<User>> = applicants
+
+    fun approve(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.approveApplication(userId, family.last()!!.id)
+            } catch (e: Exception) {
+                errors.emit("Не удалось одобрить заявку, попробуйте позднее")
+            }
+        }
+    }
+
+    fun reject(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.rejectApplication(userId, family.last()!!.id)
+            } catch (e: Exception) {
+                errors.emit("Не удалось отменить заявку, попробуйте позднее")
+            }
+        }
     }
 }
