@@ -267,6 +267,12 @@ class ShowTaskInfoFragment : Fragment() {
         binding.tvDelete.setOnClickListener {
             viewModel.deleteTask(taskId)
         }
+        binding.ivEdit.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_showTaskInfoFragment_to_editTaskFragment,
+                bundleOf("taskId" to taskId)
+            )
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

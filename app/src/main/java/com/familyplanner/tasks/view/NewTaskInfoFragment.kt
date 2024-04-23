@@ -244,7 +244,7 @@ class NewTaskInfoFragment : Fragment() {
         binding.ivNext.setOnClickListener {
             createTask()
         }
-        var options = listOf("Низкий", "Средний", "Высокий")
+        var options = listOf("Низкая", "Средняя", "Высокая")
         binding.spImportance.adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
         binding.spImportance.setSelection(0)

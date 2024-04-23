@@ -144,7 +144,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 } else {
                     finishDate.dayOfMonth
                 }
-            for (i in start..finish) {
+            for (i in start - 1..finish - 1) {
                 eventsByDate[i].add(event)
             }
         }
@@ -277,10 +277,14 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             return
         }
         val bottomSheet = BottomSheetDialog(context)
+        onEventClicked.also { bottomSheet.dismiss() }
         bottomSheet.setContentView(R.layout.bottomsheet_events_list)
         bottomSheet.behavior.isDraggable = false
         val eventsRecycler = bottomSheet.findViewById<RecyclerView>(R.id.events_list)
-        val eventsAdapter = EventAdapter(onEventClicked)
+        val eventsAdapter = EventAdapter {
+            onEventClicked?.invoke(it)
+            bottomSheet.dismiss()
+        }
         eventsRecycler?.layoutManager = LinearLayoutManager(context)
         eventsRecycler?.adapter = eventsAdapter
         eventsAdapter.setData(eventsByDate[date])

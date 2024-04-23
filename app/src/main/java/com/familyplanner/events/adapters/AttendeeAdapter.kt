@@ -31,7 +31,7 @@ class AttendeeAdapter : RecyclerView.Adapter<AttendeeAdapter.AttendeeViewHolder>
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttendeeViewHolder {
-        return AttendeeViewHolder(ViewholderObserverBinding.inflate(LayoutInflater.from(parent.context)))
+        return AttendeeViewHolder(ViewholderObserverBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun getItemCount(): Int = attendees.size

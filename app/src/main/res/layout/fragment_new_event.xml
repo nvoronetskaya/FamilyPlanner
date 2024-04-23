@@ -99,8 +99,8 @@
                 android:id="@+id/tv_start_time"
                 style="@style/textBody"
                 android:layout_width="wrap_content"
-                android:text="@string/start_date"
                 android:layout_height="wrap_content"
+                android:text="@string/start_date"
                 app:layout_constraintStart_toStartOf="@id/tf_description"
                 app:layout_constraintTop_toBottomOf="@id/tf_description" />
 
@@ -109,15 +109,16 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 app:layout_constraintBottom_toBottomOf="@id/tv_start_time"
                 app:layout_constraintStart_toEndOf="@id/tv_start_time" />
 
             <TextView
                 android:id="@+id/tv_finish_time"
                 style="@style/textBody"
-                android:text="@string/finish_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/finish_date"
                 app:layout_constraintStart_toStartOf="@id/tv_start_time"
                 app:layout_constraintTop_toBottomOf="@id/tv_start_time" />
 
@@ -126,6 +127,7 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 app:layout_constraintBottom_toBottomOf="@id/tv_finish_time"
                 app:layout_constraintStart_toEndOf="@id/tv_finish_time" />
 
@@ -133,14 +135,14 @@
                 android:id="@+id/tv_can_see"
                 style="@style/textBar"
                 android:layout_width="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:textColor="@color/black"
+                android:layout_marginTop="10dp"
                 android:text="@string/who_sees_event"
-                app:layout_constraintTop_toBottomOf="@id/tv_finish_time"
+                android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_finish_time" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_observers"

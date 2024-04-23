@@ -71,56 +71,63 @@ class EditEventFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.prepareData(eventId, familyId)
                 val event = viewModel.getEvent()
-                if (event == null) {
-                    Toast.makeText(requireContext(), "Мероприятие недоступно", Toast.LENGTH_SHORT)
-                        .show()
-                    return@repeatOnLifecycle
-                }
-                binding.etName.setText(event.name)
-                binding.etDescription.setText(event.description)
-                binding.tvStartValue.text = LocalDateTime.ofInstant(
-                    Instant.ofEpochSecond(event.start),
-                    ZoneId.systemDefault()
-                ).format(FamilyPlanner.dateTimeFormatter)
-                binding.tvFinishValue.text = LocalDateTime.ofInstant(
-                    Instant.ofEpochSecond(event.finish),
-                    ZoneId.systemDefault()
-                ).format(FamilyPlanner.dateTimeFormatter)
-                binding.tvStartValue.setOnClickListener {
-                    setDate(true)
-                }
-                binding.tvFinishValue.setOnClickListener {
-                    setDate(false)
-                }
-                attendeesAdapter.setData(viewModel.getAttendees())
-                filesAdapter.setData(viewModel.getFiles())
-                binding.tvAttachFile.setOnClickListener {
-                    val openDocumentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                        type = "*/*"
-                    }
-                    startActivityForResult(openDocumentIntent, ATTACH_FILES)
-                }
-                binding.ivDone.setOnClickListener {
-                    if (binding.etName.text.isNullOrBlank()) {
-                        binding.tfName.error = "Название мероприятия не может быть пустым"
-                        return@setOnClickListener
-                    }
-                    binding.tfName.isErrorEnabled = false
-                    viewModel.updateEventInfo(
-                        binding.etName.text!!.toString().trim(),
-                        binding.etDescription.text!!.toString().trim(),
-                        getDateTimeFromString(binding.tvStartTime.text.toString()),
-                        getDateTimeFromString(binding.tvFinishTime.text.toString()),
-                        attendeesAdapter.getInvitations()
-                    )
-                    if (!viewModel.getIsFilesUploadSuccessful()) {
+                requireActivity().runOnUiThread {
+                    if (event == null) {
                         Toast.makeText(
                             requireContext(),
-                            "Не удалось загрузить некоторые файлы. Вы можете отредактироавть мероприятие позднее",
+                            "Мероприятие недоступно",
                             Toast.LENGTH_SHORT
-                        ).show()
+                        )
+                            .show()
+                        findNavController().popBackStack()
+                        return@runOnUiThread
                     }
-                    findNavController().popBackStack()
+                    binding.etName.setText(event.name)
+                    binding.etDescription.setText(event.description)
+                    binding.tvStartValue.text = LocalDateTime.ofInstant(
+                        Instant.ofEpochSecond(event.start),
+                        ZoneId.systemDefault()
+                    ).format(FamilyPlanner.dateTimeFormatter)
+                    binding.tvFinishValue.text = LocalDateTime.ofInstant(
+                        Instant.ofEpochSecond(event.finish),
+                        ZoneId.systemDefault()
+                    ).format(FamilyPlanner.dateTimeFormatter)
+                    binding.tvStartValue.setOnClickListener {
+                        setDate(true)
+                    }
+                    binding.tvFinishValue.setOnClickListener {
+                        setDate(false)
+                    }
+                    attendeesAdapter.setData(viewModel.getAttendees())
+                    filesAdapter.setData(viewModel.getFiles())
+                    binding.tvAttachFile.setOnClickListener {
+                        val openDocumentIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                            type = "*/*"
+                        }
+                        startActivityForResult(openDocumentIntent, ATTACH_FILES)
+                    }
+                    binding.ivDone.setOnClickListener {
+                        if (binding.etName.text.isNullOrBlank()) {
+                            binding.tfName.error = "Название мероприятия не может быть пустым"
+                            return@setOnClickListener
+                        }
+                        binding.tfName.isErrorEnabled = false
+                        viewModel.updateEventInfo(
+                            binding.etName.text!!.toString().trim(),
+                            binding.etDescription.text!!.toString().trim(),
+                            getDateTimeFromString(binding.tvStartValue.text.toString()),
+                            getDateTimeFromString(binding.tvFinishValue.text.toString()),
+                            attendeesAdapter.getInvitations()
+                        )
+                        if (!viewModel.getIsFilesUploadSuccessful()) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Не удалось загрузить некоторые файлы. Вы можете отредактироавть мероприятие позднее",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        findNavController().popBackStack()
+                    }
                 }
             }
         }

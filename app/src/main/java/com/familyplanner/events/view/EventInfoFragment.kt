@@ -20,6 +20,7 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentEventInfoBinding
 import com.familyplanner.events.adapters.AttendeeAdapter
+import com.familyplanner.events.data.EventAttendeeStatus
 import com.familyplanner.events.viewmodel.EventInfoViewModel
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,7 @@ class EventInfoFragment : Fragment() {
                                     "Мероприятие не найдено",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                findNavController().popBackStack()
                             } else {
                                 binding.etName.setText(it.name)
                                 binding.tfDescription.isVisible = it.description.isNotBlank()
@@ -81,26 +83,6 @@ class EventInfoFragment : Fragment() {
                                 binding.ivEdit.isVisible = FamilyPlanner.userId.equals(it.createdBy)
                                 binding.tvCancel.isVisible =
                                     FamilyPlanner.userId.equals(it.createdBy)
-                                binding.ivEdit.setOnClickListener {
-                                    val bundle = Bundle()
-                                    bundle.putString("eventId", eventId)
-                                    bundle.putString("familyId", viewModel.getFamilyId())
-                                    findNavController().navigate(
-                                        R.id.action_eventInfoFragment_to_editEventFragment,
-                                        bundle
-                                    )
-                                }
-                                binding.tvCancel.setOnClickListener {
-                                    viewModel.deleteEvent(eventId)
-                                    findNavController().popBackStack()
-                                }
-                                binding.cbParticipate.setOnClickListener {
-                                    viewModel.changeComing(
-                                        FamilyPlanner.userId,
-                                        eventId,
-                                        binding.cbParticipate.isChecked
-                                    )
-                                }
                             }
                         }
                     }
@@ -109,6 +91,19 @@ class EventInfoFragment : Fragment() {
                     viewModel.getAttendees().collect {
                         requireActivity().runOnUiThread {
                             attendeeAdapter.setData(it)
+                            val curUser =
+                                it.firstOrNull { attendee -> attendee.userId.equals(FamilyPlanner.userId) }
+                            curUser?.let {
+                                if (it.status == EventAttendeeStatus.UNKNOWN) {
+                                    viewModel.changeComing(
+                                        FamilyPlanner.userId,
+                                        eventId,
+                                        binding.cbParticipate.isChecked
+                                    )
+                                }
+                                binding.cbParticipate.isChecked =
+                                    it.status == EventAttendeeStatus.COMING
+                            }
                         }
                     }
                 }
@@ -121,13 +116,47 @@ class EventInfoFragment : Fragment() {
                                     "Не удалось получить файлы. Проверьте соединение",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                binding.llFiles.isVisible = false
                                 return@runOnUiThread
                             }
+                            binding.llFiles.isVisible = it.size > 0
                             filesAdapter.addPaths(it)
                         }
                     }
                 }
             }
+        }
+        binding.ivEdit.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString("eventId", eventId)
+            bundle.putString("familyId", viewModel.getFamilyId())
+            findNavController().navigate(
+                R.id.action_eventInfoFragment_to_editEventFragment,
+                bundle
+            )
+        }
+        binding.tvCancel.setOnClickListener {
+            viewModel.deleteEvent(eventId)
+        }
+        binding.cbParticipate.setOnClickListener {
+            viewModel.changeComing(
+                FamilyPlanner.userId,
+                eventId,
+                binding.cbParticipate.isChecked
+            )
+        }
+        binding.ivBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+        binding.ivObserversFolded.setOnClickListener {
+            binding.rvObservers.isVisible = true
+            binding.ivObserversFolded.isVisible = false
+            binding.ivObserversUnfolded.isVisible = true
+        }
+        binding.ivObserversUnfolded.setOnClickListener {
+            binding.rvObservers.isVisible = false
+            binding.ivObserversFolded.isVisible = true
+            binding.ivObserversUnfolded.isVisible = false
         }
     }
 

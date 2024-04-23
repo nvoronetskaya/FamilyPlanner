@@ -21,7 +21,7 @@ class ListBudgetAdapter : RecyclerView.Adapter<ListBudgetAdapter.BudgetViewHolde
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BudgetViewHolder {
-        return BudgetViewHolder(ViewholderBudgetBinding.inflate(LayoutInflater.from(parent.context)))
+        return BudgetViewHolder(ViewholderBudgetBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun getItemCount(): Int = budgetObjects.size

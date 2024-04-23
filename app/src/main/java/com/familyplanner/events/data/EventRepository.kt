@@ -52,21 +52,41 @@ class EventRepository {
     }
 
     suspend fun getEventByIdOnce(eventId: String): Event? {
-        return firestore.collection("events").document(eventId).get().await()
+        val event = firestore.collection("events").document(eventId).get().await()
             .toObject(Event::class.java)
+        event?.id = eventId
+        return event
     }
 
     fun getEventAttendees(eventId: String): Flow<List<EventAttendee>> {
         return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots()
             .map {
-                it.toObjects(EventAttendee::class.java)
+                it.map {
+                    val userName =
+                        firestore.collection("users").document(it["userId"].toString()).get()
+                            .await()["name"].toString()
+                    EventAttendee(
+                        it["eventId"].toString(),
+                        it["userId"].toString(),
+                        EventAttendeeStatus.valueOf(it["status"].toString()),
+                        userName
+                    )
+                }
             }
     }
 
     suspend fun getEventAttendeesOnce(eventId: String): List<EventAttendee> {
         return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).get().await()
             .map {
-                it.toObject(EventAttendee::class.java)
+                val userName =
+                    firestore.collection("users").document(it["userId"].toString()).get()
+                        .await()["name"].toString()
+                EventAttendee(
+                    it["eventId"].toString(),
+                    it["userId"].toString(),
+                    EventAttendeeStatus.valueOf(it["status"].toString()),
+                    userName
+                )
             }
     }
 
@@ -111,7 +131,7 @@ class EventRepository {
         return storage.reference.child("event-$eventId").child(fileName).delete()
     }
 
-    fun updateEvent(
+    suspend fun updateEvent(
         eventId: String,
         name: String,
         description: String,
@@ -126,21 +146,21 @@ class EventRepository {
             "start" to start,
             "finish" to finish
         )
-        firestore.collection("events").document(eventId).update(data).addOnSuccessListener {
-            for (invitation in newInvitations) {
-                if (invitation.isInvited != attendees[invitation.userId]?.isInvited) {
-                    firestore.collection("eventAttendees").whereEqualTo("userId", invitation.userId)
-                        .whereEqualTo("eventId", eventId).get().addOnSuccessListener {
-                            it.documents.forEach { it.reference.delete() }
-                            if (invitation.isInvited) {
-                                val newInvitation = mapOf<String, Any>(
-                                    "eventId" to eventId,
-                                    "userId" to invitation.userId,
-                                    "status" to EventAttendeeStatus.UNKNOWN
-                                )
-                                firestore.collection("eventAttendees").add(newInvitation)
-                            }
-                        }
+        firestore.collection("events").document(eventId).update(data).await()
+        for (invitation in newInvitations) {
+            if (invitation.isInvited != attendees[invitation.userId]?.isInvited) {
+                if (invitation.isInvited) {
+                    val newInvitation = mapOf<String, Any>(
+                        "eventId" to eventId,
+                        "userId" to invitation.userId,
+                        "status" to EventAttendeeStatus.UNKNOWN
+                    )
+                    firestore.collection("eventAttendees").add(newInvitation)
+                } else {
+                    firestore.collection("eventAttendees")
+                        .whereEqualTo("eventId", eventId)
+                        .whereEqualTo("userId", invitation.userId).get()
+                        .await().documents.forEach { it.reference.delete() }
                 }
             }
         }
@@ -149,7 +169,11 @@ class EventRepository {
     fun getEventsForPeriod(start: Long, finish: Long): Flow<List<Event>> {
         return firestore.collection("events").whereGreaterThanOrEqualTo("finish", start)
             .whereLessThanOrEqualTo("start", finish).snapshots().map {
-                it.toObjects(Event::class.java)
+                it.map {
+                    val event = it.toObject(Event::class.java)
+                    event.id = it.id
+                    event
+                }
             }
     }
 }

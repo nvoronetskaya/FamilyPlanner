@@ -18,8 +18,8 @@ import kotlinx.coroutines.tasks.await
 class EventInfoViewModel : ViewModel() {
     private var eventId: String = ""
     private var familyId: String = ""
-    private val event = MutableSharedFlow<Event?>()
-    private val attendees = MutableSharedFlow<List<EventAttendee>>()
+    private val event = MutableSharedFlow<Event?>(replay = 1)
+    private val attendees = MutableSharedFlow<List<EventAttendee>>(replay = 1)
     private val eventRepo = EventRepository()
     private val userRepo = UserRepository()
     private var files = MutableSharedFlow<List<String>?>(replay = 1)

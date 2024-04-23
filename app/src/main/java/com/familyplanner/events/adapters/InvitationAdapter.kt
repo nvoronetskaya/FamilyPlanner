@@ -26,7 +26,7 @@ class InvitationAdapter : RecyclerView.Adapter<InvitationAdapter.InvitationViewH
             ViewholderEventObserverBinding.inflate(
                 LayoutInflater.from(
                     parent.context
-                )
+                ), parent, false
             )
         )
     }

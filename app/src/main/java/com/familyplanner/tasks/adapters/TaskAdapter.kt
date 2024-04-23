@@ -45,7 +45,7 @@ class TaskAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder =
-        TaskViewHolder(ViewholderTaskBinding.inflate(LayoutInflater.from(parent.context)))
+        TaskViewHolder(ViewholderTaskBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun getItemCount(): Int = tasks.size
 

@@ -110,7 +110,7 @@ class EditTaskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EditTaskViewModel::class.java]
         val taskId = requireArguments().getString("taskId") ?: ""
-        val options = listOf("Низкий", "Средний", "Высокий")
+        val options = listOf("Низкая", "Средняя", "Высокая")
         filesAdapter = FileAdapter(viewModel::removeFile)
         binding.rvFiles.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)

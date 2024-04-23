@@ -8,6 +8,7 @@ import com.familyplanner.events.data.EventRepository
 import com.familyplanner.events.data.Invitation
 import com.familyplanner.family.data.FamilyRepository
 import com.familyplanner.tasks.model.UserFile
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -18,6 +19,7 @@ class EditEventViewModel : ViewModel() {
     private val familyRepo = FamilyRepository()
     private var files = mutableListOf<UserFile>()
     private var attendees = mutableMapOf<String, Invitation>()
+    private var initialAttendees = mutableMapOf<String, Invitation>()
     private var isFileUploadSuccessful: Boolean = true
 
     suspend fun prepareData(eventId: String, familyId: String) {
@@ -31,6 +33,14 @@ class EditEventViewModel : ViewModel() {
         val invitations = eventRepo.getEventAttendeesOnce(eventId)
         attendees.clear()
         attendees.putAll(allMembers.map { user ->
+            user.id to Invitation(
+                user.id,
+                user.name,
+                user.birthday,
+                invitations.firstOrNull { it.userId == user.id } != null)
+        })
+        initialAttendees.clear()
+        initialAttendees.putAll(allMembers.map { user ->
             user.id to Invitation(
                 user.id,
                 user.name,
@@ -70,7 +80,18 @@ class EditEventViewModel : ViewModel() {
         finish: Long,
         newInvitations: List<Invitation>
     ) {
-        eventRepo.updateEvent(eventId, name, description, start, finish, newInvitations, attendees)
+        viewModelScope.launch(Dispatchers.IO) {
+            eventRepo.updateEvent(
+                eventId,
+                name,
+                description,
+                start,
+                finish,
+                newInvitations,
+                initialAttendees
+            )
+
+        }
     }
 
     fun getIsFilesUploadSuccessful() = isFileUploadSuccessful

@@ -32,7 +32,7 @@ class EventAdapter(val onEventClicked: ((String) -> Unit)?) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
-        return EventViewHolder(ViewholderEventBinding.inflate(LayoutInflater.from(parent.context)))
+        return EventViewHolder(ViewholderEventBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun getItemCount(): Int = events.size
