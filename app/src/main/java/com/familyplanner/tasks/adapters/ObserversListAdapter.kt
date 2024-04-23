@@ -40,5 +40,6 @@ class ObserversListAdapter(private val userId: String) :
     fun setObservers(users: List<ObserverDto>) {
         observers.clear()
         observers.addAll(users)
+        notifyDataSetChanged()
     }
 }

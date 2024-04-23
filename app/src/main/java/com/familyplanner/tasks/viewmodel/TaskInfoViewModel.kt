@@ -39,7 +39,6 @@ class TaskInfoViewModel : ViewModel() {
     private var task: MutableSharedFlow<Task?> = MutableSharedFlow(replay = 1)
     private var comments: MutableSharedFlow<List<CommentDto>> = MutableSharedFlow(replay = 1)
     private var observers: MutableSharedFlow<List<ObserverDto>> = MutableSharedFlow(replay = 1)
-    private var executors: MutableSharedFlow<List<Observer>> = MutableSharedFlow(replay = 1)
     private val repo = TaskRepository()
     private var subTasks: MutableSharedFlow<List<TaskWithDate>> = MutableSharedFlow(replay = 1)
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
@@ -102,7 +101,7 @@ class TaskInfoViewModel : ViewModel() {
             }
             launch {
                 repo.getTaskObservers(taskId).collect {
-                    executors.emit(it)
+                    observers.emit(it)
                 }
             }
             launch {

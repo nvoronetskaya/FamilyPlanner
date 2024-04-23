@@ -3,6 +3,7 @@ package com.familyplanner.tasks.repository
 import android.net.Uri
 import com.familyplanner.common.User
 import com.familyplanner.tasks.dto.CommentDto
+import com.familyplanner.tasks.dto.ObserverDto
 import com.familyplanner.tasks.model.Importance
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.familyplanner.tasks.model.Observer
@@ -123,12 +124,16 @@ class TaskRepository {
         }
     }
 
-    fun getTaskObservers(taskId: String): Flow<List<Observer>> {
+    fun getTaskObservers(taskId: String): Flow<List<ObserverDto>> {
         return firestore.collection("observers").whereEqualTo("taskId", taskId).snapshots().map {
-            val users = mutableListOf<Observer>()
+            val users = mutableListOf<ObserverDto>()
             for (doc in it.documents) {
-                val user = Observer(
+                val userName =
+                    firestore.collection("users").document(doc["userId"].toString()).get()
+                        .await()["name"].toString()
+                val user = ObserverDto(
                     doc["userId"].toString(),
+                    userName,
                     doc.getBoolean("isExecutor") ?: false,
                     doc["taskId"].toString()
                 )

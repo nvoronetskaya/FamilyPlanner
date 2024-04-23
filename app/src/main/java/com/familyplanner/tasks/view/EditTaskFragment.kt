@@ -352,6 +352,7 @@ class EditTaskFragment : Fragment() {
             binding.swHasLocation.isChecked,
             curPoint
         )
+        findNavController().popBackStack()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

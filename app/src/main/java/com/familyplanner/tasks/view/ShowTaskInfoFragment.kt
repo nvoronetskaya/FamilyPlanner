@@ -127,6 +127,7 @@ class ShowTaskInfoFragment : Fragment() {
                     viewModel.getSubtasks().collect {
                         requireActivity().runOnUiThread {
                             subtasksAdapter.setTasks(it)
+                            binding.layoutSubtasks.isVisible = it.isNotEmpty()
                         }
                     }
                 }
@@ -139,8 +140,10 @@ class ShowTaskInfoFragment : Fragment() {
                                     "Не удалось получить файлы. Проверьте соединение",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                binding.layoutFiles.isVisible = false
                                 return@runOnUiThread
                             }
+                            binding.layoutFiles.isVisible = it.isNotEmpty()
                             filesAdapter.addPaths(it)
                         }
                     }
