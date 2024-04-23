@@ -37,6 +37,7 @@ class NoFamilyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[NoFamilyViewModel::class.java]
+        (requireActivity() as MainActivity).showBottomNavigation()
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {

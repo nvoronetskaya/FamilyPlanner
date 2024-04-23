@@ -10,7 +10,7 @@
     <string name="password">Пароль</string>
     <string name="forgot_password"><u>Забыли пароль?</u></string>
     <string name="has_account">Уже есть аккаунт? <u>Войти</u></string>
-    <string name="promo_text">Замечательный текст, который нужно дописать</string>
+    <string name="promo_text">Отслеживайте задачи, мероприятия, списки покупок и местоположение своих близких в одном приложении! </string>
     <string name="enter_email">Введите адрес электронной почты:</string>
     <string name="enter_code">Проверьте почту и введите код подтверждения:</string>
     <string name="code">Код</string>

@@ -69,7 +69,7 @@ class GroceryListInfoFragment : Fragment() {
         binding.rvProducts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProducts.adapter = productsAdapter
-        binding.rvObservers.adapter = observerAdapter 
+        binding.rvObservers.adapter = observerAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {

@@ -31,7 +31,8 @@ class GroceryListRepository {
     fun getListsForUser(userId: String): Flow<List<GroceryList>> {
         scope.launch {
             firestore.collection("usersLists").whereEqualTo("userId", userId).snapshots().collect {
-                val listIds = it.documents.map { it["listId"].toString() }
+                val listIds = it.documents.map { it["listId"].toString() }.toMutableList()
+                listIds.add("1")
                 launch {
                     firestore.collection("lists").whereIn(FieldPath.documentId(), listIds)
                         .snapshots()
@@ -89,7 +90,8 @@ class GroceryListRepository {
     suspend fun getObserversForList(listId: String): Flow<List<ListObserver>> {
         val usersId =
             firestore.collection("usersLists").whereEqualTo("listId", listId).get().await()
-                .map { it["userId"].toString() }
+                .map { it["userId"].toString() }.toMutableList()
+        usersId.add("1")
         return firestore.collection("users").whereIn(FieldPath.documentId(), usersId)
             .snapshots().map { users ->
                 val dbObservers = mutableListOf<ListObserver>()
@@ -209,6 +211,9 @@ class GroceryListRepository {
     suspend fun getSpending(familyId: String): List<BudgetDto> {
         val listIds = firestore.collection("lists").whereEqualTo("familyId", familyId).get().await()
             .map { it.id }
+        if (listIds.isEmpty()) {
+            return listOf()
+        }
         val result = mutableListOf<BudgetDto>()
         val documents = firestore.collection("spending").whereIn("listId", listIds).get().await()
         for (spending in documents) {

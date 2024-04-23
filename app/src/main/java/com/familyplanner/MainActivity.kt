@@ -5,11 +5,14 @@ import android.app.NotificationManager
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.iterator
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -74,6 +77,11 @@ class MainActivity : AppCompatActivity() {
             )
         nManager.createNotificationChannel(locationChan)
         startService(Intent(applicationContext, LocationService::class.java))
+    }
+
+    fun showBottomNavigation() {
+        binding.bottomNavigation.isVisible = true
+        setUpBottomNavigation() 
     }
 
     private fun setUpBottomNavigation() {

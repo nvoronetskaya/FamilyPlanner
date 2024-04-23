@@ -39,17 +39,21 @@ class TaskRepository {
                 .whereEqualTo("userId", userId).snapshots().collect {
                     val tasksIds = it.map { it["taskId"].toString() }
                     launch {
-                        firestore.collection("tasks").whereEqualTo("parentId", null)
-                            .whereIn(FieldPath.documentId(), tasksIds).snapshots()
-                            .collect { result ->
-                                val queryTasks = mutableListOf<Task>()
-                                for (doc in result.documents) {
-                                    val task = doc.toObject(Task::class.java)!!
-                                    task.id = doc.id
-                                    queryTasks.add(task)
+                        if (tasksIds.isEmpty()) {
+                            userTasks.emit(listOf())
+                        } else {
+                            firestore.collection("tasks").whereEqualTo("parentId", null)
+                                .whereIn(FieldPath.documentId(), tasksIds).snapshots()
+                                .collect { result ->
+                                    val queryTasks = mutableListOf<Task>()
+                                    for (doc in result.documents) {
+                                        val task = doc.toObject(Task::class.java)!!
+                                        task.id = doc.id
+                                        queryTasks.add(task)
+                                    }
+                                    userTasks.emit(queryTasks)
                                 }
-                                userTasks.emit(queryTasks)
-                            }
+                        }
                     }
                 }
         }
@@ -65,24 +69,32 @@ class TaskRepository {
             firestore.collection("observers").whereEqualTo("userId", userId).snapshots().collect {
                 val ids = it.map { it["taskId"].toString() }
                 launch {
-                    firestore.collection("observers").whereEqualTo("userId", executorId)
-                        .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots()
-                        .collect { result ->
-                            val tasksIds = result.map { it["taskId"].toString() }
-                            launch {
-                                firestore.collection("tasks").whereEqualTo("parentId", null)
-                                    .whereIn(FieldPath.documentId(), tasksIds).snapshots()
-                                    .collect { result ->
-                                        val queryTasks = mutableListOf<Task>()
-                                        for (doc in result.documents) {
-                                            val task = doc.toObject(Task::class.java)!!
-                                            task.id = doc.id
-                                            queryTasks.add(task)
-                                        }
-                                        userTasks.emit(queryTasks)
+                    if (ids.isEmpty()) {
+                        userTasks.emit(listOf())
+                    } else {
+                        firestore.collection("observers").whereEqualTo("userId", executorId)
+                            .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots()
+                            .collect { result ->
+                                val tasksIds = result.map { it["taskId"].toString() }
+                                launch {
+                                    if (tasksIds.isEmpty()) {
+                                        userTasks.emit(listOf())
+                                    } else {
+                                        firestore.collection("tasks").whereEqualTo("parentId", null)
+                                            .whereIn(FieldPath.documentId(), tasksIds).snapshots()
+                                            .collect { result ->
+                                                val queryTasks = mutableListOf<Task>()
+                                                for (doc in result.documents) {
+                                                    val task = doc.toObject(Task::class.java)!!
+                                                    task.id = doc.id
+                                                    queryTasks.add(task)
+                                                }
+                                                userTasks.emit(queryTasks)
+                                            }
                                     }
+                                }
                             }
-                        }
+                    }
                 }
             }
         }
