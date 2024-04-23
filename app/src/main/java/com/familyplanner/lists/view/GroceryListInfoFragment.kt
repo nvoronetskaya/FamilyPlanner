@@ -69,12 +69,7 @@ class GroceryListInfoFragment : Fragment() {
         binding.rvProducts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProducts.adapter = productsAdapter
-        binding.rvObservers.adapter = observerAdapter
-        val products = mutableListOf<Product>()
-        for (i in 0..20) {
-            products.add(Product("", "Name", false))
-        }
-        productsAdapter.updateData(products)
+        binding.rvObservers.adapter = observerAdapter 
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
