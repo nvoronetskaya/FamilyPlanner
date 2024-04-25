@@ -18,8 +18,8 @@ class ListBudgetViewModel : ViewModel() {
             this.listId = listId
             allSpendings.clear()
             allSpendings.addAll(listRepo.getListSpending(listId))
-            startDate = allSpendings.minOf { it.addedAt }.toLocalDate()
-            finishDate = allSpendings.maxOf { it.addedAt }.toLocalDate()
+            startDate = allSpendings.minOfOrNull { it.addedAt }?.toLocalDate() ?: LocalDate.now()
+            finishDate = allSpendings.maxOfOrNull { it.addedAt }?.toLocalDate() ?: LocalDate.now()
         }
         return getSpendingsForPeriod()
     }

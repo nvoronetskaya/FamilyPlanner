@@ -176,7 +176,7 @@
     <fragment
         android:id="@+id/eventInfoFragment"
         android:name="com.familyplanner.events.view.EventInfoFragment"
-        android:label="EventInfoFragment" >
+        android:label="EventInfoFragment">
         <action
             android:id="@+id/action_eventInfoFragment_to_editEventFragment"
             app:destination="@id/editEventFragment" />
@@ -192,7 +192,7 @@
     <fragment
         android:id="@+id/eventsListFragment"
         android:name="com.familyplanner.events.view.EventsListFragment"
-        android:label="EventsListFragment" >
+        android:label="EventsListFragment">
         <action
             android:id="@+id/action_eventsListFragment_to_newEventFragment"
             app:destination="@id/newEventFragment" />

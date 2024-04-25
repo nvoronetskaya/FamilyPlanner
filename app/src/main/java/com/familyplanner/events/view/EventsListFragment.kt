@@ -36,7 +36,7 @@ class EventsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EventsListViewModel::class.java]
-        binding.tvCurMonth.text = viewModel.currentMonthString()
+        binding.tvCurMonth.text = viewModel.setDate()
         binding.ivPrevMonth.setOnClickListener {
             binding.tvCurMonth.text = viewModel.previousMonth()
             binding.calendar.clearEvents()
@@ -57,7 +57,9 @@ class EventsListFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getEvents().collect {
-                    binding.calendar.updateEvents(it, viewModel.currentMonth())
+                    requireActivity().runOnUiThread {
+                        binding.calendar.updateEvents(it, viewModel.currentMonth())
+                    }
                 }
             }
         }

@@ -87,7 +87,7 @@
         app:dateTextSize="16sp"
         app:eventFillColor="@color/dark_orange"
         app:eventTextColor="@color/white"
-        app:eventTextSize="14sp"
+        app:eventTextSize="12sp"
         app:eventsGap="2dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"

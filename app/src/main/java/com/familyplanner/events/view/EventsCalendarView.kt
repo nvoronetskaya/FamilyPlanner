@@ -248,7 +248,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                     TextUtils.TruncateAt.END
                 )
                 canvas.drawText(
-                    event.name,
+                    text,
                     0,
                     text.length,
                     xPos + boundsWidth * 3,
@@ -273,13 +273,13 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     }
 
     private fun showEventsForDay(date: Int) {
-        if (eventsByDate[date].size == 0) {
+        if (date > eventsByDate.size || eventsByDate[date].size == 0) {
             return
         }
         val bottomSheet = BottomSheetDialog(context)
         onEventClicked.also { bottomSheet.dismiss() }
         bottomSheet.setContentView(R.layout.bottomsheet_events_list)
-        bottomSheet.behavior.isDraggable = false
+        bottomSheet.behavior.isDraggable = true
         val eventsRecycler = bottomSheet.findViewById<RecyclerView>(R.id.events_list)
         val eventsAdapter = EventAdapter {
             onEventClicked?.invoke(it)

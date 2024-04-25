@@ -33,5 +33,6 @@ class ListBudgetAdapter : RecyclerView.Adapter<ListBudgetAdapter.BudgetViewHolde
     fun setData(newBudget: List<BudgetDto>) {
         budgetObjects.clear()
         budgetObjects.addAll(newBudget)
+        notifyDataSetChanged()
     }
 }

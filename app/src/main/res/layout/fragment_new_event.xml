@@ -100,6 +100,7 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:text="@string/start_date"
                 app:layout_constraintStart_toStartOf="@id/tf_description"
                 app:layout_constraintTop_toBottomOf="@id/tf_description" />
@@ -131,38 +132,61 @@
                 app:layout_constraintBottom_toBottomOf="@id/tv_finish_time"
                 app:layout_constraintStart_toEndOf="@id/tv_finish_time" />
 
-            <TextView
-                android:id="@+id/tv_can_see"
-                style="@style/textBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:text="@string/who_sees_event"
-                android:textColor="@color/black"
+            <View
+                android:id="@+id/title_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="@color/gray_medium"
+                android:paddingHorizontal="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_finish_time" />
 
+            <TextView
+                android:id="@+id/tv_can_see"
+                style="@style/textBar"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/who_sees_event"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_divider" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_observers"
                 style="@style/textBody"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/tv_finish_time"
                 app:layout_constraintTop_toBottomOf="@id/tv_can_see"
                 tools:listitem="@layout/viewholder_event_observer" />
 
+            <View
+                android:id="@+id/files_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray_medium"
+                android:layout_marginTop="15dp"
+                android:paddingHorizontal="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_observers" />
+
             <TextView
                 android:id="@+id/tv_attach_file"
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="15dp"
                 android:text="@string/attach_file"
                 app:drawableStartCompat="@drawable/add"
                 app:layout_constraintStart_toStartOf="@id/rv_observers"
-                app:layout_constraintTop_toBottomOf="@id/rv_observers" />
+                app:layout_constraintTop_toBottomOf="@id/files_divider" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_files"

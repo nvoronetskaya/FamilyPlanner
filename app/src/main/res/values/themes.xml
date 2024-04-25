@@ -43,12 +43,12 @@
 
     <style name="textBar">
         <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:fontFamily">@font/roboto_serif</item>
     </style>
 
     <style name="textBody">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
         <item name="android:fontFamily">@font/roboto_serif</item>
     </style>
@@ -76,7 +76,7 @@
     </style>
 
     <style name="commentText">
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">@font/roboto_serif</item>
     </style>
 
@@ -85,7 +85,7 @@
         <item name="hintTextColor">?attr/colorOutline</item>
     </style>
 
-    <style name="editText">
+    <style name="editText" parent="textBody">
         <item name="android:layout_width">300dp</item>
     </style>
 
