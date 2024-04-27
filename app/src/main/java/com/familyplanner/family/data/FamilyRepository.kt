@@ -29,7 +29,8 @@ class FamilyRepository {
             }
 
     suspend fun updateFamily(familyId: String, newName: String) {
-        firestore.collection("families").document(familyId).get().await().reference.update(mapOf("name" to newName))
+        firestore.collection("families").document(familyId).get()
+            .await().reference.update(mapOf("name" to newName))
     }
 
     fun getFamilyMembers(familyId: String): Flow<List<User>> =
@@ -64,48 +65,59 @@ class FamilyRepository {
 
     fun getApplicationsToFamily(familyId: String): Flow<List<Application>> =
         firestore.collection("applications").whereEqualTo("familyId", familyId)
-            .whereEqualTo("status", ApplicationStatus.NEW).dataObjects()
+            .whereEqualTo("status", ApplicationStatus.NEW.name).snapshots()
+            .map {
+                it.toObjects(Application::class.java)
+            }
 
     fun getApplicants(ids: List<String>): Flow<List<User>> {
         val newIds = mutableListOf("1")
         newIds.addAll(ids)
-        return firestore.collection("users").whereIn(FieldPath.documentId(), newIds).snapshots().map {
-            val users = mutableListOf<User>()
-            for (doc in it.documents) {
-                val user = User(
-                    doc.id,
-                    doc["name"].toString(),
-                    doc["birthday"].toString(),
-                    doc["hasFamily"] as Boolean,
-                    doc["familyId"].toString(),
-                    doc["email"].toString()
-                )
-                users.add(user)
+        return firestore.collection("users").whereIn(FieldPath.documentId(), newIds).snapshots()
+            .map {
+                val users = mutableListOf<User>()
+                for (doc in it.documents) {
+                    val user = User(
+                        doc.id,
+                        doc["name"].toString(),
+                        doc["birthday"].toString(),
+                        doc["hasFamily"] as Boolean,
+                        doc["familyId"].toString(),
+                        doc["email"].toString()
+                    )
+                    users.add(user)
+                }
+                users
             }
-            users
-        }
     }
 
     fun approveApplication(userId: String, familyId: String) {
         firestore.collection("applications").whereEqualTo("userId", userId)
             .whereEqualTo("familyId", familyId).get()
-            .addOnCompleteListener {
-                if (!it.result.isEmpty) {
-                    for (doc in it.result) {
+            .addOnSuccessListener {
+                if (it.documents.isNotEmpty()) {
+                    for (doc in it.documents) {
                         doc.reference.update(mapOf("status" to ApplicationStatus.APPROVED))
                     }
                 }
+
+                firestore.collection("users").whereEqualTo(FieldPath.documentId(), userId).get()
+                    .addOnCompleteListener {
+                        if (!it.result.isEmpty) {
+                            for (doc in it.result) {
+                                if (doc["hasFamily"] as Boolean)
+                                    doc.reference.update(
+                                        mapOf(
+                                            "hasFamily" to true,
+                                            "familyId" to familyId
+                                        )
+                                    )
+                            }
+                        }
+                    }
             }
 
-        firestore.collection("users").whereEqualTo(FieldPath.documentId(), userId).get()
-            .addOnCompleteListener {
-                if (!it.result.isEmpty) {
-                    for (doc in it.result) {
-                        if (doc["hasFamily"] as Boolean)
-                            doc.reference.update(mapOf("hasFamily" to true, "familyId" to ""))
-                    }
-                }
-            }
+
     }
 
     fun rejectApplication(userId: String, familyId: String) {

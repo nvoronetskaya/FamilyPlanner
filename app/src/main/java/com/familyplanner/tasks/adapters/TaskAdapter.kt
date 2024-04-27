@@ -32,8 +32,8 @@ class TaskAdapter(
                 LocalDate.ofEpochDay(task.date!!)
             ) else ""
             binding.cbIsDone.isClickable = task.date != null && task.date!! <= day || task.task.repeatType == RepeatType.ONCE
-            binding.cbIsDone.setOnCheckedChangeListener { _, isChecked ->
-                onTaskCompleted(task.task, isChecked, userId)
+            binding.cbIsDone.setOnClickListener {
+                onTaskCompleted(task.task, binding.cbIsDone.isChecked, userId)
             }
             binding.root.setOnClickListener { onClick(task.task.id) }
         }

@@ -43,10 +43,12 @@ class MembersListViewModel : ViewModel() {
                     }
                     launch {
                         repository.getApplicationsToFamily(familyId).collect {
-                            repository.getApplicants(it.map { application -> application.userId })
-                                .collect { users ->
-                                    applicants.emit(users)
-                                }
+                            launch {
+                                repository.getApplicants(it.map { application -> application.userId })
+                                    .collect { users ->
+                                        applicants.emit(users)
+                                    }
+                            }
                         }
                     }
                 }
