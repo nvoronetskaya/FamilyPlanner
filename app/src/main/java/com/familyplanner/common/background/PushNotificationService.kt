@@ -7,14 +7,18 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.navigation.NavDeepLinkBuilder
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class PushNotificationService : FirebaseMessagingService() {
+    private val firestore = Firebase.firestore
+
     override fun onMessageReceived(message: RemoteMessage) {
         if (message.data.isEmpty()) {
             return
@@ -44,7 +48,8 @@ class PushNotificationService : FirebaseMessagingService() {
                 .setGraph(R.navigation.navigation).setDestination(navigateTo)
                 .setArguments(bundleOf(key to sourceId)).createPendingIntent()
             val notification =
-                NotificationCompat.Builder(this, "DATA_UPDATES").setContentTitle(title).setSmallIcon(R.drawable.notifications)
+                NotificationCompat.Builder(this, "DATA_UPDATES").setContentTitle(title)
+                    .setSmallIcon(R.drawable.notifications)
                     .setContentText(body)
                     .setContentIntent(link).build()
             val manager = NotificationManagerCompat.from(this)
@@ -54,6 +59,6 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        TODO()
+        firestore.collection("users").document(FamilyPlanner.userId).update("fcmToken", token)
     }
 }

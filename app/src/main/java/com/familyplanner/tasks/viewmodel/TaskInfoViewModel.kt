@@ -143,8 +143,8 @@ class TaskInfoViewModel : ViewModel() {
         return runBlocking { repo.downloadFile("$taskId/$path").await() }
     }
 
-    fun changeCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
-        repo.changeTaskCompleted(taskId, isCompleted, completedById)
+    fun changeCompleted(task: Task, isCompleted: Boolean, completedById: String) {
+        repo.changeTaskCompleted(task, isCompleted, completedById)
     }
 
     fun addComment(userId: String, comment: String, files: List<UserFile>) {

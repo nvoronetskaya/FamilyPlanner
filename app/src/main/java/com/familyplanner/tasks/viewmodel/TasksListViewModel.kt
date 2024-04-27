@@ -9,6 +9,7 @@ import com.familyplanner.tasks.dto.TaskWithDate
 import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.SortingType
+import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.repository.TaskRepository
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
@@ -198,7 +199,7 @@ class TasksListViewModel : ViewModel() {
         }
     }
 
-    fun changeCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
-        taskRepo.changeTaskCompleted(taskId, isCompleted, completedById)
+    fun changeCompleted(task: Task, isCompleted: Boolean, completedById: String) {
+        taskRepo.changeTaskCompleted(task, isCompleted, completedById)
     }
 }

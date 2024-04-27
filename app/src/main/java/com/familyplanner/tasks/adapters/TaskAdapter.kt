@@ -8,10 +8,11 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderTaskBinding
 import com.familyplanner.tasks.dto.TaskWithDate
 import com.familyplanner.tasks.model.RepeatType
+import com.familyplanner.tasks.model.Task
 import java.time.LocalDate
 
 class TaskAdapter(
-    val onTaskCompleted: (String, Boolean, String) -> Unit,
+    val onTaskCompleted: (Task, Boolean, String) -> Unit,
     val userId: String,
     val onClick: (String) -> Unit,
     var day: Long
@@ -32,7 +33,7 @@ class TaskAdapter(
             ) else ""
             binding.cbIsDone.isClickable = task.date != null && task.date!! <= day || task.task.repeatType == RepeatType.ONCE
             binding.cbIsDone.setOnCheckedChangeListener { _, isChecked ->
-                onTaskCompleted(task.task.id, isChecked, userId)
+                onTaskCompleted(task.task, isChecked, userId)
             }
             binding.root.setOnClickListener { onClick(task.task.id) }
         }

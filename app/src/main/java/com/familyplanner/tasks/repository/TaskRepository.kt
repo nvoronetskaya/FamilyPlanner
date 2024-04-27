@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 
 class TaskRepository {
     private val firestore = Firebase.firestore
@@ -229,8 +230,33 @@ class TaskRepository {
         return firestore.collection("comments").add(data)
     }
 
-    fun changeTaskCompleted(taskId: String, isCompleted: Boolean, completedById: String) {
-        //TODO()
+    fun changeTaskCompleted(task: Task, isCompleted: Boolean, completedById: String) {
+        val today = LocalDate.now().toEpochDay()
+        if (isCompleted) {
+            val data = mapOf<String, Any?>(
+                "lastCompletionDate" to today,
+                "previousCompletionDate" to task.lastCompletionDate
+            )
+            firestore.collection("tasks").document(task.id).update(data).addOnSuccessListener {
+                val completion = mapOf<String, Any>(
+                    "userId" to completedById,
+                    "taskId" to task.id,
+                    "completionDate" to today
+                )
+                firestore.collection("taskCompletion").add(completion)
+            }
+        } else {
+            val data = mapOf<String, Any?>(
+                "previousCompletionDate" to null,
+                "lastCompletionDate" to task.previousCompletionDate
+            )
+            firestore.collection("tasks").document(task.id).update(data).addOnSuccessListener {
+                firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
+                    .whereEqualTo("completionDate", today).get().addOnCompleteListener {
+                        it.result.documents.forEach { it.reference.delete() }
+                    }
+            }
+        }
     }
 
     fun deleteTask(taskId: String) {

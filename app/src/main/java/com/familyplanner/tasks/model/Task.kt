@@ -19,12 +19,13 @@ data class Task(
     var location: GeoPoint?,
     var createdBy: String,
     var familyId: String,
+    var previousCompletionDate: Long?,
     var lastCompletionDate: Long?,
     var parentId: String?
 ) {
     constructor() : this(
         "", "", false, null, false, 0,
         0, RepeatType.ONCE, 0, 0, null, Importance.HIGH,
-        false, GeoPoint(0.0, 0.0), "", "", null, null
+        false, GeoPoint(0.0, 0.0), "", "", null, null, null
     )
 }
