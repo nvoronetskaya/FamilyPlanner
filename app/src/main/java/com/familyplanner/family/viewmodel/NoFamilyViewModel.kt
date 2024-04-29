@@ -23,7 +23,7 @@ class NoFamilyViewModel : ViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            userRepo.getUserByEmail(auth.currentUser!!.email!!).collect {
+            userRepo.getUserById(FamilyPlanner.userId).collect {
                 user.emit(it)
             }
         }

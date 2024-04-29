@@ -34,6 +34,8 @@ class EnterEmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val isChangeEmail = arguments?.getBoolean("changeEmail", false) ?: false
+        val password = arguments?.getString("password") ?: ""
         viewModel = ViewModelProvider(this)[ConfirmEmailViewModel::class.java]
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -44,6 +46,8 @@ class EnterEmailFragment : Fragment() {
                         val bundle = Bundle()
                         bundle.putString("email", emailAddress)
                         bundle.putString("code", viewModel.getConfirmationCode())
+                        bundle.putBoolean("changeEmail", isChangeEmail)
+                        bundle.putString("password", password)
                         activity?.runOnUiThread {
                             binding.pbLoading.visibility = View.GONE
                             findNavController().navigate(

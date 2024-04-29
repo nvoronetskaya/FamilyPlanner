@@ -75,9 +75,6 @@
         android:id="@+id/membersListFragment"
         android:name="com.familyplanner.family.view.MembersListFragment"
         android:label="MembersListFragment">
-        <action
-            android:id="@+id/action_membersListFragment_to_applicationsListFragment"
-            app:destination="@id/applicationsListFragment" />
     </fragment>
     <fragment
         android:id="@+id/tasksListFragment"
@@ -99,10 +96,6 @@
             android:id="@+id/action_tasksListFragment_to_newTaskInfoFragment"
             app:destination="@id/newTaskInfoFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/applicationsListFragment"
-        android:name="com.familyplanner.tasks.ApplicationsListFragment"
-        android:label="ApplicationsListFragment" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.familyplanner.auth.view.ProfileFragment"

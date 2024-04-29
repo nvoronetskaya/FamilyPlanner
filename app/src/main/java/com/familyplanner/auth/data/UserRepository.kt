@@ -1,6 +1,9 @@
 package com.familyplanner.auth.data
 
 import com.familyplanner.common.User
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.dataObjects
@@ -13,6 +16,7 @@ import kotlinx.coroutines.tasks.await
 
 class UserRepository {
     private val firestore = Firebase.firestore
+    private val auth = Firebase.auth
 
     fun addUser(name: String, birthday: String, email: String, uid: String) {
         val data = HashMap<String, Any>()
@@ -25,21 +29,6 @@ class UserRepository {
         firestore.collection("users").document(uid).set(data)
     }
 
-    fun getUserByEmail(email: String): Flow<User> =
-        firestore.collection("users").whereEqualTo("email", email)
-            .snapshots().map {
-                val doc = it.documents[0]
-                User(
-                    doc.id,
-                    doc["name"].toString(),
-                    doc["birthday"].toString(),
-                    doc["hasFamily"] as Boolean,
-                    doc["familyId"].toString(),
-                    doc["email"].toString(),
-                    doc.getGeoPoint("location")
-                )
-            }
-
     fun getUserById(userId: String): Flow<User> = firestore.collection("users").whereEqualTo(
         FieldPath.documentId(), userId
     ).snapshots().map {
@@ -50,7 +39,7 @@ class UserRepository {
             doc["birthday"].toString(),
             doc["hasFamily"] as Boolean,
             doc["familyId"].toString(),
-            doc["email"].toString(),
+            auth.currentUser?.email ?: "",
             doc.getGeoPoint("location")
         )
     }
@@ -63,7 +52,7 @@ class UserRepository {
             doc["birthday"].toString(),
             doc["hasFamily"] as Boolean,
             doc["familyId"].toString(),
-            doc["email"].toString(),
+            auth.currentUser?.email ?: "",
             doc.getGeoPoint("location")
         )
     }
@@ -81,5 +70,25 @@ class UserRepository {
 
     fun setFcmToken(userId: String, token: String) {
         firestore.collection("users").document(userId).update("fcmToken", token)
+    }
+
+    fun checkPassword(password: String): Task<Void>? {
+        val user = auth.currentUser ?: return null
+        val credentials = EmailAuthProvider.getCredential(user.email!!, password)
+        return user.reauthenticate(credentials)
+    }
+
+    suspend fun changeEmail(password: String, newEmail: String): Task<Void>? {
+        val credentials = EmailAuthProvider.getCredential(auth.currentUser!!.email!!, password)
+        val task = auth.currentUser?.reauthenticate(credentials) ?: return null
+        task.await()
+        if (task.isSuccessful) {
+            return auth.currentUser?.updateEmail(newEmail)
+        }
+        return null
+    }
+
+    suspend fun hasAccount(email: String): Boolean {
+        return auth.fetchSignInMethodsForEmail(email).await().signInMethods?.isNotEmpty() ?: false
     }
 }

@@ -2,8 +2,10 @@ package com.familyplanner.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
+import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -21,7 +23,7 @@ class ProfileViewModel : ViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            userRepo.getUserByEmail(auth.currentUser!!.email!!).collect {
+            userRepo.getUserById(FamilyPlanner.userId).collect {
                 user.emit(it)
             }
         }
@@ -52,29 +54,7 @@ class ProfileViewModel : ViewModel() {
         return errorMessage
     }
 
-    fun changeEmail(newEmail: String, password: String): Flow<Boolean> {
-        val currentUser = auth.currentUser
-        val credentials = EmailAuthProvider.getCredential(
-            currentUser!!.email!!,
-            password
-        )
-
-        val wasSuccessful = MutableSharedFlow<Boolean>()
-        currentUser.reauthenticate(credentials).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                currentUser.verifyBeforeUpdateEmail(newEmail)
-                    .addOnCompleteListener { update ->
-                        viewModelScope.launch(Dispatchers.IO) {
-                            wasSuccessful.emit(update.isSuccessful)
-                        }
-                    }
-            } else {
-                viewModelScope.launch(Dispatchers.IO) {
-                    wasSuccessful.emit(false)
-                }
-            }
-        }
-
-        return wasSuccessful
+    fun checkPassword(password: String): Task<Void>? {
+        return userRepo.checkPassword(password)
     }
 }

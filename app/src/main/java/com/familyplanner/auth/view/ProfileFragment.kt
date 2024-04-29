@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -19,7 +21,6 @@ import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.ProfileViewModel
 import com.familyplanner.databinding.FragmentProfileBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -33,7 +34,7 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -43,10 +44,6 @@ class ProfileFragment : Fragment() {
 
         val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
-//        val newEmail = arguments?.getString("newEmail")
-//        if (newEmail != null) {
-//            viewModel.changeEmail()
-//        }
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {
@@ -143,22 +140,45 @@ class ProfileFragment : Fragment() {
         }
 
         binding.tvChangeEmail.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val changeEmailResult = viewModel.changeEmail("", "")
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    changeEmailResult.collect {
-                        if (it) {
+            val password = EditText(activity)
+            password.textSize = 19F
+            val dialog =
+                AlertDialog.Builder(activity as MainActivity).setTitle("Введите пароль от аккаунта")
+                    .setView(password)
+                    .setPositiveButton("Готово", null)
+                    .setNegativeButton("Отмена") { dialog, _ ->
+                        dialog.cancel()
+                    }.show()
+            dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                if (password.text.isNullOrBlank()) {
+                    password.error = "Введите пароль"
+                } else {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val checkTask = viewModel.checkPassword(password.text.toString())
+                        if (checkTask == null) {
                             Toast.makeText(
-                                activity,
-                                "Адрес почты успешно изменён",
+                                requireContext(),
+                                "Ошибка. Проверьте данные и попробуйте позднее",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            AlertDialog.Builder(activity as MainActivity).setTitle("Ошибка")
-                                .setMessage("Не удалось сменить адрес почты. Проверьте корректность введённого пароля и то, что этот адрес ещё не используется.")
-                                .setNeutralButton("Ок") { dialog, _ ->
-                                    dialog.cancel()
+                            checkTask.addOnCompleteListener {
+                                requireActivity().runOnUiThread {
+                                    if (it.isSuccessful) {
+                                        dialog.dismiss()
+                                        findNavController().navigate(
+                                            R.id.action_profileFragment_to_enterEmailFragment,
+                                            bundleOf("changeEmail" to true, "password" to password.text.toString())
+                                        )
+                                    } else {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Ошибка. Проверьте данные и попробуйте позднее",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
+                            }
                         }
                     }
                 }
