@@ -22,6 +22,7 @@ import java.util.Calendar
 
 class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var textPaint: Paint
+    private var neighbourMonthPaint: Paint
     private var eventTitlePaint: TextPaint
     private var curDayPaint: Paint
     private var eventBackgroundPaint: Paint
@@ -46,6 +47,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     private val events = mutableListOf<Event>()
     private val eventsByDate = Array(31) { _ -> mutableListOf<Event>() }
     private var onEventClicked: ((String) -> Unit)? = null
+    private var marginItemDecoration = EventsItemDecoration()
 
     init {
         val attrsValues = context.obtainStyledAttributes(attrs, R.styleable.EventsCalendarView)
@@ -71,6 +73,12 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             color = textColor
             textSize = dateTextSize.toFloat()
             textAlign = Paint.Align.CENTER
+        }
+        neighbourMonthPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = textColor
+            textSize = dateTextSize.toFloat()
+            textAlign = Paint.Align.CENTER
+            alpha = (255 * 0.3).toInt()
         }
         eventTitlePaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             color = eventTextColor
@@ -99,18 +107,26 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         this.onEventClicked = onEventClicked
     }
 
-    fun clearEvents() {
-        this.events.clear()
-        groupEvents()
-        invalidate()
-    }
-
     fun updateEvents(newEvents: List<Event>, date: LocalDateTime) {
-        currentDate =
-            Calendar.Builder().set(Calendar.YEAR, date.year)
-                .set(Calendar.MONTH, date.monthValue - 1)
-                .set(Calendar.DAY_OF_MONTH, date.dayOfMonth).build()
-        rowCount = currentDate.getActualMaximum(Calendar.WEEK_OF_MONTH)
+        currentDate = Calendar.Builder().set(Calendar.YEAR, date.year)
+            .set(Calendar.MONTH, date.monthValue - 1)
+            .set(Calendar.DAY_OF_MONTH, date.dayOfMonth).build()
+        monthStart = Calendar.Builder().set(Calendar.YEAR, date.year)
+            .set(Calendar.MONTH, date.monthValue - 1)
+            .set(Calendar.DAY_OF_MONTH, date.dayOfMonth).build()
+        monthEnd = Calendar.Builder().set(Calendar.YEAR, date.year)
+            .set(Calendar.MONTH, date.monthValue - 1)
+            .set(Calendar.DAY_OF_MONTH, date.dayOfMonth).build()
+        monthStart.add(Calendar.DAY_OF_MONTH, -monthStart.get(Calendar.DAY_OF_MONTH) + 1)
+        monthEnd.add(
+            Calendar.DAY_OF_MONTH,
+            monthEnd.getActualMaximum(Calendar.DAY_OF_MONTH) - monthEnd.get(Calendar.DAY_OF_MONTH)
+        )
+        rowCount = if (currentDate.get(Calendar.DAY_OF_WEEK) != 2) {
+            (currentDate.getActualMaximum(Calendar.DAY_OF_MONTH) - 1 + (currentDate.get(Calendar.DAY_OF_WEEK) + 5) % 7) / 7 + 1
+        } else {
+            (currentDate.getActualMaximum(Calendar.DAY_OF_MONTH) + 6) / 7
+        }
         this.events.clear()
         this.events.addAll(newEvents)
         groupEvents()
@@ -187,11 +203,12 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         drawDaysNames(canvas)
         drawGrid(canvas)
         var curInd = 0
+        val yOffset = dateTextSize * 1.5f
         if ((monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7 != 0) {
-            val previousMonth = Calendar.getInstance()
+            val previousMonth = currentDate
             previousMonth.add(Calendar.MONTH, -1)
             val previousMonthDaysCount = previousMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
-            val curMonthStartWeekday = monthStart.get(Calendar.DAY_OF_WEEK)
+            val curMonthStartWeekday = (monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7
             for (i in 0 until curMonthStartWeekday) {
                 val xPos = i * cellWidth
                 val yPos = 0
@@ -200,13 +217,12 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 canvas.drawText(
                     dayNumber.toString(),
                     xPosCenter,
-                    yPos + textPaint.textSize,
-                    textPaint
+                    yPos + textPaint.textSize + yOffset,
+                    neighbourMonthPaint
                 )
             }
             curInd = curMonthStartWeekday
         }
-        val yOffset = dateTextSize * 1.5f
         for (curDayOfMonth in 1..monthEnd.get(Calendar.DAY_OF_MONTH)) {
             val x = curInd % columnCount
             val y = curInd / columnCount
@@ -224,7 +240,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             for (i in 0 until totalEvents) {
                 val event = eventsByDate[curDayOfMonth - 1][i]
                 canvas.drawRoundRect(
-                    xPos + boundsWidth,
+                    xPos + 2 * boundsWidth,
                     yPos + verticalOffset,
                     xPos + cellWidth - boundsWidth,
                     yPos + verticalOffset + eventTextSize * 1.5f,
@@ -235,7 +251,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 if (verticalOffset + (eventTextSize * 1.5f + eventsGap) * 2 > cellHeight) {
                     canvas.drawText(
                         "ещё ${totalEvents - i}",
-                        xPos + boundsWidth * 3,
+                        xPos + boundsWidth * 4,
                         yPos + verticalOffset + eventTextSize * 1.5f - eventTextSize / 2f,
                         eventTitlePaint
                     )
@@ -251,12 +267,28 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                     text,
                     0,
                     text.length,
-                    xPos + boundsWidth * 3,
+                    xPos + boundsWidth * 4,
                     yPos + verticalOffset + eventTextSize * 1.5f - eventTextSize / 2f,
                     eventTitlePaint
                 )
                 verticalOffset += eventTextSize * 1.5f + eventsGap
             }
+            ++curInd
+        }
+        var i = 1
+        while (curInd < rowCount * 7) {
+            val x = curInd % columnCount
+            val y = curInd / columnCount
+            val xPos = x * cellWidth
+            val yPos = y * cellHeight + yOffset
+            val xPosCenter = xPos + cellWidth / 2
+            canvas.drawText(
+                i.toString(),
+                xPosCenter,
+                yPos + textPaint.textSize,
+                neighbourMonthPaint
+            )
+            ++i
             ++curInd
         }
     }
@@ -288,6 +320,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         eventsRecycler?.layoutManager = LinearLayoutManager(context)
         eventsRecycler?.adapter = eventsAdapter
         eventsAdapter.setData(eventsByDate[date])
+        eventsRecycler?.addItemDecoration(marginItemDecoration)
         bottomSheet.show()
     }
 }

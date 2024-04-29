@@ -51,5 +51,6 @@ class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
     fun setData(files: List<UserFile>) {
         this.files.clear()
         this.files.addAll(files)
+        notifyDataSetChanged()
     }
 }

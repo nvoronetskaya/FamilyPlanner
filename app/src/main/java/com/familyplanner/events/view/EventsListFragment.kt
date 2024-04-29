@@ -36,14 +36,12 @@ class EventsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EventsListViewModel::class.java]
-        binding.tvCurMonth.text = viewModel.setDate()
+        viewModel.setDate()
         binding.ivPrevMonth.setOnClickListener {
-            binding.tvCurMonth.text = viewModel.previousMonth()
-            binding.calendar.clearEvents()
+            viewModel.previousMonth()
         }
         binding.ivNextMonth.setOnClickListener {
-            binding.tvCurMonth.text = viewModel.nextMonth()
-            binding.calendar.clearEvents()
+            viewModel.nextMonth()
         }
         binding.ivAdd.setOnClickListener {
             findNavController().navigate(R.id.action_eventsListFragment_to_newEventFragment)
@@ -59,6 +57,7 @@ class EventsListFragment : Fragment() {
                 viewModel.getEvents().collect {
                     requireActivity().runOnUiThread {
                         binding.calendar.updateEvents(it, viewModel.currentMonth())
+                        binding.tvCurMonth.text = viewModel.currentMonthString()
                     }
                 }
             }

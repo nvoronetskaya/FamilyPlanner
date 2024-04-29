@@ -44,7 +44,10 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginBottom="20dp"
+        android:foregroundGravity="top"
+        app:layout_constraintBottom_toTopOf="@id/tv_cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -88,6 +91,7 @@
                     android:layout_width="350dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
                     android:hint="@string/description"
                     app:endIconMode="clear_text"
                     app:layout_constraintEnd_toEndOf="@id/tf_name"
@@ -140,7 +144,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginTop="10dp"
                     android:gravity="center_vertical"
                     app:layout_constraintBottom_toBottomOf="@id/tv_finish"
                     app:layout_constraintStart_toEndOf="@id/tv_finish" />
@@ -184,8 +187,9 @@
                     android:id="@+id/tv_observers"
                     style="@style/textBar"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginEnd="15dp"
                     android:maxLines="1"
                     android:text="@string/who_sees_event"
                     android:textColor="@color/black"
@@ -197,8 +201,9 @@
                     android:id="@+id/iv_observers_unfolded"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     app:layout_constraintBottom_toBottomOf="@id/tv_observers"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_observers"
                     app:layout_constraintTop_toTopOf="@id/tv_observers"
                     app:srcCompat="@drawable/unfolded" />
 
@@ -206,9 +211,10 @@
                     android:id="@+id/iv_observers_folded"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@id/tv_observers"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tv_observers"
                     app:layout_constraintTop_toTopOf="@id/tv_observers"
                     app:srcCompat="@drawable/folded" />
 
@@ -217,6 +223,7 @@
                     style="@style/textBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_observers"
                     tools:listitem="@layout/viewholder_observer" />
@@ -227,6 +234,7 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
                 android:text="@string/event_participation" />
         </LinearLayout>
     </ScrollView>
@@ -236,9 +244,9 @@
         style="@style/textBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/cancel_event"
         android:textColor="@color/red"
         app:drawableStartCompat="@drawable/cancel_event"

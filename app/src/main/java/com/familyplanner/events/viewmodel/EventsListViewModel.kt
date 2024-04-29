@@ -36,11 +36,11 @@ class EventsListViewModel : ViewModel() {
         "Декабрь"
     )
 
-    fun setDate(newDate: LocalDateTime = LocalDateTime.now()): String {
+    fun setDate(newDate: LocalDateTime = LocalDateTime.now()) {
         viewModelScope.launch(Dispatchers.IO) {
             collectEvents?.cancelAndJoin()
             curDate = newDate
-            collectEvents = launch(Dispatchers.IO) {
+            launch(Dispatchers.IO) {
                 val start = curDate.minusDays(curDate.dayOfMonth.toLong())
                 val finish = curDate.minusDays(curDate.dayOfMonth.toLong() - 1).plusMonths(1)
                 repo.getEventsForPeriod(
@@ -52,19 +52,16 @@ class EventsListViewModel : ViewModel() {
             }
             collectEvents?.start()
         }
-        return "${months[newDate.monthValue - 1]} ${newDate.year}"
     }
 
-    fun previousMonth(): String {
+    fun previousMonth() {
         curDate = curDate.minusMonths(1)
         setDate(curDate)
-        return "${months[curDate.monthValue - 1]} ${curDate.year}"
     }
 
-    fun nextMonth(): String {
+    fun nextMonth() {
         curDate = curDate.plusMonths(1)
         setDate(curDate)
-        return "${months[curDate.monthValue - 1]} ${curDate.year}"
     }
 
     fun currentMonthString(): String = "${months[curDate.monthValue - 1]} ${curDate.year}"

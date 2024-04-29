@@ -64,7 +64,7 @@ class EditEventViewModel : ViewModel() {
     }
 
     fun addFile(file: UserFile) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (!eventRepo.addFile(eventId, file)) {
                 isFileUploadSuccessful = false
             }

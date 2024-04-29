@@ -10,13 +10,20 @@ import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.ListResult
 import com.google.firebase.storage.storage
 import com.google.firebase.storage.storageMetadata
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class EventRepository {
     private val firestore = Firebase.firestore
     private val storage = Firebase.storage
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val userEvents = MutableSharedFlow<List<Event>>()
 
     fun addEvent(event: Event): Task<DocumentReference> {
         return firestore.collection("events").add(event)
@@ -167,13 +174,22 @@ class EventRepository {
     }
 
     fun getEventsForPeriod(start: Long, finish: Long): Flow<List<Event>> {
-        return firestore.collection("events").whereGreaterThanOrEqualTo("finish", start)
-            .whereLessThanOrEqualTo("start", finish).snapshots().map {
-                it.map {
-                    val event = it.toObject(Event::class.java)
-                    event.id = it.id
-                    event
+        scope.launch {
+            firestore.collection("events").whereGreaterThanOrEqualTo("finish", start).snapshots()
+                .collect {
+                    val documents = it.documents.filter { it.getLong("start")!! <= finish }
+                    val result = if (documents.isEmpty()) {
+                        listOf()
+                    } else {
+                        documents.map {
+                            val event = it.toObject(Event::class.java)!!
+                            event.id = it.id
+                            event
+                        }
+                    }
+                    userEvents.emit(result)
                 }
-            }
+        }
+        return userEvents
     }
 }

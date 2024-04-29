@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -15,11 +16,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentEventInfoBinding
 import com.familyplanner.events.adapters.AttendeeAdapter
+import com.familyplanner.events.data.EventAttendee
 import com.familyplanner.events.data.EventAttendeeStatus
 import com.familyplanner.events.viewmodel.EventInfoViewModel
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
@@ -34,6 +38,7 @@ class EventInfoFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: EventInfoViewModel
     private lateinit var eventId: String
+    private lateinit var dividerItemDecoration: DividerItemDecoration
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,8 +59,17 @@ class EventInfoFragment : Fragment() {
         binding.rvObservers.layoutManager = attendeeLayoutManager
         binding.rvObservers.adapter = attendeeAdapter
         val filesAdapter = ObserveFilesAdapter(::downloadFile)
-        binding.rvFiles.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFiles.layoutManager =
+            LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvFiles.adapter = filesAdapter
+        dividerItemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
+        dividerItemDecoration.setDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.divider
+            )!!
+        )
+        binding.rvObservers.addItemDecoration(dividerItemDecoration)
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -90,7 +104,11 @@ class EventInfoFragment : Fragment() {
                 launch {
                     viewModel.getAttendees().collect {
                         requireActivity().runOnUiThread {
-                            attendeeAdapter.setData(it)
+                            val list = mutableListOf<EventAttendee>()
+                            for (i in 1..10) {
+                                list.add(EventAttendee("", "", EventAttendeeStatus.UNKNOWN, "name"))
+                            }
+                            attendeeAdapter.setData(list)
                             val curUser =
                                 it.firstOrNull { attendee -> attendee.userId.equals(FamilyPlanner.userId) }
                             curUser?.let {
@@ -119,7 +137,7 @@ class EventInfoFragment : Fragment() {
                                 binding.llFiles.isVisible = false
                                 return@runOnUiThread
                             }
-                            binding.llFiles.isVisible = it.size > 0
+                            binding.llFiles.isVisible = it.isNotEmpty()
                             filesAdapter.addPaths(it)
                         }
                     }
