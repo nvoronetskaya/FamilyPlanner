@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -81,6 +82,7 @@ class NewEventFragment : Fragment() {
                     val creationResult = viewModel.getCreationStatus()
                     creationResult.collect {
                         requireActivity().runOnUiThread {
+                            binding.pbLoading.isVisible = false
                             when (it) {
                                 TaskCreationStatus.SUCCESS -> findNavController().popBackStack()
 
@@ -137,11 +139,14 @@ class NewEventFragment : Fragment() {
             startActivityForResult(openDocumentIntent, ATTACH_FILES)
         }
         binding.ivDone.setOnClickListener {
+            binding.ivDone.isClickable = false
             if (binding.etName.text.isNullOrBlank()) {
                 binding.tfName.error = "Название мероприятия не может быть пустым"
+                binding.ivDone.isClickable = true
                 return@setOnClickListener
             }
             binding.tfName.isErrorEnabled = false
+            binding.pbLoading.isVisible = true
             viewModel.createEvent(
                 binding.etName.text!!.toString().trim(),
                 binding.etDescription.text!!.toString().trim(),

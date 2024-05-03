@@ -127,8 +127,8 @@
             <ProgressBar
                 android:id="@+id/pb_loading"
                 style="@style/progressBar"
-                android:visibility="gone"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/b_ready"

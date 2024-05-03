@@ -26,11 +26,13 @@ class LocationService : Service() {
     private lateinit var locationRequest: LocationRequest
     private val firestore = Firebase.firestore
     private val userId = FamilyPlanner.userId
+    private val notificationSender = LocationNotificationSender(this)
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let {
                 firestore.collection("users").document(userId)
                     .update("location", GeoPoint(it.latitude, it.longitude))
+                notificationSender.onLocationUpdated(it.latitude, it.longitude)
             }
         }
     }

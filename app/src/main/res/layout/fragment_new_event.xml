@@ -147,9 +147,9 @@
                 android:id="@+id/tv_can_see"
                 style="@style/textBar"
                 android:layout_width="wrap_content"
-                android:layout_marginTop="15dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
                 android:text="@string/who_sees_event"
                 android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -159,9 +159,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_observers"
                 style="@style/textBody"
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="@id/tv_finish_time"
                 app:layout_constraintTop_toBottomOf="@id/tv_can_see"
                 tools:listitem="@layout/viewholder_event_observer" />
@@ -170,8 +170,8 @@
                 android:id="@+id/files_divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/gray_medium"
                 android:layout_marginTop="15dp"
+                android:background="@color/gray_medium"
                 android:paddingHorizontal="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -200,4 +200,14 @@
                 tools:listitem="@layout/viewholder_file" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="@style/progressBar"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
