@@ -89,6 +89,7 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="@id/tv_has_deadline"
                 app:layout_constraintTop_toBottomOf="@id/tv_has_deadline" />
 
@@ -134,8 +135,8 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:text="@string/finish_time"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_start_time" />
 
@@ -146,6 +147,17 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@id/tv_finish_time"
                 app:layout_constraintTop_toTopOf="@id/tv_finish_time" />
+
+            <View
+                android:id="@+id/title_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="@color/gray_medium"
+                android:paddingHorizontal="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_finish_value" />
 
             <TextView
                 android:id="@+id/tv_repeat"
@@ -286,6 +298,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="@string/repeat_starting_with"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rg_repeat_options" />
 
@@ -294,8 +307,20 @@
                 style="@style/textBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_repeat_from" />
+
+            <View
+                android:id="@+id/repeat_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="15dp"
+                android:background="@color/gray_medium"
+                android:paddingHorizontal="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_repeat_start" />
 
             <TextView
                 android:id="@+id/tv_importance"
@@ -330,8 +355,8 @@
                 style="@style/switchButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/tv_location"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_location" />
 
             <TextView

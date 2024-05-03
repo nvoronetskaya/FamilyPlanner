@@ -56,7 +56,7 @@ class ShowTaskInfoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTaskInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -70,7 +70,7 @@ class ShowTaskInfoFragment : Fragment() {
         viewModel.setTask(taskId)
 
         var task: Task? = null
-        val commentsAdapter = CommentsListAdapter(::downloadFile, userId)
+        val commentsAdapter = CommentsListAdapter(::downloadCommentFile, userId)
         val observersAdapter = ObserversListAdapter(userId)
         val subtasksAdapter = TaskAdapter(
             viewModel::changeCompleted,
@@ -78,7 +78,7 @@ class ShowTaskInfoFragment : Fragment() {
             ::onTaskClicked,
             LocalDate.now().toEpochDay()
         )
-        val filesAdapter = ObserveFilesAdapter(::downloadFile)
+        val filesAdapter = ObserveFilesAdapter(::downloadTaskFile)
         binding.rvComment.layoutManager = LinearLayoutManager(requireContext())
         binding.rvComment.adapter = commentsAdapter
         binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
@@ -371,8 +371,16 @@ class ShowTaskInfoFragment : Fragment() {
 
     private fun timeToString(time: Int): String = "${time / 60}:${time % 60}"
 
-    private fun downloadFile(path: String) {
-        val request = DownloadManager.Request(viewModel.downloadFile(taskId, path))
+    private fun downloadTaskFile(path: String) {
+        downloadFile("task", path)
+    }
+
+    private fun downloadCommentFile(path: String) {
+        downloadFile("comment", path)
+    }
+
+    private fun downloadFile(prefix: String, path: String) {
+        val request = DownloadManager.Request(viewModel.downloadFile(prefix, taskId, path))
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,

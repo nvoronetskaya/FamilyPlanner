@@ -25,18 +25,6 @@ class EventInfoViewModel : ViewModel() {
     private var files = MutableSharedFlow<List<String>?>(replay = 1)
 
     fun setEvent(eventId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            eventRepo.getFilesForEvent(eventId).addOnCompleteListener {
-                val curFiles = if (it.isSuccessful) {
-                    it.result.items.map { it.name }
-                } else {
-                    null
-                }
-                viewModelScope.launch(Dispatchers.IO) {
-                    files.emit(curFiles)
-                }
-            }
-        }
         if (eventId == this.eventId) {
             return
         }
@@ -54,6 +42,18 @@ class EventInfoViewModel : ViewModel() {
             launch {
                 eventRepo.getEventAttendees(eventId).collect {
                     attendees.emit(it)
+                }
+            }
+            launch {
+                eventRepo.getFilesForEvent(eventId).addOnCompleteListener {
+                    val curFiles = if (it.isSuccessful) {
+                        it.result.items.map { it.name }
+                    } else {
+                        null
+                    }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        files.emit(curFiles)
+                    }
                 }
             }
         }
@@ -75,8 +75,8 @@ class EventInfoViewModel : ViewModel() {
         }
     }
 
-    fun downloadFile(taskId: String, path: String): Uri {
-        return runBlocking { eventRepo.downloadFile("$taskId/$path").await() }
+    fun downloadFile(eventId: String, path: String): Uri {
+        return runBlocking { eventRepo.downloadFile("event-$eventId/$path").await() }
     }
 
     fun getFiles(): Flow<List<String>?> = files

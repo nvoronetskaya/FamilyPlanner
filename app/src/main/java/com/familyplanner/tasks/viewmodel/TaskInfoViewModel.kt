@@ -139,8 +139,8 @@ class TaskInfoViewModel : ViewModel() {
 
     fun getFiles(): Flow<List<String>?> = files
 
-    fun downloadFile(taskId: String, path: String): Uri {
-        return runBlocking { repo.downloadFile("$taskId/$path").await() }
+    fun downloadFile(prefix: String, taskId: String, path: String): Uri {
+        return runBlocking { repo.downloadFile("$prefix-$taskId/$path").await() }
     }
 
     fun changeCompleted(task: Task, isCompleted: Boolean, completedById: String) {
