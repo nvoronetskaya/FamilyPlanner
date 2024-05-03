@@ -160,7 +160,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 } else {
                     finishDate.dayOfMonth
                 }
-            for (i in start - 1..finish - 1) {
+            for (i in start - 1..<finish) {
                 eventsByDate[i].add(event)
             }
         }

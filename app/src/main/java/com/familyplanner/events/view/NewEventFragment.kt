@@ -28,7 +28,6 @@ import com.familyplanner.tasks.adapters.FileAdapter
 import com.familyplanner.tasks.model.TaskCreationStatus
 import com.familyplanner.tasks.model.UserFile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -180,7 +179,11 @@ class NewEventFragment : Fragment() {
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
-                    filesAdapter.addFile(UserFile(uri, name, size))
+                    try {
+                        filesAdapter.addFile(UserFile(uri, name, size))
+                    } catch (e: IllegalArgumentException) {
+                        Toast.makeText(requireContext(), "Файл с таким именем уже прикреплён", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

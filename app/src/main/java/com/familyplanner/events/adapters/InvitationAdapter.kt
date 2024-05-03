@@ -15,7 +15,7 @@ class InvitationAdapter : RecyclerView.Adapter<InvitationAdapter.InvitationViewH
             binding.tvName.text = invitation.userName
             binding.cbMakeObserver.isChecked = invitation.isInvited
             binding.tvBirthday.text = invitation.birthday
-            binding.cbMakeObserver.setOnCheckedChangeListener { buttonView, isChecked ->
+            binding.cbMakeObserver.setOnCheckedChangeListener { _, isChecked ->
                 invitation.isInvited = isChecked
             }
         }

@@ -371,7 +371,11 @@ class EditTaskFragment : Fragment() {
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
-                    filesAdapter.addFile(UserFile(uri, name, size))
+                    try {
+                        filesAdapter.addFile(UserFile(uri, name, size))
+                    } catch (e: IllegalArgumentException) {
+                        Toast.makeText(requireContext(), "Файл с таким именем уже добавлен", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

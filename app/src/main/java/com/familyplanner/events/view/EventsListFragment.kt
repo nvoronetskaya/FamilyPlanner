@@ -16,13 +16,11 @@ import com.familyplanner.databinding.FragmentEventsListBinding
 import com.familyplanner.events.viewmodel.EventsListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class EventsListFragment : Fragment() {
     private var _binding: FragmentEventsListBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: EventsListViewModel
-    private val calendar = Calendar.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,

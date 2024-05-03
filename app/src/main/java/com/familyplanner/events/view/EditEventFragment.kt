@@ -227,8 +227,16 @@ class EditEventFragment : Fragment() {
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
                     val file = UserFile(uri, name, size)
-                    filesAdapter.addFile(file)
-                    viewModel.addFile(file)
+                    try {
+                        filesAdapter.addFile(file)
+                        viewModel.addFile(file)
+                    } catch (e: IllegalArgumentException) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Файл с таким именем уже прикреплён",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }

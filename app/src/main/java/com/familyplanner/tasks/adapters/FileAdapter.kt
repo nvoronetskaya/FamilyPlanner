@@ -1,6 +1,5 @@
 package com.familyplanner.tasks.adapters
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +36,9 @@ class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
     }
 
     fun addFile(file: UserFile) {
+        if (files.any { it.name.equals(file.name) }) {
+            throw IllegalArgumentException()
+        }
         files.add(file)
         notifyItemInserted(files.size - 1)
     }

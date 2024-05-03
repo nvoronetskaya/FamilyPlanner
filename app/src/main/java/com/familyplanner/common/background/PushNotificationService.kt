@@ -10,7 +10,6 @@ import androidx.navigation.NavDeepLinkBuilder
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -27,8 +26,8 @@ class PushNotificationService : FirebaseMessagingService() {
         val sourceId = message.data["sourceId"]
         val title = message.data["title"]
         val body = message.data["body"]
-        var key = ""
-        var navigateTo = 0
+        val key: String
+        val navigateTo: Int
         if (sourceType.equals("TASK")) {
             key = "taskId"
             navigateTo = R.id.showTaskInfoFragment
