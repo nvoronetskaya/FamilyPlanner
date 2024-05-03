@@ -3,11 +3,13 @@ package com.familyplanner.location.data
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Looper
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.os.bundleOf
+import androidx.navigation.NavDeepLinkBuilder
 import com.familyplanner.FamilyPlanner
+import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ListenerRegistration
@@ -96,10 +98,14 @@ class LocationNotificationSender(val context: Context) {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
+                val link = NavDeepLinkBuilder(context).setComponentName(MainActivity::class.java)
+                    .setGraph(R.navigation.navigation).setDestination(R.id.showTaskInfoFragment)
+                    .setArguments(bundleOf("taskId" to task.id)).createPendingIntent()
                 val notification = NotificationCompat.Builder(context, "LOCATION")
+                    .setContentIntent(link)
                     .setSmallIcon(R.drawable.notifications)
                     .setContentTitle("Не забудьте выполнить задачу!")
-                    .setContentText("Неподалёку доступна задача ${task.title}").setOngoing(true)
+                    .setContentText("Неподалёку доступна задача ${task.title}")
                     .build()
                 val manager = NotificationManagerCompat.from(context)
                 manager.notify(System.currentTimeMillis().toInt(), notification)
