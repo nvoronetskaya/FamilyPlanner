@@ -33,14 +33,6 @@
             android:text="@string/family" />
 
         <ImageView
-            android:id="@+id/iv_more"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/more_options" />
-
-        <ImageView
             android:id="@+id/iv_tune"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,20 +48,20 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
+        android:text="20.04.2024"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        android:text="20.04.2024" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_tasks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_date"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constrainedHeight="true"
         tools:listitem="@layout/viewholder_task" />
 
     <ImageView
@@ -92,11 +84,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
+        android:text="@string/no_tasks"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_no_tasks"
-        android:text="@string/no_tasks"
-        android:visibility="gone" />
+        app:layout_constraintTop_toBottomOf="@id/iv_no_tasks" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"

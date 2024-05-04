@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.iterator
@@ -121,5 +122,10 @@ class MainActivity : AppCompatActivity() {
 
     fun hideBottomNavigation() {
         binding.bottomNavigation.isVisible = false
+    }
+
+    fun setToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
     }
 }

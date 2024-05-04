@@ -1,6 +1,7 @@
 <resources xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Base application theme. -->
     <style name="Theme.FamilyPlanner" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:actionOverflowButtonStyle">@style/overflow</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="colorSecondary">@color/white</item>
         <item name="colorPrimaryVariant">@color/light_orange</item>
@@ -136,10 +137,16 @@
         <item name="colorControlActivated">@color/orange</item>
         <item name="android:textColorPrimary">@color/black</item>
         <item name="android:windowBackground">@color/white</item>
-        <item name="android:buttonBarButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="android:buttonBarButtonStyle">
+            @style/DatePickerTheme.ButtonBarPositiveButtonStyle
+        </item>
     </style>
 
     <style name="DatePickerTheme.ButtonBarPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/dark_orange_text</item>
+    </style>
+
+    <style name="overflow">
+        <item name="android:src">@drawable/more_options</item>
     </style>
 </resources>

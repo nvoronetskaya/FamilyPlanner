@@ -14,6 +14,7 @@ dependencyResolutionManagement {
             url = uri("http://maven.google.com/")
             isAllowInsecureProtocol = true
         }
+        maven { url = uri("https://jitpack.io") }
     }
 }
 

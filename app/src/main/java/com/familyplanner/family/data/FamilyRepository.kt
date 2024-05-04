@@ -24,9 +24,16 @@ class FamilyRepository {
                 Family(
                     doc.id,
                     doc["name"].toString(),
-                    doc["code"].toString()
+                    doc["code"].toString(),
+                    doc["createdBy"].toString()
                 )
             }
+
+    suspend fun getFamilyByIdOnce(familyId: String): Family? =
+        firestore.collection("families").whereEqualTo(FieldPath.documentId(), familyId).get()
+            .await().documents.map {
+            Family(it.id, it["name"].toString(), it["code"].toString(), it["createdBy"].toString())
+        }.firstOrNull()
 
     suspend fun updateFamily(familyId: String, newName: String) {
         firestore.collection("families").document(familyId).get()

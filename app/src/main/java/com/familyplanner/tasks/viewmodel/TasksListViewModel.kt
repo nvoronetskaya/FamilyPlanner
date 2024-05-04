@@ -36,6 +36,7 @@ class TasksListViewModel : ViewModel() {
     private var userFilterId: String? = null
     private var curDate: LocalDate = LocalDate.now()
     private var familyId: String? = null
+    private var adminId: String? = null
 
     fun setUser(userId: String) {
         if (userId == this.userId) {
@@ -46,6 +47,7 @@ class TasksListViewModel : ViewModel() {
             userFilter.emit(userId)
             userRepo.getUserById(userId).collect {
                 familyId = it.familyId
+                adminId = familyRepo.getFamilyByIdOnce(familyId ?: "")?.createdBy
                 familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
                     users.clear()
                     users.addAll(members)
@@ -202,4 +204,6 @@ class TasksListViewModel : ViewModel() {
     fun changeCompleted(task: Task, isCompleted: Boolean, completedById: String) {
         taskRepo.changeTaskCompleted(task, isCompleted, completedById)
     }
+
+    fun isAdmin() = adminId.equals(userId)
 }

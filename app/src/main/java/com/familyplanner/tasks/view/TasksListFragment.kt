@@ -3,16 +3,19 @@ package com.familyplanner.tasks.view
 import android.Manifest
 import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -36,7 +39,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Calendar
 
-class TasksListFragment : Fragment() {
+class TasksListFragment : Fragment(), MenuProvider {
     private var _binding: FragmentTasksListBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: TasksListViewModel
@@ -49,12 +52,14 @@ class TasksListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        requireActivity().addMenuProvider(this, viewLifecycleOwner)
         _binding = FragmentTasksListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireActivity() as MainActivity).setToolbar(binding.toolbar)
         val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[TasksListViewModel::class.java]
         val tasksAdapter = TaskAdapter(
@@ -128,9 +133,6 @@ class TasksListFragment : Fragment() {
             )
             dialog.datePicker.minDate = calendar.timeInMillis
             dialog.show()
-        }
-        binding.ivMore.setOnClickListener {
-            findNavController().navigate(R.id.action_tasksListFragment_to_membersListFragment, bundleOf("isAdmin" to true))
         }
         if (!askedForNotification) {
             askNotificationPermission()
@@ -257,5 +259,21 @@ class TasksListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.menu_task_list, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        when (menuItem.itemId) {
+            R.id.members -> findNavController().navigate(
+                R.id.action_tasksListFragment_to_membersListFragment,
+                bundleOf("isAdmin" to viewModel.isAdmin())
+            )
+
+            R.id.stats -> TODO()
+        }
+        return true
     }
 }
