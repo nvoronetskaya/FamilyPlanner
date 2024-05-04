@@ -122,8 +122,8 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             Calendar.DAY_OF_MONTH,
             monthEnd.getActualMaximum(Calendar.DAY_OF_MONTH) - monthEnd.get(Calendar.DAY_OF_MONTH)
         )
-        rowCount = if (currentDate.get(Calendar.DAY_OF_WEEK) != 2) {
-            (currentDate.getActualMaximum(Calendar.DAY_OF_MONTH) - 1 + (currentDate.get(Calendar.DAY_OF_WEEK) + 5) % 7) / 7 + 1
+        rowCount = if (monthStart.get(Calendar.DAY_OF_WEEK) != 2) {
+            (monthStart.getActualMaximum(Calendar.DAY_OF_MONTH) - 1 + (monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7) / 7 + 1
         } else {
             (currentDate.getActualMaximum(Calendar.DAY_OF_MONTH) + 6) / 7
         }
@@ -305,7 +305,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
     }
 
     private fun showEventsForDay(date: Int) {
-        if (date > eventsByDate.size || eventsByDate[date].size == 0) {
+        if (date < 0 || date >= eventsByDate.size || eventsByDate[date].size == 0) {
             return
         }
         val bottomSheet = BottomSheetDialog(context)

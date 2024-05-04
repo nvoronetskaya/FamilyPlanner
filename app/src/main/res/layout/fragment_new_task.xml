@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="@string/deadline"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@id/tf_name"
                 app:layout_constraintTop_toBottomOf="@id/tf_name" />
 
             <TextView
@@ -106,6 +106,8 @@
                 android:id="@+id/cb_continuous_task"
                 style="@style/textBody"
                 android:layout_width="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="@string/continuous_task"
@@ -157,7 +159,7 @@
                 android:paddingHorizontal="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_finish_value" />
+                app:layout_constraintTop_toBottomOf="@id/tv_finish_time" />
 
             <TextView
                 android:id="@+id/tv_repeat"
@@ -167,12 +169,13 @@
                 android:layout_marginTop="15dp"
                 android:text="@string/repeat_task"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_finish_time" />
+                app:layout_constraintTop_toBottomOf="@id/title_divider" />
 
             <RadioGroup
                 android:id="@+id/rg_repeat_options"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_repeat">
@@ -181,26 +184,26 @@
                     android:id="@+id/rb_once"
                     style="@style/textBody"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                    android:layout_height="45dp"
                     android:text="@string/once" />
 
                 <RadioButton
                     android:id="@+id/rb_every_day"
                     style="@style/textBody"
                     android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                    android:layout_height="45dp"
                     android:text="@string/every_day" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="45dp"
                     android:orientation="horizontal">
 
                     <RadioButton
                         android:id="@+id/rb_each_n_days"
                         style="@style/textBody"
                         android:layout_width="wrap_content"
-                        android:layout_height="30dp"
+                        android:layout_height="45dp"
                         android:text="@string/every" />
 
                     <EditText
@@ -223,7 +226,7 @@
                     android:id="@+id/rb_days_of_week"
                     style="@style/textBody"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_height="45dp"
                     android:text="@string/certain_days_of_week" />
 
                 <HorizontalScrollView
@@ -330,7 +333,7 @@
                 android:layout_marginTop="15dp"
                 android:text="@string/importance"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_repeat_from" />
+                app:layout_constraintTop_toBottomOf="@id/repeat_divider" />
 
             <Spinner
                 android:id="@+id/sp_importance"
