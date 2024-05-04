@@ -15,6 +15,10 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class LocationNotificationSender(val context: Context) {
     private val tasks: HashMap<String, TaskLocationDto> = hashMapOf()
@@ -22,6 +26,7 @@ class LocationNotificationSender(val context: Context) {
     private var listener: ListenerRegistration? = null
     private var lastLatitude: Double? = null
     private var lastLongitude: Double? = null
+    private val RADIUS = 6371e3
 
     init {
         firestore.collection("observers").whereEqualTo("userId", FamilyPlanner.userId)
@@ -85,10 +90,7 @@ class LocationNotificationSender(val context: Context) {
     private fun notifyIfNeeded(task: TaskLocationDto) {
         lastLatitude ?: return
         lastLongitude ?: return
-        val latitudeDiff = (lastLatitude!! - task.latitude)
-        val longitudeDiff = (lastLongitude!! - task.longitude)
-        val shouldNotify =
-            latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff <= task.radius * task.radius
+        val shouldNotify = countDistance(task.latitude, task.longitude) <= task.radius
         if (shouldNotify && !task.wasNotified) {
             if (ActivityCompat.checkSelfPermission(
                     context,
@@ -114,5 +116,17 @@ class LocationNotificationSender(val context: Context) {
         } else if (!shouldNotify && task.wasNotified) {
             task.wasNotified = false
         }
+    }
+
+    private fun countDistance(latitude: Double, longitude: Double): Double {
+        val phi1 = latitude * Math.PI / 180
+        val phi2 = lastLatitude!! * Math.PI / 180
+        val latDiff = phi2 - phi1
+        val longDiff = (longitude - lastLongitude!!) * Math.PI / 180
+        val sinLat = sin(latDiff / 2)
+        val sinLong = sin(longDiff / 2)
+        val a = sinLat * sinLat + cos(phi1) * cos(phi2) * sinLong * sinLong
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return c * RADIUS
     }
 }
