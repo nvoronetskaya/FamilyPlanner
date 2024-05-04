@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.common.User
 import com.familyplanner.databinding.ViewholderMemberBinding
@@ -12,6 +13,7 @@ import com.familyplanner.family.viewmodel.MembersListViewModel
 
 class MemberAdapter(
     val isAdmin: Boolean,
+    val userId: String,
     val activity: Context,
     val viewModel: MembersListViewModel
 ) :
@@ -22,8 +24,9 @@ class MemberAdapter(
     inner class MemberViewHolder(private val binding: ViewholderMemberBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun onBind(member: User) {
-            binding.tvName.text = member.name
+            binding.tvName.text = if (userId.equals(member.id)) "(Вы) ${member.name}" else member.name
             binding.tvBirthday.text = member.birthday
+            binding.ivRemove.isVisible = isAdmin && !userId.equals(member.id)
             if (isAdmin) {
                 binding.ivRemove.setOnClickListener {
                     AlertDialog.Builder(activity).setTitle("Удаление участника")

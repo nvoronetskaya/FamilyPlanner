@@ -25,9 +25,11 @@ class ConfirmEmailViewModel : ViewModel() {
             val message: String
             if (!userRepo.hasAccount(address)) {
                 code = generateCode()
-                message = code
+                message =
+                    "Здравствуйте! \nДля продолжения регистрации в \"Семейном планировщике\" введите следующий код подтверждения: $code"
             } else {
-                message = "Вы уже зарегистрированы"
+                message =
+                    "Вы уже зарегистрированы в приложении \"Семейный планировщик\". В случае утери пароля воспользуйтесь функцией его восстановления"
             }
             try {
                 sendSignUpCode(address, message)

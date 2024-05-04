@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,6 +13,9 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <ImageView
@@ -43,9 +46,12 @@
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="55dp"
+        android:backgroundTint="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="#D8D8D8"
-        android:backgroundTint="?attr/colorPrimary">
+        app:tabTextColor="#D8D8D8">
 
         <com.google.android.material.tabs.TabItem
             style="@style/textBody"
@@ -60,47 +66,85 @@
             android:text="@string/applications" />
     </com.google.android.material.tabs.TabLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_marginStart="20dp"
-        android:layout_marginVertical="20dp"
+    <TextView
+        android:id="@+id/tv_apply_by"
+        style="@style/textBody"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/family_code"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabs" />
 
-        <TextView
-            android:id="@+id/tv_apply_by"
-            style="@style/textBody"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:text="@string/family_code" />
+    <TextView
+        android:id="@+id/tv_code"
+        style="@style/textBody"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/code"
+        android:textIsSelectable="true"
+        app:layout_constraintStart_toStartOf="@id/tv_apply_by"
+        app:layout_constraintTop_toBottomOf="@id/tv_apply_by" />
 
-        <TextView
-            android:id="@+id/tv_code"
-            style="@style/textBody"
-            android:textIsSelectable="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/code"  />
-    </LinearLayout>
+<!--    <View-->
+<!--        android:id="@+id/list_divider"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_marginTop="15dp"-->
+<!--        android:background="@color/gray_medium"-->
+<!--        android:paddingHorizontal="20dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/tv_code" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_members"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="15dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/ll_leave"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_code"
         tools:listitem="@layout/viewholder_member" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_applicants"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="15dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/ll_leave"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_code"
         tools:listitem="@layout/viewholder_applicant" />
+
+<!--    <View-->
+<!--        android:id="@+id/leave_divider"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_marginBottom="15dp"-->
+<!--        android:background="@color/gray_medium"-->
+<!--        android:paddingHorizontal="20dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/ll_leave"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent" />-->
 
     <LinearLayout
         android:id="@+id/ll_leave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/ll_delete"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -108,7 +152,7 @@
             app:srcCompat="@drawable/leave" />
 
         <TextView
-            style="@style/subText"
+            style="@style/textBody"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -120,8 +164,11 @@
         android:id="@+id/ll_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -129,11 +176,11 @@
             app:srcCompat="@drawable/delete" />
 
         <TextView
-            style="@style/subText"
+            style="@style/textBody"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="15dp"
             android:text="@string/delete" />
     </LinearLayout>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

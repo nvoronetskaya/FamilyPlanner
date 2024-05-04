@@ -17,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
-import com.familyplanner.R
 import com.familyplanner.databinding.FragmentMembersBinding
 import com.familyplanner.family.adapters.ApplicationAdapter
 import com.familyplanner.family.adapters.MemberAdapter
@@ -37,7 +36,7 @@ class MembersListFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentMembersBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -48,7 +47,7 @@ class MembersListFragment : Fragment() {
         val isAdmin = requireArguments().getBoolean("isAdmin")
         val userId = FamilyPlanner.userId
         viewModel = ViewModelProvider(this)[MembersListViewModel::class.java]
-        adapter = MemberAdapter(isAdmin, activity as MainActivity, viewModel)
+        adapter = MemberAdapter(isAdmin, userId, activity as MainActivity, viewModel)
 
         val manager = LinearLayoutManager(activity)
         binding.rvMembers.layoutManager = manager
@@ -107,13 +106,7 @@ class MembersListFragment : Fragment() {
                 }
             }
         }
-
-        if (isAdmin) {
-            binding.llDelete.visibility = View.GONE
-        } else {
-            binding.llDelete.visibility = View.VISIBLE
-        }
-
+        binding.llDelete.isVisible = isAdmin
         binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val isMembers = binding.tabs.getTabAt(0)!!.equals(tab)
