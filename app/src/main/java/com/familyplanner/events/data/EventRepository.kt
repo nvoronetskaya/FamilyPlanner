@@ -65,8 +65,8 @@ class EventRepository {
 
     fun getEventAttendees(eventId: String): Flow<List<EventAttendee>> {
         return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots()
-            .map {
-                it.map {
+            .map { attendees ->
+                attendees.map {
                     val userName =
                         firestore.collection("users").document(it["userId"].toString()).get()
                             .await()["name"].toString()
@@ -109,7 +109,7 @@ class EventRepository {
         firestore.collection("events").document(eventId).delete().addOnSuccessListener {
             firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).get()
                 .addOnCompleteListener {
-                    it.result.documents.forEach { it.reference.delete() }
+                    it.result.documents.forEach { doc -> doc.reference.delete() }
                 }
             storage.reference.child("event-$eventId").delete()
         }
@@ -176,13 +176,13 @@ class EventRepository {
         scope.launch {
             firestore.collection("events").whereGreaterThanOrEqualTo("finish", start).snapshots()
                 .collect {
-                    val documents = it.documents.filter { it.getLong("start")!! <= finish }
+                    val documents = it.documents.filter { doc -> doc.getLong("start")!! <= finish }
                     val result = if (documents.isEmpty()) {
                         listOf()
                     } else {
-                        documents.map {
-                            val event = it.toObject(Event::class.java)!!
-                            event.id = it.id
+                        documents.map { doc ->
+                            val event = doc.toObject(Event::class.java)!!
+                            event.id = doc.id
                             event
                         }
                     }

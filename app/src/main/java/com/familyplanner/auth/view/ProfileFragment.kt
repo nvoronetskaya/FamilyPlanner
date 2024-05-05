@@ -80,12 +80,12 @@ class ProfileFragment : Fragment() {
 
         binding.ivDone.setOnClickListener {
             if (binding.etName.text.isNullOrBlank()) {
-                binding.tfName.error = "Имя не может быть пустым"
+                binding.tfName.error = resources.getString(R.string.enter_name)
                 return@setOnClickListener
             }
             binding.tfName.isErrorEnabled = false
             if (binding.etBirthday.text.isNullOrBlank()) {
-                binding.tfBirthday.error = "Дата рождения не может быть пустой"
+                binding.tfBirthday.error = resources.getString(R.string.enter_birthday)
                 return@setOnClickListener
             }
             binding.tfBirthday.isErrorEnabled = false
@@ -102,14 +102,15 @@ class ProfileFragment : Fragment() {
         }
 
         binding.bExit.setOnClickListener {
-            AlertDialog.Builder(activity as MainActivity).setTitle("Выход")
-                .setMessage("Вы уверены, что хотите выйти?")
-                .setPositiveButton("Да") { _, _ ->
+            AlertDialog.Builder(activity as MainActivity)
+                .setTitle(resources.getString(R.string.exit))
+                .setMessage(resources.getString(R.string.wanna_leave))
+                .setPositiveButton(resources.getString(R.string.yes)) { _, _ ->
                     viewModel.exit()
                     (requireActivity() as MainActivity).hideBottomNavigation()
                     findNavController().navigate(R.id.action_profileFragment_to_welcomeFragment)
                 }
-                .setNegativeButton("Отмена") { dialog, _ ->
+                .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
                     dialog.cancel()
                 }.create().show()
         }
@@ -123,7 +124,7 @@ class ProfileFragment : Fragment() {
                             if (it.isEmpty()) {
                                 Toast.makeText(
                                     requireContext(),
-                                    "Письмо для восстановления пароля направлено на почту",
+                                    resources.getString(R.string.password_reset_email_sent),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
@@ -143,22 +144,23 @@ class ProfileFragment : Fragment() {
             val password = EditText(activity)
             password.textSize = 19F
             val dialog =
-                AlertDialog.Builder(activity as MainActivity).setTitle("Введите пароль от аккаунта")
+                AlertDialog.Builder(activity as MainActivity)
+                    .setTitle(resources.getString(R.string.enter_password))
                     .setView(password)
-                    .setPositiveButton("Готово", null)
-                    .setNegativeButton("Отмена") { dialog, _ ->
+                    .setPositiveButton(resources.getString(R.string.ready), null)
+                    .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
                         dialog.cancel()
                     }.show()
             dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 if (password.text.isNullOrBlank()) {
-                    password.error = "Введите пароль"
+                    password.error = resources.getString(R.string.enter_password)
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val checkTask = viewModel.checkPassword(password.text.toString())
                         if (checkTask == null) {
                             Toast.makeText(
                                 requireContext(),
-                                "Ошибка. Проверьте данные и попробуйте позднее",
+                                resources.getString(R.string.error_check_data),
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
@@ -168,12 +170,15 @@ class ProfileFragment : Fragment() {
                                         dialog.dismiss()
                                         findNavController().navigate(
                                             R.id.action_profileFragment_to_enterEmailFragment,
-                                            bundleOf("changeEmail" to true, "password" to password.text.toString())
+                                            bundleOf(
+                                                "changeEmail" to true,
+                                                "password" to password.text.toString()
+                                            )
                                         )
                                     } else {
                                         Toast.makeText(
                                             requireContext(),
-                                            "Ошибка. Проверьте данные и попробуйте позднее",
+                                            resources.getString(R.string.error_check_data),
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }

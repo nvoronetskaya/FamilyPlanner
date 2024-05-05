@@ -6,10 +6,8 @@ import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.auth.generateCode
 import com.familyplanner.auth.sendSignUpCode
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.ktx.firestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.google.firebase.ktx.Firebase
 import com.sun.mail.smtp.SMTPAddressFailedException
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -32,7 +30,7 @@ class ConfirmEmailViewModel : ViewModel() {
                     "Вы уже зарегистрированы в приложении \"Семейный планировщик\". В случае утери пароля воспользуйтесь функцией его восстановления"
             }
             try {
-                sendSignUpCode(address, message)
+                sendSignUpCode(address, message, "Регистрация в Семейном помощнике")
                 letterSent.emit("")
             } catch (e: Exception) {
                 val errorMessage = if (e.cause is SMTPAddressFailedException) {

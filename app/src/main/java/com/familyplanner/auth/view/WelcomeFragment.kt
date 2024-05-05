@@ -1,9 +1,5 @@
 package com.familyplanner.auth.view
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +17,7 @@ class WelcomeFragment : Fragment()  {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentWelcomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -34,14 +30,6 @@ class WelcomeFragment : Fragment()  {
 
         binding.tvSignIn.setOnClickListener {
             findNavController().navigate(R.id.action_welcomeFragment_to_signInFragment)
-        }
-    }
-
-    private fun startWorkManager() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notChan = NotificationChannel("1", "CHANNEL", NotificationManager.IMPORTANCE_HIGH)
-            val nManager = requireActivity().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            nManager.createNotificationChannel(notChan)
         }
     }
 

@@ -7,7 +7,6 @@ import com.familyplanner.auth.data.UserRepository
 import com.familyplanner.common.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers

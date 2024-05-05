@@ -31,7 +31,7 @@ class EnterInfoFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentSignUpInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -75,32 +75,31 @@ class EnterInfoFragment : Fragment() {
         binding.bReady.setOnClickListener {
             it.isEnabled = false
             if (binding.etName.text.isNullOrBlank()) {
-                binding.tfName.error = "Введите имя"
+                binding.tfName.error = resources.getString(R.string.enter_name)
                 it.isEnabled = true
                 return@setOnClickListener
             }
             binding.tfName.isErrorEnabled = false
             if (binding.etBirthday.text.isNullOrBlank()) {
-                binding.tfBirthday.error = "Введите дату рождения"
+                binding.tfBirthday.error = resources.getString(R.string.enter_birthday)
                 it.isEnabled = true
                 return@setOnClickListener
             }
             binding.tfBirthday.isErrorEnabled = false
             if (binding.etPassword.text.isNullOrBlank()) {
-                binding.tfPassword.error = "Введите пароль"
+                binding.tfPassword.error = resources.getString(R.string.enter_password)
                 it.isEnabled = true
                 return@setOnClickListener
             }
             if (binding.etPassword.text!!.length < 6) {
-                binding.tfPassword.error = "Пароль должен состоять из хотя бы 6 символов"
+                binding.tfPassword.error = resources.getString(R.string.too_short_password)
                 it.isEnabled = true
                 return@setOnClickListener
             }
             binding.tfPassword.isErrorEnabled = false
-            if (!binding.etPassword.text!!.toString()
-                    .equals(binding.etRepeatPassword.text.toString())
+            if (binding.etPassword.text!!.toString() != binding.etRepeatPassword.text.toString()
             ) {
-                binding.tfRepeatPassword.error = "Пароли не совпадают"
+                binding.tfRepeatPassword.error = resources.getString(R.string.different_passwords)
                 it.isEnabled = true
                 return@setOnClickListener
             }

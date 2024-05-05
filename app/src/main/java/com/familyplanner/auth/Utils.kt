@@ -13,7 +13,7 @@ fun generateCode(): String {
     return array.joinToString("")
 }
 
-fun sendSignUpCode(email: String, message: String) {
+fun sendSignUpCode(email: String, message: String, subject: String) {
     val props = Properties()
     props["mail.smtp.host"] = "smtp.gmail.com"
     props["mail.smtp.auth"] = "true"
@@ -33,7 +33,7 @@ fun sendSignUpCode(email: String, message: String) {
     mime.sender = InternetAddress("noreply.familyplanner@gmail.com")
 
     mime.setRecipients(Message.RecipientType.TO, email)
-    mime.subject = "Регистрация в Семейном помощнике"
+    mime.subject = subject
     mime.setText(message)
 
     Transport.send(mime)

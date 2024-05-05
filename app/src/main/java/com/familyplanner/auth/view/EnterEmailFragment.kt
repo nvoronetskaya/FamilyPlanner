@@ -26,7 +26,7 @@ class EnterEmailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentSignUpEmailBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -76,7 +76,7 @@ class EnterEmailFragment : Fragment() {
             val email = binding.etEmail.text
             if (email.isNullOrBlank()) {
                 binding.pbLoading.visibility = View.GONE
-                binding.tfEmail.error = "Адрес почты не может быть пустым"
+                binding.tfEmail.error = resources.getString(R.string.empty_email)
                 it.isEnabled = true
                 return@setOnClickListener
             }

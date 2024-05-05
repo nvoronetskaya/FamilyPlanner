@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="try_later">Ошибка. Попробуйте позднее</string>
+    <string name="wrong_code">Неверный код</string>
+    <string name="empty_code">Код подтверждения не может быть пустым</string>
+    <string name="empty_email">Адрес почты не может быть пустым</string>
+    <string name="enter_name">Введите имя</string>
+    <string name="enter_birthday">Введите дату рождения</string>
+    <string name="enter_password">Введите пароль</string>
+    <string name="too_short_password">Пароль должен состоять из хотя бы 6 символов</string>
+    <string name="different_passwords">Пароли не совпадают</string>
+    <string name="exit">Выход</string>
+    <string name="wanna_leave">Вы уверены, что хотите выйти?</string>
+    <string name="yes">Да</string>
+    <string name="cancel">Пароли не совпадают</string>
+    <string name="password_reset_email_sent">Пароли не совпадают</string>
+    <string name="ready">Пароли не совпадают</string>
+    <string name="error_check_data">Ошибка. Проверьте данные и попробуйте позднее</string>
+    <string name="mail_sign_up_theme">Ошибка. Проверьте данные и попробуйте позднее</string>
+</resources>

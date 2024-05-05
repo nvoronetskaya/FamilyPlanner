@@ -25,7 +25,7 @@ class ConfirmEmailFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentSignUpConfirmationBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -44,13 +44,13 @@ class ConfirmEmailFragment : Fragment() {
 
             val inputCode = binding.tfCode.text
             if (inputCode.isNullOrBlank()) {
-                binding.tfCode.error = "Код подтверждения не может быть пустым"
+                binding.tfCode.error = resources.getString(R.string.empty_code)
                 it.isEnabled = true
                 return@setOnClickListener
             }
 
-            if (!inputCode.trim().toString().equals(code)) {
-                binding.tfCode.error = "Неверный код"
+            if (inputCode.trim().toString() != code) {
+                binding.tfCode.error = resources.getString(R.string.wrong_code)
                 it.isEnabled = true
                 return@setOnClickListener
             }
@@ -65,7 +65,7 @@ class ConfirmEmailFragment : Fragment() {
                         if (changeTask == null || !changeTask.isSuccessful) {
                             Toast.makeText(
                                 requireContext(),
-                                "Ошибка. Попробуйте позднее",
+                                resources.getString(R.string.try_later),
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
