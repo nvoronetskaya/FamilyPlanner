@@ -11,8 +11,6 @@ import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.SortingType
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.repository.TaskRepository
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -44,22 +42,26 @@ class TasksListViewModel : ViewModel() {
         }
         this.userId = userId
         viewModelScope.launch(Dispatchers.IO) {
-            userFilter.emit(userId)
-            userRepo.getUserById(userId).collect {
-                familyId = it.familyId
-                adminId = familyRepo.getFamilyByIdOnce(familyId ?: "")?.createdBy
-                familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
-                    users.clear()
-                    users.addAll(members)
+            launch {
+                userFilter.emit(userId)
+                userRepo.getUserById(userId).collect {
+                    familyId = it.familyId
+                    adminId = familyRepo.getFamilyByIdOnce(familyId ?: "")?.createdBy
+                    familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
+                        users.clear()
+                        users.addAll(members)
+                    }
                 }
             }
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            userFilter.collect {
-                taskRepo.getSharedTasks(userId, it).collect { tasks ->
-                    allTasks.clear()
-                    allTasks.addAll(tasks.map { task -> TaskWithDate(task, null) })
-                    filteredTasks.emit(getTasksForDate(curDate, applyFilters()))
+            launch {
+                userFilter.collect {
+                    launch {
+                        taskRepo.getSharedTasks(userId, it).collect { tasks ->
+                            allTasks.clear()
+                            allTasks.addAll(tasks.map { task -> TaskWithDate(task, null) })
+                            filteredTasks.emit(getTasksForDate(curDate, applyFilters()))
+                        }
+                    }
                 }
             }
         }
@@ -101,7 +103,7 @@ class TasksListViewModel : ViewModel() {
         }
     }
 
-    fun getTasksForDate(
+    private fun getTasksForDate(
         date: LocalDate,
         curAllTasks: List<TaskWithDate>? = filteredTasks.replayCache.lastOrNull()
     ): List<TaskWithDate> {
@@ -189,7 +191,7 @@ class TasksListViewModel : ViewModel() {
 
     private fun applyFilters(): List<TaskWithDate> {
         val result =
-            allTasks.filter { if (hasLocationFilter != null) it.task.hasLocation == hasLocationFilter else true }
+            List(allTasks.size) { i -> allTasks[i] }.filter { if (hasLocationFilter != null) it.task.hasLocation == hasLocationFilter else true }
                 .filter { if (hasDeadlineFilter != null) it.task.hasDeadline == hasDeadlineFilter else true }
                 .filter { if (importanceFilter != null) it.task.importance == importanceFilter else true }
         return when (sortingType) {

@@ -107,7 +107,7 @@ class ListBudgetFragment : Fragment() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
-        dialog.datePicker.minDate = calendar.timeInMillis
+        dialog.datePicker.maxDate = calendar.timeInMillis
         dialog.show()
     }
 

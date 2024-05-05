@@ -250,6 +250,7 @@ class TaskRepository {
                 "previousCompletionDate" to null,
                 "lastCompletionDate" to task.previousCompletionDate
             )
+            TODO()
             firestore.collection("tasks").document(task.id).update(data).addOnSuccessListener {
                 firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
                     .whereEqualTo("completionDate", today).get().addOnCompleteListener {

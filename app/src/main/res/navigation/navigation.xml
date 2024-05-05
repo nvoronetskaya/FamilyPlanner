@@ -95,6 +95,9 @@
         <action
             android:id="@+id/action_tasksListFragment_to_newTaskInfoFragment"
             app:destination="@id/newTaskInfoFragment" />
+        <action
+            android:id="@+id/action_tasksListFragment_to_completionHistoryFragment"
+            app:destination="@id/completionHistoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -205,4 +208,12 @@
         android:id="@+id/listBudgetFragment"
         android:name="com.familyplanner.lists.view.ListBudgetFragment"
         android:label="ListBudgetFragment" />
+    <fragment
+        android:id="@+id/completionHistoryFragment"
+        android:name="com.familyplanner.family.view.CompletionHistoryFragment"
+        android:label="CompletionHistoryFragment" >
+        <action
+            android:id="@+id/action_completionHistoryFragment_to_showTaskInfoFragment"
+            app:destination="@id/showTaskInfoFragment" />
+    </fragment>
 </navigation>

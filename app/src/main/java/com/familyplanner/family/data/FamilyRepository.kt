@@ -10,12 +10,18 @@ import com.google.firebase.firestore.dataObjects
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class FamilyRepository {
     private val firestore = Firebase.firestore
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     fun getFamilyById(familyId: String): Flow<Family> =
         firestore.collection("families").whereEqualTo(FieldPath.documentId(), familyId).snapshots()
@@ -32,8 +38,13 @@ class FamilyRepository {
     suspend fun getFamilyByIdOnce(familyId: String): Family? =
         firestore.collection("families").whereEqualTo(FieldPath.documentId(), familyId).get()
             .await().documents.map {
-            Family(it.id, it["name"].toString(), it["code"].toString(), it["createdBy"].toString())
-        }.firstOrNull()
+                Family(
+                    it.id,
+                    it["name"].toString(),
+                    it["code"].toString(),
+                    it["createdBy"].toString()
+                )
+            }.firstOrNull()
 
     suspend fun updateFamily(familyId: String, newName: String) {
         firestore.collection("families").document(familyId).get()
@@ -217,5 +228,28 @@ class FamilyRepository {
         }
 
         return task
+    }
+
+    fun getCompletionHistory(start: Long, finish: Long): Flow<List<CompletionDto>> {
+        val history = MutableSharedFlow<List<CompletionDto>>()
+        scope.launch {
+            firestore.collection("taskCompletion")
+                .whereGreaterThanOrEqualTo("completionDate", start).snapshots().collect {
+                    val documents = it.documents.filter { it.getLong("competionDate")!! <= finish }
+                    val result = documents.map {
+                        val userName =
+                            firestore.collection("users").document(it["userId"].toString()).get()
+                                .await()["name"].toString()
+                        CompletionDto(
+                            it["taskId"].toString(),
+                            it["taskName"].toString(),
+                            userName,
+                            it.getLong("completionDate")!!
+                        )
+                    }
+                    history.emit(result)
+                }
+        }
+        return history
     }
 }

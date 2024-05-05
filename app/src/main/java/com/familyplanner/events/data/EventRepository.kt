@@ -22,7 +22,6 @@ class EventRepository {
     private val firestore = Firebase.firestore
     private val storage = Firebase.storage
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val userEvents = MutableSharedFlow<List<Event>>()
 
     fun addEvent(event: Event): Task<DocumentReference> {
         return firestore.collection("events").add(event)
@@ -173,6 +172,7 @@ class EventRepository {
     }
 
     fun getEventsForPeriod(start: Long, finish: Long): Flow<List<Event>> {
+        val userEvents = MutableSharedFlow<List<Event>>()
         scope.launch {
             firestore.collection("events").whereGreaterThanOrEqualTo("finish", start).snapshots()
                 .collect {

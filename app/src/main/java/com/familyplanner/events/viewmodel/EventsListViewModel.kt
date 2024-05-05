@@ -40,7 +40,7 @@ class EventsListViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             collectEvents?.cancelAndJoin()
             curDate = newDate
-            launch(Dispatchers.IO) {
+            collectEvents = launch(Dispatchers.IO) {
                 val start = curDate.minusDays(curDate.dayOfMonth.toLong())
                 val finish = curDate.minusDays(curDate.dayOfMonth.toLong() - 1).plusMonths(1)
                 repo.getEventsForPeriod(
