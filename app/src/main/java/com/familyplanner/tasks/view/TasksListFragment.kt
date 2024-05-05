@@ -46,6 +46,11 @@ class TasksListFragment : Fragment(), MenuProvider {
     private val calendar = Calendar.getInstance()
     private val lastChosen = Calendar.getInstance()
     private var askedForNotification = false
+    private val importanceDict = mapOf(
+        Importance.LOW to "Низкая",
+        Importance.MEDIUM to "Средняя",
+        Importance.HIGH to "Высокая"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -198,7 +203,8 @@ class TasksListFragment : Fragment(), MenuProvider {
         val userFilter = viewModel.getUserFilter()
         filtersBinding.usersFilter.removeAllViews()
         for (user in viewModel.getUsers()) {
-            val chip = Chip(context)
+            val chip = layoutInflater.inflate(R.layout.chip, filtersBinding.usersFilter, false) as Chip
+            chip.text = user.name
             if (userFilter == user.id) {
                 chip.isChecked = true
             }
@@ -210,7 +216,8 @@ class TasksListFragment : Fragment(), MenuProvider {
         val importanceFilter = viewModel.getImportanceFilter()
         filtersBinding.importanceGroup.removeAllViews()
         for (value in Importance.values()) {
-            val chip = Chip(context)
+            val chip = layoutInflater.inflate(R.layout.chip, filtersBinding.importanceGroup, false) as Chip
+            chip.text = importanceDict[value]
             if (value == importanceFilter) {
                 chip.isChecked = true
             }

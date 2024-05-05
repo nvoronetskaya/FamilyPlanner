@@ -49,6 +49,12 @@
             android:text="@string/deadline_desc" />
     </com.google.android.material.chip.ChipGroup>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="5dp"
+        android:background="@color/gray_medium" />
+
     <TextView
         style="@style/textBody"
         android:layout_width="match_parent"
@@ -56,11 +62,17 @@
         android:text="@string/filter_executors" />
 
     <com.google.android.material.chip.ChipGroup
-        android:id="@+id/importance_group"
+        android:id="@+id/users_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:chipSpacingVertical="0dp"
         app:singleSelection="true" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="5dp"
+        android:background="@color/gray_medium" />
 
     <TextView
         style="@style/textBody"
@@ -90,6 +102,12 @@
             android:text="@string/no" />
     </com.google.android.material.chip.ChipGroup>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="5dp"
+        android:background="@color/gray_medium" />
+
     <TextView
         style="@style/textBody"
         android:layout_width="match_parent"
@@ -97,11 +115,17 @@
         android:text="@string/importance" />
 
     <com.google.android.material.chip.ChipGroup
-        android:id="@+id/users_filter"
+        android:id="@+id/importance_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:chipSpacingVertical="0dp"
         app:singleSelection="true" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="5dp"
+        android:background="@color/gray_medium" />
 
     <TextView
         style="@style/textBody"

@@ -119,10 +119,21 @@
         <item name="cornerSize">90dp</item>
     </style>
 
-    <style name="chip" parent="commentText">
+    <style name="chip">
         <item name="textStartPadding">0dp</item>
         <item name="textEndPadding">0dp</item>
-        <item name="fontWeight">200</item>
+        <item name="chipCornerRadius">20dp</item>
+        <item name="android:checkable">true</item>
+        <item name="chipBackgroundColor">#F1D9C8</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="android:textAppearance">@style/chipText</item>
+    </style>
+
+    <style name="chipText">
+        <item name="fontWeight">400</item>
+        <item name="android:textSize">14sp</item>
+        <item name="fontStyle">normal</item>
+        <item name="fontFamily">@font/roboto_serif</item>
     </style>
 
     <style name="progressBar" parent="@style/Widget.AppCompat.ProgressBar">

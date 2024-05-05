@@ -90,8 +90,8 @@
     <string name="deadline_asc">дедлайну <b>↑</b></string>
     <string name="deadline_desc">дедлайну <b>↓</b></string>
     <string name="filter_executors">Исполнители задачи:</string>
-    <string name="has_location">Привязана к локации</string>
-    <string name="has_deadline">Есть дедлайн</string>
+    <string name="has_location">Привязана к локации: </string>
+    <string name="has_deadline">Есть дедлайн: </string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="new_event">Новое мероприятие</string>
