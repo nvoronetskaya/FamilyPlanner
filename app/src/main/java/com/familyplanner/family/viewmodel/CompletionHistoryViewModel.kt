@@ -9,6 +9,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -50,4 +52,6 @@ class CompletionHistoryViewModel : ViewModel() {
     fun getFinishDay() = finishDay
 
     fun getHistory(): Flow<List<CompletionDto>> = completionHistory
+
+    fun lastCompletionValues(): List<CompletionDto>? = completionHistory.replayCache.lastOrNull()
 }

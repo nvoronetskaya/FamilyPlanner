@@ -243,6 +243,7 @@ class FamilyRepository {
                         CompletionDto(
                             it["taskId"].toString(),
                             it["taskName"].toString(),
+                            it["userId"].toString(),
                             userName,
                             it.getLong("completionDate")!!
                         )
