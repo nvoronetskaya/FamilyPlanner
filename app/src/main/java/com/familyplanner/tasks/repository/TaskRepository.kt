@@ -43,11 +43,13 @@ class TaskRepository {
                         if (tasksIds.isEmpty()) {
                             userTasks.emit(listOf())
                         } else {
-                            firestore.collection("tasks").whereEqualTo("parentId", null)
-                                .whereIn(FieldPath.documentId(), tasksIds).snapshots()
+                            firestore.collection("tasks").whereEqualTo("parentId", null).snapshots()
                                 .collect { result ->
                                     val queryTasks = mutableListOf<Task>()
                                     for (doc in result.documents) {
+                                        if (!tasksIds.contains(doc.id)) {
+                                            continue
+                                        }
                                         val task = doc.toObject(Task::class.java)!!
                                         task.id = doc.id
                                         queryTasks.add(task)
@@ -74,18 +76,27 @@ class TaskRepository {
                         userTasks.emit(listOf())
                     } else {
                         firestore.collection("observers").whereEqualTo("userId", executorId)
-                            .whereEqualTo("isExecutor", true).whereIn("taskId", ids).snapshots()
+                            .snapshots()
                             .collect { result ->
-                                val tasksIds = result.map { it["taskId"].toString() }
+                                val tasksIds = result.filter {
+                                    it.getBoolean("isExecutor") ?: false && ids.contains(
+                                        it.getString(
+                                            "taskId"
+                                        )
+                                    )
+                                }.map { it["taskId"].toString() }
                                 launch {
                                     if (tasksIds.isEmpty()) {
                                         userTasks.emit(listOf())
                                     } else {
                                         firestore.collection("tasks").whereEqualTo("parentId", null)
-                                            .whereIn(FieldPath.documentId(), tasksIds).snapshots()
+                                            .snapshots()
                                             .collect { result ->
                                                 val queryTasks = mutableListOf<Task>()
                                                 for (doc in result.documents) {
+                                                    if (!tasksIds.contains(doc.id)) {
+                                                        continue
+                                                    }
                                                     val task = doc.toObject(Task::class.java)!!
                                                     task.id = doc.id
                                                     queryTasks.add(task)

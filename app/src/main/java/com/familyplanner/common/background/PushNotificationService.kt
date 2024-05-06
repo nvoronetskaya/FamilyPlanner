@@ -58,6 +58,9 @@ class PushNotificationService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        if (FamilyPlanner.userId.isEmpty()) {
+            return
+        }
         firestore.collection("users").document(FamilyPlanner.userId).update("fcmToken", token)
     }
 }

@@ -22,7 +22,7 @@ class EventInfoViewModel : ViewModel() {
     private val attendees = MutableSharedFlow<List<EventAttendee>>(replay = 1)
     private val eventRepo = EventRepository()
     private val userRepo = UserRepository()
-    private var files = MutableSharedFlow<List<String>?>(replay = 1)
+    private var files = MutableSharedFlow<List<String>>(replay = 1)
 
     fun setEvent(eventId: String) {
         if (eventId == this.eventId) {
@@ -45,15 +45,10 @@ class EventInfoViewModel : ViewModel() {
                 }
             }
             launch {
-                eventRepo.getFilesForEvent(eventId).addOnCompleteListener {
-                    val curFiles = if (it.isSuccessful) {
-                        it.result.items.map { it.name }
-                    } else {
-                        null
-                    }
-                    viewModelScope.launch(Dispatchers.IO) {
-                        files.emit(curFiles)
-                    }
+                val dbFiles = eventRepo.getFilesForEvent(eventId).await()
+                val curFiles = dbFiles.items.map { it.name }
+                viewModelScope.launch(Dispatchers.IO) {
+                    files.emit(curFiles)
                 }
             }
         }
@@ -79,7 +74,7 @@ class EventInfoViewModel : ViewModel() {
         return runBlocking { eventRepo.downloadFile("event-$eventId/$path").await() }
     }
 
-    fun getFiles(): Flow<List<String>?> = files
+    fun getFiles(): Flow<List<String>> = files
 
     fun getFamilyId() = familyId
 }

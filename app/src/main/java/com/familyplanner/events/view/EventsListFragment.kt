@@ -36,6 +36,7 @@ class  EventsListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EventsListViewModel::class.java]
         viewModel.updateEvents()
+        binding.tvCurMonth.text = viewModel.currentMonthString()
         binding.ivPrevMonth.setOnClickListener {
             viewModel.previousMonth()
         }

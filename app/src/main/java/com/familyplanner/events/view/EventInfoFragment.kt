@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
+import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentEventInfoBinding
 import com.familyplanner.events.adapters.AttendeeAdapter
@@ -70,6 +71,14 @@ class EventInfoFragment : Fragment() {
             )!!
         )
         binding.rvObservers.addItemDecoration(dividerItemDecoration)
+        if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+            Toast.makeText(
+                requireContext(),
+                "Нет сети. Файлы недоступны ",
+                Toast.LENGTH_SHORT
+            ).show()
+            binding.llFiles.isVisible = false
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -124,15 +133,6 @@ class EventInfoFragment : Fragment() {
                 launch {
                     viewModel.getFiles().collect {
                         requireActivity().runOnUiThread {
-                            if (it == null) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Не удалось получить файлы. Проверьте соединение",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                binding.llFiles.isVisible = false
-                                return@runOnUiThread
-                            }
                             binding.llFiles.isVisible = it.isNotEmpty()
                             filesAdapter.addPaths(it)
                         }
@@ -175,6 +175,14 @@ class EventInfoFragment : Fragment() {
     }
 
     private fun downloadFile(path: String) {
+        if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+            Toast.makeText(
+                requireContext(),
+                "Нет сети. Файлы недоступны ",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
         val request = DownloadManager.Request(viewModel.downloadFile(eventId, path))
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(
