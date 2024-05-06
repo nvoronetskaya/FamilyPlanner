@@ -22,6 +22,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.util.UUID
 
 class GroceryListRepository {
     private val firestore = Firebase.firestore
@@ -153,13 +154,13 @@ class GroceryListRepository {
             }
     }
 
-    fun addList(name: String, createdBy: String) {
+    suspend fun addList(name: String, createdBy: String) {
         val listData =
             mapOf<String, Any>("name" to name, "createdBy" to createdBy, "isCompleted" to false)
-        firestore.collection("lists").add(listData).addOnSuccessListener {
-            firestore.collection("usersLists")
-                .add(mapOf("userId" to createdBy, "listId" to it.id))
-        }
+        val listId = UUID.randomUUID().toString()
+        firestore.collection("lists").document(listId).set(listData)
+        firestore.collection("usersLists")
+            .add(mapOf("userId" to createdBy, "listId" to listId))
     }
 
     suspend fun changeListCompleted(listId: String) {

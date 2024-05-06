@@ -104,11 +104,7 @@ class EventInfoFragment : Fragment() {
                 launch {
                     viewModel.getAttendees().collect {
                         requireActivity().runOnUiThread {
-                            val list = mutableListOf<EventAttendee>()
-                            for (i in 1..10) {
-                                list.add(EventAttendee("", "", EventAttendeeStatus.UNKNOWN, "name"))
-                            }
-                            attendeeAdapter.setData(list)
+                            attendeeAdapter.setData(it)
                             val curUser =
                                 it.firstOrNull { attendee -> attendee.userId.equals(FamilyPlanner.userId) }
                             curUser?.let {

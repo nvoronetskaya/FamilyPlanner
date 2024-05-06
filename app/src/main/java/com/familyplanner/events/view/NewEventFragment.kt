@@ -152,7 +152,8 @@ class NewEventFragment : Fragment() {
                 getDateTimeFromString(binding.tvStartValue.text.toString()),
                 getDateTimeFromString(binding.tvFinishValue.text.toString()),
                 attendeesAdapter.getInvitations(),
-                filesAdapter.getFiles()
+                filesAdapter.getFiles(),
+                (requireActivity() as MainActivity).isConnectedToInternet()
             )
         }
     }
@@ -182,7 +183,11 @@ class NewEventFragment : Fragment() {
                     try {
                         filesAdapter.addFile(UserFile(uri, name, size))
                     } catch (e: IllegalArgumentException) {
-                        Toast.makeText(requireContext(), "Файл с таким именем уже прикреплён", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Файл с таким именем уже прикреплён",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

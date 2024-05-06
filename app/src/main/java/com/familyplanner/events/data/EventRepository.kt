@@ -1,10 +1,13 @@
 package com.familyplanner.events.data
 
 import android.net.Uri
+import com.familyplanner.FamilyPlanner
+import com.familyplanner.family.data.ApplicationStatus
 import com.familyplanner.tasks.model.UserFile
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.storage.ListResult
@@ -14,17 +17,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class EventRepository {
     private val firestore = Firebase.firestore
     private val storage = Firebase.storage
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun addEvent(event: Event): Task<DocumentReference> {
-        return firestore.collection("events").add(event)
+    fun addEvent(event: Event): String {
+        val eventId = UUID.randomUUID().toString()
+        firestore.collection("events").document(eventId).set(event)
+        return eventId
     }
 
     fun addInvitations(invitations: List<Invitation>, eventId: String) {
@@ -32,7 +39,7 @@ class EventRepository {
             val attendeeData = mapOf<String, Any>(
                 "eventId" to eventId,
                 "userId" to invitation.userId,
-                "status" to EventAttendeeStatus.UNKNOWN
+                "status" to if (invitation.userId != FamilyPlanner.userId) EventAttendeeStatus.UNKNOWN else EventAttendeeStatus.COMING
             )
             firestore.collection("eventAttendees").add(attendeeData)
         }
@@ -171,22 +178,77 @@ class EventRepository {
         }
     }
 
-    fun getEventsForPeriod(start: Long, finish: Long): Flow<List<Event>> {
+    fun getEventsForPeriod(
+        userId: String,
+        start: Long,
+        finish: Long
+    ): Flow<List<Event>> {
         val userEvents = MutableSharedFlow<List<Event>>()
         scope.launch {
-            firestore.collection("events").whereGreaterThanOrEqualTo("finish", start).snapshots()
+            firestore.collection("eventAttendees").whereEqualTo("userId", userId).snapshots()
                 .collect {
-                    val documents = it.documents.filter { doc -> doc.getLong("start")!! <= finish }
-                    val result = if (documents.isEmpty()) {
-                        listOf()
-                    } else {
-                        documents.map { doc ->
-                            val event = doc.toObject(Event::class.java)!!
-                            event.id = doc.id
-                            event
+                    launch {
+                        val eventsId =
+                            it.documents.map { document -> document["eventId"].toString() }
+                        if (eventsId.isEmpty()) {
+                            userEvents.emit(listOf())
+                        } else {
+                            firestore.collection("events").whereIn(FieldPath.documentId(), eventsId)
+                                .snapshots()
+                                .collect {
+                                    val documents =
+                                        it.documents.filter { doc -> doc.getLong("start")!! in start..finish }
+                                    val result = if (documents.isEmpty()) {
+                                        listOf()
+                                    } else {
+                                        documents.map { doc ->
+                                            val event = doc.toObject(Event::class.java)!!
+                                            event.id = doc.id
+                                            event
+                                        }
+                                    }
+                                    userEvents.emit(result)
+                                }
                         }
                     }
-                    userEvents.emit(result)
+                }
+        }
+        return userEvents
+    }
+
+    fun getAttendingEventsForPeriod(
+        userId: String,
+        start: Long,
+        finish: Long
+    ): Flow<List<Event>> {
+        val userEvents = MutableSharedFlow<List<Event>>()
+        scope.launch {
+            firestore.collection("eventAttendees").whereEqualTo("userId", userId)
+                .whereEqualTo("status", EventAttendeeStatus.COMING.name).snapshots().collect {
+                    launch {
+                        val eventsId =
+                            it.documents.map { document -> document["eventId"].toString() }
+                        if (eventsId.isEmpty()) {
+                            userEvents.emit(listOf())
+                        } else {
+                            firestore.collection("events").whereIn(FieldPath.documentId(), eventsId)
+                                .snapshots()
+                                .collect {
+                                    val documents =
+                                        it.documents.filter { doc -> doc.getLong("start")!! in start..finish }
+                                    val result = if (documents.isEmpty()) {
+                                        listOf()
+                                    } else {
+                                        documents.map { doc ->
+                                            val event = doc.toObject(Event::class.java)!!
+                                            event.id = doc.id
+                                            event
+                                        }
+                                    }
+                                    userEvents.emit(result)
+                                }
+                        }
+                    }
                 }
         }
         return userEvents

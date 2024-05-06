@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +18,7 @@ import com.familyplanner.events.viewmodel.EventsListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class EventsListFragment : Fragment() {
+class  EventsListFragment : Fragment() {
     private var _binding: FragmentEventsListBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: EventsListViewModel
@@ -34,7 +35,7 @@ class EventsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EventsListViewModel::class.java]
-        viewModel.setDate()
+        viewModel.updateEvents()
         binding.ivPrevMonth.setOnClickListener {
             viewModel.previousMonth()
         }
@@ -49,6 +50,16 @@ class EventsListFragment : Fragment() {
                 R.id.action_eventsListFragment_to_eventInfoFragment,
                 bundleOf("eventId" to it)
             )
+        }
+        binding.ivEye.setOnClickListener {
+            viewModel.hideNonVisiting()
+            binding.ivEye.isVisible = false
+            binding.ivEyeClosed.isVisible = true
+        }
+        binding.ivEyeClosed.setOnClickListener {
+            viewModel.showAll()
+            binding.ivEye.isVisible = true
+            binding.ivEyeClosed.isVisible = false
         }
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

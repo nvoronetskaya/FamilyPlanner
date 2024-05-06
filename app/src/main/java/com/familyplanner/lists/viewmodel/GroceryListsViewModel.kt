@@ -34,7 +34,9 @@ class GroceryListsViewModel : ViewModel() {
     fun getGroceryLists(): Flow<List<GroceryList>> = groceryLists
 
     fun addList(name: String) {
-        listsRepository.addList(name, userId)
+        viewModelScope.launch(Dispatchers.IO) {
+            listsRepository.addList(name, userId)
+        }
     }
 
     fun changeListStatus(groceryList: GroceryList, isCompleted: Boolean) {

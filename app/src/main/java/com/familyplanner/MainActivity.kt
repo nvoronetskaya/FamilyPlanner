@@ -6,6 +6,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
+import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -30,6 +31,7 @@ import com.familyplanner.location.data.LocationService
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -43,7 +45,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (!FamilyPlanner.isInit) {
             FamilyPlanner.isInit = true
             MapKitFactory.setApiKey("20c53eda-cff4-4d4e-bbac-f2d4a5cda330")
@@ -127,5 +128,12 @@ class MainActivity : AppCompatActivity() {
     fun setToolbar(toolbar: Toolbar) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+    }
+
+    fun isConnectedToInternet(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            ?: return false
+        val network = connectivityManager.activeNetworkInfo
+        return network != null && network.isConnected
     }
 }

@@ -34,6 +34,15 @@
             app:srcCompat="@drawable/ic_show_done" />
 
         <ImageView
+            android:id="@+id/iv_eye_closed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="15dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_hide" />
+
+        <ImageView
             android:id="@+id/iv_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

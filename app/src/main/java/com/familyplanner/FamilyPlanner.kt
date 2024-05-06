@@ -1,6 +1,8 @@
 package com.familyplanner
 
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import java.time.format.DateTimeFormatter
