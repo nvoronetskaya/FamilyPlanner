@@ -1,6 +1,7 @@
 package com.familyplanner.lists.view
 
 import android.app.DatePickerDialog
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ import com.familyplanner.databinding.FragmentSpendingsBinding
 import com.familyplanner.lists.adapters.ListBudgetAdapter
 import com.familyplanner.lists.viewmodel.GroceryListsViewModel
 import com.familyplanner.lists.viewmodel.ListBudgetViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -62,10 +64,11 @@ class ListBudgetFragment : Fragment() {
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.ivAdd.setOnClickListener {
             val moneySpent = EditText(activity)
+            moneySpent.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
             moneySpent.hint = "Введите сумму"
-            moneySpent.textSize = 19F
+            moneySpent.textSize = 17F
             moneySpent.inputType = InputType.TYPE_CLASS_NUMBER
-            AlertDialog.Builder(activity as MainActivity).setTitle("Добавление траты").setView(moneySpent)
+            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Добавление траты").setView(moneySpent, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (moneySpent.text.isNullOrBlank()) {
                         moneySpent.error = "Введите сумму"

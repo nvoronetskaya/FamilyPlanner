@@ -7,6 +7,7 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -29,6 +30,7 @@ import com.familyplanner.events.data.EventAttendee
 import com.familyplanner.events.data.EventAttendeeStatus
 import com.familyplanner.events.viewmodel.EventInfoViewModel
 import com.familyplanner.tasks.adapters.ObserveFilesAdapter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -159,7 +161,7 @@ class EventInfoFragment : Fragment() {
             )
         }
         binding.tvCancel.setOnClickListener {
-            AlertDialog.Builder(activity as MainActivity).setTitle("Отмена мероприятия")
+            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Отмена мероприятия")
                 .setMessage("Вы уверены, что хотите отменить мероприятие?")
                 .setPositiveButton("Да") { _, _ ->
                     viewModel.deleteEvent(eventId)

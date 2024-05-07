@@ -36,6 +36,7 @@ import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.model.TaskCreationStatus
 import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.yandex.mapkit.geometry.Point
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
@@ -248,7 +249,7 @@ class ShowTaskInfoFragment : Fragment() {
                 val reason = EditText(activity)
                 reason.hint = "Причина"
                 reason.textSize = 19F
-                AlertDialog.Builder(activity as MainActivity).setView(reason)
+                MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setView(reason, 40, 0, 40, 0)
                     .setMessage("Укажите причину, по которой Вы не сможете выполнить задачу: ")
                     .setPositiveButton("Готово") { _, _ ->
                         if (reason.text.isNullOrBlank()) {

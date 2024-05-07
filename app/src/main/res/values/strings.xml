@@ -39,7 +39,7 @@
     <string name="delete">Удалить</string>
     <string name="change_email"><u>Сменить почту</u></string>
     <string name="change_password"><u>Сменить пароль</u></string>
-    <string name="exit">Выйти</string>
+    <string name="exit">Выход</string>
     <string name="no_tasks">Все задачи выполнены! Теперь можно насладиться заслуженным отдыхом</string>
     <string name="new_task">Новая задача</string>
     <string name="task_title">Название</string>

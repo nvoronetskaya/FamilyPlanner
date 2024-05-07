@@ -1,5 +1,6 @@
 package com.familyplanner.lists.view
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputFilter
 import android.util.TypedValue
@@ -7,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -24,6 +27,7 @@ import com.familyplanner.lists.adapters.ListAdapter
 import com.familyplanner.lists.adapters.ProductsListDecorator
 import com.familyplanner.lists.model.GroceryList
 import com.familyplanner.lists.viewmodel.GroceryListsViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -71,7 +75,12 @@ class ListsListFragment : Fragment() {
         binding.fabAdd.setOnClickListener {
             createAddListDialog()
         }
-        binding.ivSpendings.setOnClickListener { findNavController().navigate(R.id.action_listsListFragment_to_allListsBudgetFragment, bundleOf("familyId" to viewModel.getFamilyId())) }
+        binding.ivSpendings.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_listsListFragment_to_allListsBudgetFragment,
+                bundleOf("familyId" to viewModel.getFamilyId())
+            )
+        }
     }
 
     private fun openList(listId: String, isCreator: Boolean) {
@@ -92,10 +101,12 @@ class ListsListFragment : Fragment() {
     private fun createAddListDialog() {
         val name = EditText(activity)
         name.hint = "Название списка"
-        name.textSize = 19F
+        name.textSize = 17F
         name.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(19))
-        AlertDialog.Builder(activity as MainActivity).setTitle("Добавление списка")
-            .setView(name)
+        name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+        MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog)
+            .setTitle("Добавление списка")
+            .setView(name, 40, 0, 40, 0)
             .setPositiveButton("Готово") { _, _ ->
                 if (name.text.isNullOrBlank()) {
                     name.error = "Введите название"
@@ -109,7 +120,7 @@ class ListsListFragment : Fragment() {
     }
 
     private fun onListDelete(list: GroceryList) {
-        AlertDialog.Builder(requireActivity()).setTitle("Удаление списка")
+        MaterialAlertDialogBuilder(requireActivity(), R.style.alertDialog).setTitle("Удаление списка")
             .setMessage("Вы уверены, что хотите удалить список ${list.name}?")
             .setPositiveButton("Да") { _, _ ->
                 viewModel.removeList(list)

@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.familyplanner.R
 import com.familyplanner.common.User
 import com.familyplanner.databinding.ViewholderApplicantBinding
 import com.familyplanner.family.viewmodel.MembersListViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ApplicationAdapter(
     val isAdmin: Boolean,
@@ -30,7 +32,7 @@ class ApplicationAdapter(
                 }
 
                 binding.ivReject.setOnClickListener {
-                    AlertDialog.Builder(activity).setTitle("Отклонение заявки")
+                    MaterialAlertDialogBuilder(activity, R.style.alertDialog).setTitle("Отклонение заявки")
                         .setMessage("Вы уверены, что хотите отклонить заявку пользователя ${applicant.name}?")
                         .setPositiveButton("Да") { _, _ ->
                             viewModel.reject(applicant.id)

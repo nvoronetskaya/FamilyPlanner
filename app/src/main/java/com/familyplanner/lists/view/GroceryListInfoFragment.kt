@@ -1,11 +1,13 @@
 package com.familyplanner.lists.view
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -29,6 +31,7 @@ import com.familyplanner.lists.adapters.ProductsListDecorator
 import com.familyplanner.lists.model.ListObserver
 import com.familyplanner.lists.model.Product
 import com.familyplanner.lists.viewmodel.GroceryListInfoViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -139,7 +142,7 @@ class GroceryListInfoFragment : Fragment() {
     }
 
     private fun onProductDelete(product: Product) {
-        AlertDialog.Builder(requireActivity()).setTitle("Удаление продукта")
+        MaterialAlertDialogBuilder(requireContext(), R.style.alertDialog).setTitle("Удаление продукта")
             .setMessage("Вы уверены, что хотите удалить продукт ${product.name}?")
             .setPositiveButton("Да") { _, _ ->
                 viewModel.deleteProduct(product)
@@ -150,7 +153,7 @@ class GroceryListInfoFragment : Fragment() {
     }
 
     private fun onObserverDelete(observer: ListObserver) {
-        AlertDialog.Builder(requireActivity()).setTitle("Удаление участника")
+        MaterialAlertDialogBuilder(requireActivity(), R.style.alertDialog).setTitle("Удаление участника")
             .setMessage("Вы уверены, что хотите убрать участника ${observer.userName} из списка?")
             .setPositiveButton("Да") { _, _ ->
                 viewModel.deleteObserver(observer)
@@ -163,9 +166,10 @@ class GroceryListInfoFragment : Fragment() {
     private fun createAddProductDialog() {
         val name = EditText(activity)
         name.hint = "Название товара"
-        name.textSize = 19F
-        AlertDialog.Builder(activity as MainActivity).setTitle("Добавление товара")
-            .setView(name)
+        name.textSize = 17F
+        name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+        MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Добавление товара")
+            .setView(name, 40, 0, 40, 0)
             .setPositiveButton("Готово") { _, _ ->
                 if (name.text.isNullOrBlank()) {
                     name.error = "Введите название"
@@ -180,14 +184,14 @@ class GroceryListInfoFragment : Fragment() {
 
     private fun createAddObserversDialog() {
         val curActivity = requireActivity()
-        val builder = AlertDialog.Builder(curActivity)
+        val builder = MaterialAlertDialogBuilder(curActivity, R.style.alertDialog)
         val view = curActivity.layoutInflater.inflate(R.layout.dialog_add_list_observers, null)
         val nonObserversList = view.findViewById<RecyclerView>(R.id.rv_observers)
         nonObserversList.layoutManager = LinearLayoutManager(requireContext())
         val nonObserversAdapter = NonObserverAdapter()
         nonObserversAdapter.updateData(viewModel.getNonObservers())
 
-        builder.setView(view)
+        builder.setView(view, 40, 0, 40, 0)
         builder.setPositiveButton("Готово") { dialog, _ ->
             viewModel.addObservers(nonObserversAdapter.getObservers())
             dialog.dismiss()

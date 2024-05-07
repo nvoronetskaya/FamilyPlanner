@@ -155,9 +155,27 @@
 
     <style name="DatePickerTheme.ButtonBarPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/dark_orange_text</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="overflow">
         <item name="android:src">@drawable/more_options</item>
+    </style> 
+    
+    <style name="alertDialogShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">15dp</item>
+    </style>
+    
+    <style name="alertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/textBody</item>
+        <item name="shapeAppearanceOverlay">@style/alertDialogShape</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+        <item name="android:textSize">18sp</item>
     </style>
 </resources>

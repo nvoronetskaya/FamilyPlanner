@@ -1,11 +1,13 @@
 package com.familyplanner.auth.view
 
 import android.app.DatePickerDialog
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -20,6 +22,7 @@ import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.ProfileViewModel
 import com.familyplanner.databinding.FragmentProfileBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -102,15 +105,13 @@ class ProfileFragment : Fragment() {
         }
 
         binding.bExit.setOnClickListener {
-            AlertDialog.Builder(activity as MainActivity)
-                .setTitle(resources.getString(R.string.exit))
+            MaterialAlertDialogBuilder(requireContext(), R.style.alertDialog).setTitle(resources.getString(R.string.exit))
                 .setMessage(resources.getString(R.string.wanna_leave))
                 .setPositiveButton(resources.getString(R.string.yes)) { _, _ ->
                     viewModel.exit()
                     (requireActivity() as MainActivity).hideBottomNavigation()
                     findNavController().navigate(R.id.action_profileFragment_to_welcomeFragment)
-                }
-                .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
+                }.setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
                     dialog.cancel()
                 }.create().show()
         }
@@ -142,11 +143,13 @@ class ProfileFragment : Fragment() {
 
         binding.tvChangeEmail.setOnClickListener {
             val password = EditText(activity)
-            password.textSize = 19F
+            password.textSize = 17F
+            password.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
             val dialog =
-                AlertDialog.Builder(activity as MainActivity)
+                MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog)
                     .setTitle(resources.getString(R.string.enter_password))
-                    .setView(password)
+                    .setView(password, 40, 0, 40, 0)
                     .setPositiveButton(resources.getString(R.string.ready), null)
                     .setNegativeButton(resources.getString(R.string.cancel)) { dialog, _ ->
                         dialog.cancel()

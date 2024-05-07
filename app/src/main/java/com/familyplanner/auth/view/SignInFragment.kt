@@ -1,10 +1,12 @@
 package com.familyplanner.auth.view
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -17,6 +19,7 @@ import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.SignInViewModel
 import com.familyplanner.databinding.FragmentSignInBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -82,8 +85,9 @@ class SignInFragment : Fragment() {
         binding.tvForgotPassword.setOnClickListener {
             val email = EditText(activity)
             email.hint = "Адрес почты"
-            email.textSize = 19F
-            AlertDialog.Builder(activity as MainActivity).setTitle("Сброс пароля").setView(email)
+            email.textSize = 17F
+            email.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Сброс пароля").setView(email, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (email.text.isNullOrBlank()) {
                         email.error = "Введите почту"

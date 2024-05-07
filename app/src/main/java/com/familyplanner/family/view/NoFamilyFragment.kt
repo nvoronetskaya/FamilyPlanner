@@ -1,10 +1,12 @@
 package com.familyplanner.family.view
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -17,6 +19,7 @@ import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNoFamilyBinding
 import com.familyplanner.family.viewmodel.NoFamilyViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -74,8 +77,9 @@ class NoFamilyFragment : Fragment() {
         binding.bCreate.setOnClickListener {
             val name = EditText(activity)
             name.hint = "Название семьи"
-            name.textSize = 19F
-            AlertDialog.Builder(activity as MainActivity).setTitle("Создание семьи").setView(name)
+            name.textSize = 17f
+            name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Создание семьи").setView(name, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (name.text.isNullOrBlank()) {
                         name.error = "Введите название"
@@ -91,9 +95,10 @@ class NoFamilyFragment : Fragment() {
         binding.bJoin.setOnClickListener {
             val code = EditText(activity)
             code.hint = "Код присоединения"
-            code.textSize = 19F
-            AlertDialog.Builder(activity as MainActivity).setTitle("Присоединение к семье")
-                .setView(code)
+            code.textSize = 17F
+            code.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Удаление продукта")
+                .setView(code, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (code.text.isNullOrBlank()) {
                         code.error = "Введите код"

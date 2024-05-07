@@ -4,14 +4,17 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -34,6 +37,7 @@ import com.familyplanner.tasks.model.SortingType
 import com.familyplanner.tasks.viewmodel.TasksListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -164,7 +168,10 @@ class TasksListFragment : Fragment(), MenuProvider {
                 ) { isGranted: Boolean ->
                     askedForNotification = true
                     if (!isGranted) {
-                        AlertDialog.Builder(requireContext()).setTitle("Важно")
+                        MaterialAlertDialogBuilder(
+                            requireContext(),
+                            R.style.alertDialog
+                        ).setTitle("Важно")
                             .setMessage("Вы не будете получать уведомления")
                             .create().show()
                     }
@@ -203,7 +210,8 @@ class TasksListFragment : Fragment(), MenuProvider {
         val userFilter = viewModel.getUserFilter()
         filtersBinding.usersFilter.removeAllViews()
         for (user in viewModel.getUsers()) {
-            val chip = layoutInflater.inflate(R.layout.chip, filtersBinding.usersFilter, false) as Chip
+            val chip =
+                layoutInflater.inflate(R.layout.chip, filtersBinding.usersFilter, false) as Chip
             chip.text = user.name
             if (userFilter == user.id) {
                 chip.isChecked = true
@@ -216,7 +224,8 @@ class TasksListFragment : Fragment(), MenuProvider {
         val importanceFilter = viewModel.getImportanceFilter()
         filtersBinding.importanceGroup.removeAllViews()
         for (value in Importance.values()) {
-            val chip = layoutInflater.inflate(R.layout.chip, filtersBinding.importanceGroup, false) as Chip
+            val chip =
+                layoutInflater.inflate(R.layout.chip, filtersBinding.importanceGroup, false) as Chip
             chip.text = importanceDict[value]
             if (value == importanceFilter) {
                 chip.isChecked = true

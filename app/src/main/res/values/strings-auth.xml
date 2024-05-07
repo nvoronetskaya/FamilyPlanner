@@ -10,6 +10,6 @@
     <string name="too_short_password">Пароль должен состоять из хотя бы 6 символов</string>
     <string name="different_passwords">Пароли не совпадают</string>
     <string name="wanna_leave">Вы уверены, что хотите выйти?</string>
-    <string name="password_reset_email_sent">Пароли не совпадают</string>
+    <string name="password_reset_email_sent">Письмо направлено на почту</string>
     <string name="error_check_data">Ошибка. Проверьте данные и попробуйте позднее</string>
 </resources>
