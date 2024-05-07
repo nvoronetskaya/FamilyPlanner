@@ -54,21 +54,23 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getHasFamilyUpdates().collect {
-                    if (it == null) {
-                        navController.navigate(
-                            R.id.welcomeFragment,
-                            null,
-                            NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
-                        )
-                        return@collect
-                    }
-                    val currentDestination = getCurrentDestinationId()
-                    if (!it && currentDestination != R.id.noFamilyFragment) {
-                        navController.navigate(
-                            R.id.noFamilyFragment,
-                            null,
-                            NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
-                        )
+                    runOnUiThread {
+                        if (it == null) {
+                            navController.navigate(
+                                R.id.welcomeFragment,
+                                null,
+                                NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                            )
+                            return@runOnUiThread
+                        }
+                        val currentDestination = getCurrentDestinationId()
+                        if (!it && currentDestination != R.id.noFamilyFragment) {
+                            navController.navigate(
+                                R.id.noFamilyFragment,
+                                null,
+                                NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                            )
+                        }
                     }
                 }
             }
@@ -97,11 +99,19 @@ class MainActivity : AppCompatActivity() {
     private fun setUpBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener {
             if (viewModel.getHasFamily() != true) {
-                return@setOnItemSelectedListener true
+                if (it.itemId == R.id.home) {
+                    navController.navigate(
+                        R.id.noFamilyFragment,
+                        null,
+                        NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                    )
+                    return@setOnItemSelectedListener true
+                }
+                return@setOnItemSelectedListener false
             }
             when (it.itemId) {
                 R.id.home -> navController.navigate(
-                    R.id.tasksListFragment,
+                    R.id.noFamilyFragment,
                     null,
                     NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
                 )

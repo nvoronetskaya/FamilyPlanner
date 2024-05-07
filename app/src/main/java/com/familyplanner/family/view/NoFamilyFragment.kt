@@ -42,7 +42,7 @@ class NoFamilyFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.getUser().collect {
-                        if (it.hasFamily) {
+                        if (!it.familyId.isNullOrEmpty()) {
                             activity?.runOnUiThread {
                                 binding.pbLoading.visibility = View.GONE
                                 val bundle = Bundle()

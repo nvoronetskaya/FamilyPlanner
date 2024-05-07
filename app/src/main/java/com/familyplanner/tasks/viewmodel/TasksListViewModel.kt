@@ -46,8 +46,11 @@ class TasksListViewModel : ViewModel() {
                 userFilter.emit(userId)
                 userRepo.getUserById(userId).collect {
                     familyId = it.familyId
-                    adminId = familyRepo.getFamilyByIdOnce(familyId ?: "")?.createdBy
-                    familyRepo.getFamilyMembers(it.familyId ?: "").collect { members ->
+                    if (familyId.isNullOrEmpty()) {
+                        return@collect
+                    }
+                    adminId = familyRepo.getFamilyByIdOnce(familyId!!)?.createdBy
+                    familyRepo.getFamilyMembers(familyId!!).collect { members ->
                         users.clear()
                         users.addAll(members)
                     }
