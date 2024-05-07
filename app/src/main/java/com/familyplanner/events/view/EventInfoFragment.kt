@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -141,6 +142,14 @@ class EventInfoFragment : Fragment() {
             }
         }
         binding.ivEdit.setOnClickListener {
+            if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Нет сети. Проверьте подключение и попробуйте позднее ",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
             val bundle = Bundle()
             bundle.putString("eventId", eventId)
             bundle.putString("familyId", viewModel.getFamilyId())
@@ -150,7 +159,14 @@ class EventInfoFragment : Fragment() {
             )
         }
         binding.tvCancel.setOnClickListener {
-            viewModel.deleteEvent(eventId)
+            AlertDialog.Builder(activity as MainActivity).setTitle("Отмена мероприятия")
+                .setMessage("Вы уверены, что хотите отменить мероприятие?")
+                .setPositiveButton("Да") { _, _ ->
+                    viewModel.deleteEvent(eventId)
+                }
+                .setNegativeButton("Отмена") { dialog, _ ->
+                    dialog.cancel()
+                }.create().show()
         }
         binding.cbParticipate.setOnClickListener {
             viewModel.changeComing(

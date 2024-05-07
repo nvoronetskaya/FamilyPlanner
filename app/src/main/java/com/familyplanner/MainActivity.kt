@@ -10,7 +10,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -19,6 +22,8 @@ import com.familyplanner.location.data.LocationService
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.yandex.mapkit.MapKitFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -40,11 +45,33 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
-        val isWelcomeFragment = navController.currentDestination?.id == R.id.welcomeFragment
+        val isWelcomeFragment = getCurrentDestinationId() == R.id.welcomeFragment
         binding.bottomNavigation.isVisible = !isWelcomeFragment
         if (Firebase.auth.currentUser != null && isWelcomeFragment) {
             navController.navigate(R.id.action_welcomeFragment_to_noFamilyFragment)
             binding.bottomNavigation.visibility = View.VISIBLE
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getHasFamilyUpdates().collect {
+                    if (it == null) {
+                        navController.navigate(
+                            R.id.welcomeFragment,
+                            null,
+                            NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                        )
+                        return@collect
+                    }
+                    val currentDestination = getCurrentDestinationId()
+                    if (!it && currentDestination != R.id.noFamilyFragment) {
+                        navController.navigate(
+                            R.id.noFamilyFragment,
+                            null,
+                            NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                        )
+                    }
+                }
+            }
         }
         binding.fragmentContainerView.visibility = View.VISIBLE
         setUpBottomNavigation()
@@ -69,6 +96,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener {
+            if (viewModel.getHasFamily() != true) {
+                return@setOnItemSelectedListener true
+            }
             when (it.itemId) {
                 R.id.home -> navController.navigate(
                     R.id.tasksListFragment,
@@ -117,4 +147,6 @@ class MainActivity : AppCompatActivity() {
         val network = connectivityManager.activeNetworkInfo
         return network != null && network.isConnected
     }
+
+    private fun getCurrentDestinationId(): Int? = navController.currentDestination?.id
 }

@@ -18,7 +18,6 @@ class EventsListViewModel : ViewModel() {
     private var curDate = LocalDateTime.now()
     private var collectEvents: Job? = null
     private val events = MutableSharedFlow<List<Event>>(replay = 1)
-    private val allEvents = mutableListOf<Event>()
     private val repo = EventRepository()
     private val months = listOf(
         "Январь",

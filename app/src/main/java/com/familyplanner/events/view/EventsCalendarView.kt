@@ -235,7 +235,11 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
                 yPos + textPaint.textSize,
                 textPaint
             )
-            var verticalOffset = dateTextSize * 2f
+            var verticalOffset = if (cellHeight > dateTextSize * 3f) {
+                dateTextSize * 1.5f
+            } else {
+                dateTextSize.toFloat()
+            }
             val totalEvents = eventsByDate[curDayOfMonth - 1].size
             for (i in 0 until totalEvents) {
                 val event = eventsByDate[curDayOfMonth - 1][i]

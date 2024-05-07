@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -64,7 +65,15 @@ class EditEventFragment : Fragment() {
         binding.rvObservers.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         binding.rvObservers.adapter = attendeesAdapter
-
+        if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+            Toast.makeText(
+                requireContext(),
+                "Нет сети. Файлы недоступны ",
+                Toast.LENGTH_SHORT
+            ).show()
+            binding.rvFiles.isVisible = false
+            binding.tvAttachFile.isVisible = false
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.prepareData(eventId, familyId)
             val event = viewModel.getEvent()
