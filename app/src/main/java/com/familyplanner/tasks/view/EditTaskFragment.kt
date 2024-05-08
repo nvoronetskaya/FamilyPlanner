@@ -36,9 +36,11 @@ import com.familyplanner.tasks.viewmodel.EditTaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -56,31 +58,11 @@ class EditTaskFragment : Fragment() {
     private lateinit var userId: String
     private lateinit var familyId: String
     private var parentId: String? = null
+    private lateinit var imageProvider: ImageProvider
 
     private val inputListener = object : InputListener {
         override fun onMapTap(p0: Map, p1: Point) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.getAddressByGeo(p1).collect {
-                        if (it == Status.SUCCESS) {
-                            activity?.runOnUiThread {
-                                curPoint = p1
-                                binding.tvAddress.visibility = View.VISIBLE
-                                binding.tvAddress.text = viewModel.getAddress()
-                                bottomSheet?.cancel()
-                            }
-                        } else {
-                            activity?.runOnUiThread {
-                                Toast.makeText(
-                                    activity,
-                                    "Ошибка. Проверьте подключение к сети и повторите позднее",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    }
-                }
-            }
+            findLocation(p1)
         }
 
         override fun onMapLongTap(p0: Map, p1: Point) {
@@ -109,6 +91,7 @@ class EditTaskFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EditTaskViewModel::class.java]
+        imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.map_mark)
         val taskId = requireArguments().getString("taskId") ?: ""
         val options = listOf("Низкая", "Средняя", "Высокая")
         filesAdapter = FileAdapter(viewModel::removeFile)
@@ -168,6 +151,9 @@ class EditTaskFragment : Fragment() {
                 binding.spImportance.setSelection(task.importance.ordinal)
                 binding.swHasLocation.isChecked = task.location != null
                 binding.tvAddress.isVisible = task.location != null
+                task.location?.let {
+                    findLocation(Point(it.latitude, it.longitude))
+                }
             }
         }
         addListeners()
@@ -272,8 +258,8 @@ class EditTaskFragment : Fragment() {
             )
         }
 
-        binding.swHasLocation.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
+        binding.swHasLocation.setOnClickListener {
+            if (binding.swHasLocation.isChecked) {
                 binding.tvAddress.visibility = View.VISIBLE
                 showBottomSheet()
             } else {
@@ -350,7 +336,8 @@ class EditTaskFragment : Fragment() {
                 binding.tvRepeatStart.text.trim().toString(), FamilyPlanner.uiDateFormatter
             ).toEpochDay() else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
-            curPoint
+            curPoint,
+            if (curPoint != null) binding.tvAddress.text.toString() else null
         )
         findNavController().popBackStack()
     }
@@ -463,6 +450,13 @@ class EditTaskFragment : Fragment() {
         bottomSheet.setContentView(R.layout.bottomsheet_map)
         val map = bottomSheet.findViewById<MapView>(R.id.map)?.mapWindow?.map ?: return
 
+        if (curPoint != null) {
+            map.move(CameraPosition(curPoint!!, 15f, 0f, 0f))
+            map.mapObjects.addPlacemark().apply {
+                geometry = curPoint!!
+                setIcon(imageProvider)
+            }
+        }
         map.addInputListener(inputListener)
         bottomSheet.setOnDismissListener {
             if (binding.tvAddress.text.isNullOrBlank()) {
@@ -478,5 +472,38 @@ class EditTaskFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun findLocation(point: Point) {
+        if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+            Toast.makeText(
+                activity,
+                "Ошибка. Проверьте подключение к сети и повторите позднее",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getAddressByGeo(point).collect {
+                    if (it == Status.SUCCESS) {
+                        activity?.runOnUiThread {
+                            curPoint = point
+                            binding.tvAddress.visibility = View.VISIBLE
+                            binding.tvAddress.text = viewModel.getAddress()
+                            bottomSheet?.cancel()
+                        }
+                    } else {
+                        activity?.runOnUiThread {
+                            Toast.makeText(
+                                activity,
+                                "Ошибка. Проверьте подключение к сети и повторите позднее",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 }

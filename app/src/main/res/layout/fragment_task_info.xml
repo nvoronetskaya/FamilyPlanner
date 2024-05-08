@@ -50,126 +50,126 @@
             app:srcCompat="@drawable/notifications" />
     </androidx.appcompat.widget.Toolbar>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:paddingVertical="10dp"
+        android:background="@drawable/rounded_rectangle" >
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tf_name"
+            style="@style/inputLayout"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:hint="@string/name"
+            app:endIconMode="clear_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_name"
+                style="@style/editText"
+                android:inputType="textCapSentences"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/tv_deadline"
+            style="@style/textBody"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical|start"
+            android:text="@string/deadline"
+            app:layout_constraintStart_toStartOf="@id/tf_name"
+            app:layout_constraintTop_toBottomOf="@id/tf_name" />
+
+        <TextView
+            android:id="@+id/tv_deadline_date"
+            style="@style/textBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|start"
+            android:layout_marginStart="10dp"
+            tools:text="22.01.2024"
+            app:layout_constraintBottom_toBottomOf="@id/tv_deadline"
+            app:layout_constraintStart_toEndOf="@id/tv_deadline" />
+
+        <TextView
+            android:id="@+id/tv_continuous_time"
+            style="@style/textBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            tools:text="14:00–"
+            app:layout_constraintStart_toStartOf="@id/tv_deadline_date"
+            app:layout_constraintTop_toBottomOf="@id/tv_deadline_date" />
+
+        <TextView
+            android:id="@+id/tv_repeat"
+            style="@style/textBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/repeat_task"
+            app:layout_constraintStart_toStartOf="@id/tv_deadline"
+            app:layout_constraintTop_toBottomOf="@id/tv_continuous_time" />
+
+        <TextView
+            android:id="@+id/tv_repeat_type"
+            android:layout_marginStart="10dp"
+            style="@style/textBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toEndOf="@id/tv_repeat"
+            app:layout_constraintTop_toTopOf="@id/tv_repeat"
+            tools:text="один раз" />
+
+        <com.yandex.mapkit.mapview.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            app:layout_constrainedWidth="true"
+            android:duplicateParentState="true"
+            app:layout_constraintEnd_toEndOf="@id/tf_name"
+            app:layout_constraintStart_toStartOf="@id/tf_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_repeat" />
+
+        <TextView
+            android:id="@+id/tv_address"
+            style="@style/textBody"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            app:layout_constraintStart_toStartOf="@id/map"
+            app:layout_constraintTop_toBottomOf="@id/map"
+            tools:text="Москва, ул. Полянка, д. 10" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical"
-            android:paddingHorizontal="10dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_rectangle"
-                android:padding="10dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tf_name"
-                    style="@style/inputLayout"
-                    android:layout_width="350dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:hint="@string/name"
-                    app:endIconMode="clear_text"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_name"
-                        style="@style/editText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:enabled="false" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <TextView
-                    android:id="@+id/tv_deadline"
-                    style="@style/textBody"
-                    android:layout_width="200dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center_vertical|start"
-                    android:text="@string/deadline"
-                    app:layout_constraintStart_toStartOf="@id/tf_name"
-                    app:layout_constraintTop_toBottomOf="@id/tf_name" />
-
-                <TextView
-                    android:id="@+id/tv_deadline_date"
-                    style="@style/textBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical|start"
-                    android:layout_marginStart="10dp"
-                    tools:text="22.01.2024"
-                    app:layout_constraintBottom_toBottomOf="@id/tv_deadline"
-                    app:layout_constraintStart_toEndOf="@id/tv_deadline" />
-
-                <TextView
-                    android:id="@+id/tv_continuous_time"
-                    style="@style/textBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    tools:text="14:00–"
-                    app:layout_constraintStart_toStartOf="@id/tv_deadline_date"
-                    app:layout_constraintTop_toBottomOf="@id/tv_deadline_date" />
-
-                <TextView
-                    android:id="@+id/tv_repeat"
-                    style="@style/textBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/repeat_task"
-                    app:layout_constraintStart_toStartOf="@id/tv_deadline"
-                    app:layout_constraintTop_toBottomOf="@id/tv_continuous_time" />
-
-                <TextView
-                    android:id="@+id/tv_repeat_type"
-                    android:layout_marginStart="10dp"
-                    style="@style/textBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    app:layout_constraintStart_toEndOf="@id/tv_repeat"
-                    app:layout_constraintTop_toTopOf="@id/tv_repeat"
-                    tools:text="один раз" />
-
-                <com.yandex.mapkit.mapview.MapView
-                    android:id="@+id/map"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_marginTop="10dp"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintEnd_toEndOf="@id/tf_name"
-                    app:layout_constraintStart_toStartOf="@id/tf_name"
-                    app:layout_constraintTop_toBottomOf="@id/tv_repeat" />
-
-                <TextView
-                    android:id="@+id/tv_address"
-                    style="@style/textBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    app:layout_constraintStart_toStartOf="@id/map"
-                    app:layout_constraintTop_toBottomOf="@id/map"
-                    tools:text="Москва, ул. Полянка, д. 10" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
+            android:orientation="vertical" >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_subtasks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/rounded_rectangle"
-                android:padding="10dp">
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/rounded_rectangle" >
 
                 <ImageView
                     android:id="@+id/iv_add_subtask"
@@ -254,7 +254,6 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_rectangle"
                 android:padding="10dp">
 
@@ -387,6 +386,7 @@
                         android:id="@+id/et_comment"
                         style="@style/editText"
                         android:layout_width="match_parent"
+                        android:inputType="textCapSentences"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
                         android:lineSpacingExtra="0dp" />

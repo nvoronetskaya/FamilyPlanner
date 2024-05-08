@@ -34,9 +34,11 @@ import com.familyplanner.tasks.viewmodel.NewTaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -58,9 +60,18 @@ class NewTaskInfoFragment : Fragment() {
     private lateinit var userId: String
     private lateinit var familyId: String
     private var parentId: String? = null
+    private lateinit var imageProvider: ImageProvider
 
     private val inputListener = object : InputListener {
         override fun onMapTap(p0: Map, p1: Point) {
+            if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+                Toast.makeText(
+                    activity,
+                    "Ошибка. Проверьте подключение к сети и повторите позднее",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
+            }
             lifecycleScope.launch(Dispatchers.IO) {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.getAddressByGeo(p1).collect {
@@ -111,7 +122,7 @@ class NewTaskInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[NewTaskViewModel::class.java]
-
+        imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.map_mark)
         binding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -273,7 +284,11 @@ class NewTaskInfoFragment : Fragment() {
                     try {
                         filesAdapter.addFile(UserFile(uri, name, size))
                     } catch (e: IllegalArgumentException) {
-                        Toast.makeText(requireContext(), "Файл с таким именем уже добавлен", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Файл с таким именем уже добавлен",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -362,7 +377,13 @@ class NewTaskInfoFragment : Fragment() {
         val bottomSheet = BottomSheetDialog(activity as MainActivity)
         bottomSheet.setContentView(R.layout.bottomsheet_map)
         val map = bottomSheet.findViewById<MapView>(R.id.map)?.mapWindow?.map ?: return
-
+        if (curPoint != null) {
+            map.move(CameraPosition(curPoint!!, 15f, 0f, 0f))
+            map.mapObjects.addPlacemark().apply {
+                geometry = curPoint!!
+                setIcon(imageProvider)
+            }
+        }
         map.addInputListener(inputListener)
         bottomSheet.setOnDismissListener {
             if (binding.tvAddress.text.isNullOrBlank()) {
@@ -429,6 +450,7 @@ class NewTaskInfoFragment : Fragment() {
             ).toEpochDay() else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
             curPoint,
+            if (curPoint != null) binding.tvAddress.text.toString() else null,
             userId,
             familyId,
             filesAdapter.getFiles(),
@@ -460,12 +482,12 @@ class NewTaskInfoFragment : Fragment() {
                                     Toast.LENGTH_LONG
                                 ).show()
                                 val bundle = Bundle()
-                                    bundle.putString("taskId", viewModel.getCreatedTaskId())
-                                    bundle.putString("familyId", familyId)
-                                    findNavController().navigate(
-                                        R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
-                                        bundle
-                                    )
+                                bundle.putString("taskId", viewModel.getCreatedTaskId())
+                                bundle.putString("familyId", familyId)
+                                findNavController().navigate(
+                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                    bundle
+                                )
                             }
 
                             TaskCreationStatus.FAILED -> Toast.makeText(

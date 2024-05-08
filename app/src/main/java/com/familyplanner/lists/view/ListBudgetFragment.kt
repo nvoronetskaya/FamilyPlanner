@@ -64,11 +64,15 @@ class ListBudgetFragment : Fragment() {
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.ivAdd.setOnClickListener {
             val moneySpent = EditText(activity)
-            moneySpent.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            moneySpent.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
             moneySpent.hint = "Введите сумму"
             moneySpent.textSize = 17F
             moneySpent.inputType = InputType.TYPE_CLASS_NUMBER
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Добавление траты").setView(moneySpent, 40, 0, 40, 0)
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Добавление траты").setView(moneySpent, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (moneySpent.text.isNullOrBlank()) {
                         moneySpent.error = "Введите сумму"

@@ -35,7 +35,7 @@ class TaskInfoViewModel : ViewModel() {
     private val searchManager =
         SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
     private val searchStatus = MutableSharedFlow<Status>()
-    private var curAddress = MutableSharedFlow<String>()
+    private var curAddress = MutableSharedFlow<String>(replay = 1)
     private var task: MutableSharedFlow<Task?> = MutableSharedFlow(replay = 1)
     private var comments: MutableSharedFlow<List<CommentDto>> = MutableSharedFlow(replay = 1)
     private var observers: MutableSharedFlow<List<ObserverDto>> = MutableSharedFlow(replay = 1)
@@ -69,9 +69,7 @@ class TaskInfoViewModel : ViewModel() {
     }
 
     fun getAddressByGeo(obj: Point): Flow<Status> {
-        viewModelScope.launch(Dispatchers.Main) {
-            searchManager.submit(obj, 21, SearchOptions(), searchSessionListener)
-        }
+        searchManager.submit(obj, 21, SearchOptions(), searchSessionListener)
         return searchStatus
     }
 
@@ -85,12 +83,14 @@ class TaskInfoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
                 repo.getTaskById(taskId).collect {
-                    getAddressByGeo(
-                        Point(
-                            it?.location?.latitude ?: 0.0,
-                            it?.location?.longitude ?: 0.0
+                    launch(Dispatchers.Main) {
+                        getAddressByGeo(
+                            Point(
+                                it?.location?.latitude ?: 0.0,
+                                it?.location?.longitude ?: 0.0
+                            )
                         )
-                    )
+                    }
                     task.emit(it)
                 }
             }

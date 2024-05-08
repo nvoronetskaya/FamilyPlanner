@@ -2,6 +2,7 @@ package com.familyplanner.family.view
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -141,6 +142,7 @@ class MembersListFragment : Fragment() {
             familyName.textSize = 17F
             familyName.typeface =
                 Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            familyName.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             MaterialAlertDialogBuilder(
                 activity as MainActivity,
                 R.style.alertDialog

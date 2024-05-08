@@ -67,6 +67,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_name"
             style="@style/editText"
+            android:inputType="textCapSentences"
             android:layout_height="wrap_content"
             android:enabled="false" />
     </com.google.android.material.textfield.TextInputLayout>

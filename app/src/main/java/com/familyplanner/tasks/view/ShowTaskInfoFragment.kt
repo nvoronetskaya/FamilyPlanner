@@ -7,12 +7,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.text.InputType
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -38,11 +39,12 @@ import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.viewmodel.TaskInfoViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 import java.time.LocalDate
+
 
 class ShowTaskInfoFragment : Fragment() {
     private var _binding: FragmentTaskInfoBinding? = null
@@ -86,7 +88,6 @@ class ShowTaskInfoFragment : Fragment() {
         binding.rvObservers.adapter = observersAdapter
         binding.rvFiles.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFiles.adapter = filesAdapter
-
         commentFilesAdapter = FileAdapter()
         binding.rvCommentFiles.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
@@ -193,13 +194,6 @@ class ShowTaskInfoFragment : Fragment() {
                         }
                     }
                 }
-                launch {
-                    viewModel.getAddress().collect {
-                        requireActivity().runOnUiThread {
-                            binding.tvAddress.text = it
-                        }
-                    }
-                }
             }
         }
         binding.ivAddSubtask.setOnClickListener {
@@ -249,6 +243,7 @@ class ShowTaskInfoFragment : Fragment() {
                 val reason = EditText(activity)
                 reason.hint = "Причина"
                 reason.textSize = 19F
+                reason.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
                 MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setView(reason, 40, 0, 40, 0)
                     .setMessage("Укажите причину, по которой Вы не сможете выполнить задачу: ")
                     .setPositiveButton("Готово") { _, _ ->
@@ -337,11 +332,14 @@ class ShowTaskInfoFragment : Fragment() {
             RepeatType.DAYS_OF_WEEK -> getRepeatFromDays(task.daysOfWeek)
         }
         if (task.location != null) {
+            val mapPoint = Point(task.location!!.latitude, task.location!!.longitude)
+            binding.map.mapWindow.map.move(CameraPosition(mapPoint, 15f, 0f, 0f))
             binding.map.mapWindow.map.mapObjects.addPlacemark().apply {
-                geometry = Point(task.location!!.latitude, task.location!!.longitude)
-                setIcon(ImageProvider.fromResource(requireContext(), R.drawable.location))
+                geometry = mapPoint
+                setIcon(ImageProvider.fromResource(requireContext(), R.drawable.map_mark))
             }
             binding.map.visibility = View.VISIBLE
+            binding.tvAddress.text = task.address
         } else {
             binding.map.visibility = View.GONE
             binding.tvAddress.visibility = View.GONE

@@ -3,6 +3,7 @@ package com.familyplanner.lists.view
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputFilter
+import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -104,6 +105,7 @@ class ListsListFragment : Fragment() {
         name.textSize = 17F
         name.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(19))
         name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+        name.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
         MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog)
             .setTitle("Добавление списка")
             .setView(name, 40, 0, 40, 0)

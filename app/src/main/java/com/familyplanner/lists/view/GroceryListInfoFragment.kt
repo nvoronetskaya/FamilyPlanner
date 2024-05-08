@@ -2,6 +2,7 @@ package com.familyplanner.lists.view
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -168,6 +169,7 @@ class GroceryListInfoFragment : Fragment() {
         name.hint = "Название товара"
         name.textSize = 17F
         name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+        name.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
         MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Добавление товара")
             .setView(name, 40, 0, 40, 0)
             .setPositiveButton("Готово") { _, _ ->

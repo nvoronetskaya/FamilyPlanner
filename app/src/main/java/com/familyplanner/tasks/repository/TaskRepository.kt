@@ -324,6 +324,7 @@ class TaskRepository {
         newValues[TaskDbSchema.REPEAT_START] = taskData.repeatStart
         newValues[TaskDbSchema.IMPORTANCE] = taskData.importance
         newValues[TaskDbSchema.LOCATION] = taskData.location
+        newValues[TaskDbSchema.ADDRESS] = taskData.address
         firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).update(newValues)
     }
 }

@@ -109,7 +109,8 @@ class EditTaskViewModel : ViewModel() {
         daysOfWeek: Int,
         repeatStart: Long?,
         importance: Importance,
-        location: Point?
+        location: Point?,
+        address: String?
     ) {
         val newTask = Task()
         newTask.title = title
@@ -124,6 +125,7 @@ class EditTaskViewModel : ViewModel() {
         newTask.importance = importance
         newTask.location =
             if (location != null) GeoPoint(location.latitude, location.longitude) else null
+        newTask.address = address
 
         taskRepo.updateTask(taskId, newTask)
     }

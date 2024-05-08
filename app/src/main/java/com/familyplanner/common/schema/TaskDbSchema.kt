@@ -14,6 +14,7 @@ class TaskDbSchema {
         const val REPEAT_START = "repeatStart"
         const val IMPORTANCE = "importance"
         const val LOCATION = "location"
+        const val ADDRESS = "address"
         const val CREATED_BY = "createdBy"
         const val FAMILY_ID = "familyId"
         const val PREVIOUS_COMPLETION_DATE = "previousCompletionDate"

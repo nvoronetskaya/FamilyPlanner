@@ -13,6 +13,7 @@ import com.familyplanner.tasks.repository.TaskRepository
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.storage.UploadTask
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.BusinessObjectMetadata
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory
@@ -75,6 +76,7 @@ class NewTaskViewModel : ViewModel() {
         repeatStart: Long?,
         importance: Importance,
         location: Point?,
+        address: String?,
         userId: String,
         familyId: String,
         files: List<UserFile>?,
@@ -96,6 +98,7 @@ class NewTaskViewModel : ViewModel() {
         newTask.createdBy = userId
         newTask.familyId = familyId
         newTask.parentId = parentId
+        newTask.address = address
 
         tasksRepo.addTask(newTask).addOnCompleteListener {
             viewModelScope.launch(Dispatchers.IO) {
