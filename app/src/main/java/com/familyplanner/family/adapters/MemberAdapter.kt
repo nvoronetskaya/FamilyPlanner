@@ -22,7 +22,7 @@ class MemberAdapter(
 ) :
     RecyclerView.Adapter<MemberAdapter.MemberViewHolder>() {
     private val members = MutableList<User>(0)
-    { User("", "", "", true, "", "") }
+    { User("", "", "", "", "") }
 
     inner class MemberViewHolder(private val binding: ViewholderMemberBinding) :
         RecyclerView.ViewHolder(binding.root) {

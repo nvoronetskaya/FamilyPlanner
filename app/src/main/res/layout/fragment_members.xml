@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -88,16 +87,17 @@
         app:layout_constraintStart_toStartOf="@id/tv_apply_by"
         app:layout_constraintTop_toBottomOf="@id/tv_apply_by" />
 
-<!--    <View-->
-<!--        android:id="@+id/list_divider"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        android:background="@color/gray_medium"-->
-<!--        android:paddingHorizontal="20dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/tv_code" />-->
+    <View
+        android:id="@+id/list_divider"
+        android:layout_width="350dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/gray_medium"
+        android:paddingHorizontal="20dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_code" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_members"
@@ -118,6 +118,7 @@
         android:layout_height="match_parent"
         android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="15dp"
+        android:visibility="gone"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/ll_leave"
         app:layout_constraintEnd_toEndOf="parent"
@@ -125,16 +126,16 @@
         app:layout_constraintTop_toBottomOf="@id/tv_code"
         tools:listitem="@layout/viewholder_applicant" />
 
-<!--    <View-->
-<!--        android:id="@+id/leave_divider"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="1dp"-->
-<!--        android:layout_marginBottom="15dp"-->
-<!--        android:background="@color/gray_medium"-->
-<!--        android:paddingHorizontal="20dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/ll_leave"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent" />-->
+    <View
+        android:id="@+id/title_divider"
+        android:layout_width="350dp"
+        android:layout_height="1dp"
+        android:layout_marginBottom="15dp"
+        android:background="@color/gray_medium"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintBottom_toTopOf="@id/ll_leave"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/ll_leave"

@@ -2,6 +2,9 @@ package com.familyplanner.family.data
 
 import com.familyplanner.common.Application
 import com.familyplanner.common.User
+import com.familyplanner.common.schema.ApplicationDbSchema
+import com.familyplanner.common.schema.FamilyDbSchema
+import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.family.model.Family
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
@@ -24,45 +27,42 @@ class FamilyRepository {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     fun getFamilyById(familyId: String): Flow<Family> =
-        firestore.collection("families").whereEqualTo(FieldPath.documentId(), familyId).snapshots()
+        firestore.collection(FamilyDbSchema.FAMILY_TABLE).whereEqualTo(FieldPath.documentId(), familyId).snapshots()
             .map {
                 val doc = it.documents[0]
                 Family(
                     doc.id,
-                    doc["name"].toString(),
-                    doc["code"].toString(),
-                    doc["createdBy"].toString()
+                    doc[FamilyDbSchema.NAME].toString(),
+                    doc[FamilyDbSchema.CREATED_BY].toString()
                 )
             }
 
     suspend fun getFamilyByIdOnce(familyId: String): Family? =
-        firestore.collection("families").whereEqualTo(FieldPath.documentId(), familyId).get()
+        firestore.collection(FamilyDbSchema.FAMILY_TABLE).whereEqualTo(FieldPath.documentId(), familyId).get()
             .await().documents.map {
                 Family(
                     it.id,
-                    it["name"].toString(),
-                    it["code"].toString(),
-                    it["createdBy"].toString()
+                    it[FamilyDbSchema.NAME].toString(),
+                    it[FamilyDbSchema.CREATED_BY].toString()
                 )
             }.firstOrNull()
 
     suspend fun updateFamily(familyId: String, newName: String) {
-        firestore.collection("families").document(familyId).get()
-            .await().reference.update(mapOf("name" to newName))
+        firestore.collection(FamilyDbSchema.FAMILY_TABLE).document(familyId).get()
+            .await().reference.update(mapOf(FamilyDbSchema.NAME to newName))
     }
 
     fun getFamilyMembers(familyId: String): Flow<List<User>> =
-        firestore.collection("users").whereEqualTo("familyId", familyId).snapshots().map {
+        firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(UserDbSchema.FAMILY_ID, familyId).snapshots().map {
             val users = mutableListOf<User>()
             for (doc in it.documents) {
                 val user = User(
                     doc.id,
-                    doc["name"].toString(),
-                    doc["birthday"].toString(),
-                    doc["hasFamily"] as Boolean,
-                    doc["familyId"].toString(),
-                    doc["email"].toString(),
-                    doc.getGeoPoint("location")
+                    doc[UserDbSchema.NAME].toString(),
+                    doc[UserDbSchema.BIRTHDAY].toString(),
+                    doc[UserDbSchema.FAMILY_ID].toString(),
+                    doc[UserDbSchema.EMAIL].toString(),
+                    doc.getGeoPoint(UserDbSchema.LOCATION)
                 )
                 users.add(user)
             }
@@ -70,38 +70,41 @@ class FamilyRepository {
         }
 
     suspend fun getFamilyMembersOnce(familyId: String): List<User> =
-        firestore.collection("users").whereEqualTo("familyId", familyId).get().await().map {
+        firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(UserDbSchema.FAMILY_ID, familyId).get().await().map {
             User(
                 it.id,
-                it["name"].toString(),
-                it["birthday"].toString(),
-                it["hasFamily"] as Boolean,
-                it["familyId"].toString(),
-                it["email"].toString()
+                it[UserDbSchema.NAME].toString(),
+                it[UserDbSchema.BIRTHDAY].toString(),
+                it[UserDbSchema.FAMILY_ID].toString(),
+                it[UserDbSchema.EMAIL].toString()
             )
         }
 
     fun getApplicationsToFamily(familyId: String): Flow<List<Application>> =
-        firestore.collection("applications").whereEqualTo("familyId", familyId)
-            .whereEqualTo("status", ApplicationStatus.NEW.name).snapshots()
+        firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).snapshots()
             .map {
-                it.toObjects(Application::class.java)
+                it.documents.filter { it[ApplicationDbSchema.STATUS].toString() == ApplicationStatus.NEW.name }.map {
+                    Application(
+                        it[ApplicationDbSchema.USER_ID].toString(),
+                        it[ApplicationDbSchema.FAMILY_ID].toString(),
+                        ApplicationStatus.NEW
+                    )
+                }
             }
 
     fun getApplicants(ids: List<String>): Flow<List<User>> {
         val newIds = mutableListOf("1")
         newIds.addAll(ids)
-        return firestore.collection("users").whereIn(FieldPath.documentId(), newIds).snapshots()
+        return firestore.collection(UserDbSchema.USER_TABLE).whereIn(FieldPath.documentId(), newIds).snapshots()
             .map {
                 val users = mutableListOf<User>()
                 for (doc in it.documents) {
                     val user = User(
                         doc.id,
-                        doc["name"].toString(),
-                        doc["birthday"].toString(),
-                        doc["hasFamily"] as Boolean,
-                        doc["familyId"].toString(),
-                        doc["email"].toString()
+                        doc[UserDbSchema.NAME].toString(),
+                        doc[UserDbSchema.BIRTHDAY].toString(),
+                        doc[UserDbSchema.FAMILY_ID].toString(),
+                        doc[UserDbSchema.EMAIL].toString()
                     )
                     users.add(user)
                 }
@@ -110,26 +113,22 @@ class FamilyRepository {
     }
 
     fun approveApplication(userId: String, familyId: String) {
-        firestore.collection("applications").whereEqualTo("userId", userId)
-            .whereEqualTo("familyId", familyId).get()
+        firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).whereEqualTo(ApplicationDbSchema.USER_ID, userId)
+            .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get()
             .addOnSuccessListener {
                 if (it.documents.isNotEmpty()) {
                     for (doc in it.documents) {
-                        doc.reference.update(mapOf("status" to ApplicationStatus.APPROVED))
+                        doc.reference.update(mapOf(ApplicationDbSchema.STATUS to ApplicationStatus.APPROVED))
                     }
                 }
 
-                firestore.collection("users").whereEqualTo(FieldPath.documentId(), userId).get()
+                firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), userId).get()
                     .addOnCompleteListener {
                         if (!it.result.isEmpty) {
                             for (doc in it.result) {
-                                if (doc["hasFamily"] as Boolean)
-                                    doc.reference.update(
-                                        mapOf(
-                                            "hasFamily" to true,
-                                            "familyId" to familyId
-                                        )
-                                    )
+                                if (doc[UserDbSchema.FAMILY_ID].toString().isEmpty()) {
+                                    doc.reference.update(UserDbSchema.FAMILY_ID, familyId)
+                                }
                             }
                         }
                     }
@@ -139,26 +138,25 @@ class FamilyRepository {
     }
 
     fun rejectApplication(userId: String, familyId: String) {
-        firestore.collection("applications").whereEqualTo("userId", userId)
-            .whereEqualTo("familyId", familyId).get().addOnCompleteListener {
+        firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).whereEqualTo(ApplicationDbSchema.USER_ID, userId)
+            .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get().addOnCompleteListener {
                 if (!it.result.isEmpty) {
                     for (doc in it.result) {
-                        doc.reference.update(mapOf("status" to ApplicationStatus.REJECTED))
+                        doc.reference.update(mapOf(ApplicationDbSchema.STATUS to ApplicationStatus.REJECTED))
                     }
                 }
             }
     }
 
     fun removeMember(userId: String) {
-        firestore.collection("users").whereEqualTo(FieldPath.documentId(), userId).get()
+        firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), userId).get()
             .addOnCompleteListener {
                 if (!it.result.isEmpty) {
                     for (doc in it.result) {
                         doc.reference.update(
                             mapOf(
-                                "hasFamily" to false,
-                                "familyId" to "",
-                                "isAdmin" to false
+                                UserDbSchema.FAMILY_ID to "",
+                                UserDbSchema.IS_ADMIN to false
                             )
                         )
                     }
@@ -167,57 +165,55 @@ class FamilyRepository {
     }
 
     fun getUserById(userId: String): Flow<User> =
-        firestore.collection("users").whereEqualTo(FieldPath.documentId(), userId).snapshots().map {
+        firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), userId).snapshots().map {
             val doc = it.documents[0]
             User(
                 doc.id,
-                doc["name"].toString(),
-                doc["birthday"].toString(),
-                doc["hasFamily"] as Boolean,
-                doc["familyId"].toString(),
-                doc["email"].toString()
+                doc[UserDbSchema.NAME].toString(),
+                doc[UserDbSchema.BIRTHDAY].toString(),
+                doc[UserDbSchema.FAMILY_ID].toString(),
+                doc[UserDbSchema.EMAIL].toString()
             )
         }
 
     fun applyToFamily(userId: String, familyId: String) {
         val data = HashMap<String, Any>()
-        data["userId"] = userId
-        data["familyId"] = familyId
-        data["status"] = ApplicationStatus.NEW
-        firestore.collection("applications").add(data)
+        data[ApplicationDbSchema.USER_ID] = userId
+        data[ApplicationDbSchema.FAMILY_ID] = familyId
+        data[ApplicationDbSchema.STATUS] = ApplicationStatus.NEW
+        firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).add(data)
     }
 
     fun createFamily(name: String, userId: String): Task<DocumentReference> {
         val data = HashMap<String, Any>()
-        data["name"] = name
-        data["createdBy"] = userId
-        return firestore.collection("families").add(data)
+        data[FamilyDbSchema.NAME] = name
+        data[FamilyDbSchema.CREATED_BY] = userId
+        return firestore.collection(FamilyDbSchema.FAMILY_TABLE).add(data)
     }
 
     fun setUserToAdmin(userId: String, familyId: String) {
-        firestore.collection("users").document(userId)
-            .update(mapOf("hasFamily" to true, "familyId" to familyId, "isAdmin" to true))
+        firestore.collection(UserDbSchema.USER_TABLE).document(userId)
+            .update(mapOf(UserDbSchema.FAMILY_ID to familyId, UserDbSchema.IS_ADMIN to true))
     }
 
     fun deleteFamily(familyId: String): Task<Void> {
-        val task = firestore.collection("families").document(familyId).delete()
+        val task = firestore.collection(FamilyDbSchema.FAMILY_TABLE).document(familyId).delete()
         task.addOnSuccessListener {
-            firestore.collection("users").whereEqualTo("familyId", familyId).get()
+            firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(UserDbSchema.FAMILY_ID, familyId).get()
                 .addOnCompleteListener {
                     if (!it.result.isEmpty) {
                         for (doc in it.result) {
                             doc.reference.update(
                                 mapOf(
-                                    "hasFamily" to false,
-                                    "familyId" to "",
-                                    "isAdmin" to false
+                                    UserDbSchema.FAMILY_ID to "",
+                                    UserDbSchema.IS_ADMIN to false
                                 )
                             )
                         }
                     }
                 }
 
-            firestore.collection("applications").whereEqualTo("familyId", familyId).get()
+            firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get()
                 .addOnCompleteListener {
                     if (!it.result.isEmpty) {
                         for (doc in it.result) {
@@ -235,11 +231,11 @@ class FamilyRepository {
         scope.launch {
             firestore.collection("taskCompletion")
                 .whereGreaterThanOrEqualTo("completionDate", start).snapshots().collect {
-                    val documents = it.documents.filter { it.getLong("competionDate")!! <= finish }
+                    val documents = it.documents.filter { it.getLong("completionDate")!! <= finish }
                     val result = documents.map {
                         val userName =
-                            firestore.collection("users").document(it["userId"].toString()).get()
-                                .await()["name"].toString()
+                            firestore.collection(UserDbSchema.USER_TABLE).document(it["userId"].toString()).get()
+                                .await()[UserDbSchema.NAME].toString()
                         CompletionDto(
                             it["taskId"].toString(),
                             it["taskName"].toString(),

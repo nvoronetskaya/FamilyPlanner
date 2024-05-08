@@ -1,5 +1,6 @@
 package com.familyplanner.auth.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
@@ -28,12 +29,10 @@ class SignUpViewModel : ViewModel() {
                     loggedIn.emit("Ошибка. Попробуйте позднее")
                 } else {
                     repo.addUser(name, birthday, email, result.user!!.uid)
-
                     val logIn = auth.signIn(email, password).await()
                     if (logIn.user == null) {
                         loggedIn.emit("Ошибка. Попробуйте позднее")
                     } else {
-                        repo.setFcmToken(logIn.user!!.uid, Firebase.messaging.token.await())
                         loggedIn.emit("")
                         FamilyPlanner.userId = logIn.user!!.uid
                     }

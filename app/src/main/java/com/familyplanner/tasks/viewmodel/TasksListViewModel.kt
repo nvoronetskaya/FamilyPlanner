@@ -126,7 +126,7 @@ class TasksListViewModel : ViewModel() {
                     val shouldDoToday =
                         (task.task.deadline != null && task.task.deadline!! <= dateEpochDay || task.task.deadline == null) && (task.task.lastCompletionDate == today || task.task.lastCompletionDate == null)
                     if (task.task.deadline != null && task.task.deadline!! == dateEpochDay || shouldDoToday && today == dateEpochDay) {
-                        task.date = if (task.task.hasDeadline) task.task.deadline else null
+                        task.date = if (task.task.deadline != null) task.task.deadline else null
                         tasksForDate.add(task)
                     }
                 }
@@ -194,8 +194,8 @@ class TasksListViewModel : ViewModel() {
 
     private fun applyFilters(): List<TaskWithDate> {
         val result =
-            List(allTasks.size) { i -> allTasks[i] }.filter { if (hasLocationFilter != null) it.task.hasLocation == hasLocationFilter else true }
-                .filter { if (hasDeadlineFilter != null) it.task.hasDeadline == hasDeadlineFilter else true }
+            List(allTasks.size) { i -> allTasks[i] }.filter { if (hasLocationFilter != null) (it.task.location != null) == hasLocationFilter else true }
+                .filter { if (hasDeadlineFilter != null) (it.task.deadline != null) == hasDeadlineFilter else true }
                 .filter { if (importanceFilter != null) it.task.importance == importanceFilter else true }
         return when (sortingType) {
             SortingType.NONE -> result

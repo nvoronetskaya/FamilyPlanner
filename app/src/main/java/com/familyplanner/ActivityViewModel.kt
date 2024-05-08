@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class ActivityViewModel : ViewModel() {
     private val auth = Firebase.auth
     private val isLogged = MutableStateFlow(auth.currentUser != null)
-    private val hasFamilyFlow = MutableSharedFlow<Boolean?>(replay = 1)
-    private var hasFamily: Boolean? = null
+    private val hasFamilyFlow = MutableSharedFlow<Boolean>(replay = 1)
+    private var hasFamily: Boolean = false
     private val userRepository = UserRepository()
     private var userId: String? = null
     private var familyFlowJob: Job? = null
@@ -45,8 +45,6 @@ class ActivityViewModel : ViewModel() {
         viewModelScope.launch {
             familyFlowJob?.cancelAndJoin()
             if (userId.isNullOrEmpty()) {
-                hasFamily = null
-                hasFamilyFlow.emit(null)
                 return@launch
             }
             familyFlowJob = launch(Dispatchers.IO) {
@@ -59,7 +57,7 @@ class ActivityViewModel : ViewModel() {
         }
     }
 
-    fun getHasFamilyUpdates(): Flow<Boolean?> = hasFamilyFlow
+    fun getHasFamilyUpdates(): Flow<Boolean> = hasFamilyFlow
 
-    fun getHasFamily(): Boolean? = hasFamily
+    fun getHasFamily(): Boolean = hasFamily
 }

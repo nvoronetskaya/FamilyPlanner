@@ -8,11 +8,13 @@ import com.familyplanner.common.User
 import com.familyplanner.family.data.FamilyRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class NoFamilyViewModel : ViewModel() {
     private val auth = Firebase.auth
@@ -22,7 +24,11 @@ class NoFamilyViewModel : ViewModel() {
     private val errors = MutableSharedFlow<String>()
 
     init {
+        FamilyPlanner.updateUserId()
         viewModelScope.launch(Dispatchers.IO) {
+            launch(Dispatchers.Main) {
+                userRepo.setFcmToken(FamilyPlanner.userId, com.google.firebase.Firebase.messaging.token.await())
+            }
             userRepo.getUserById(FamilyPlanner.userId).collect {
                 user.emit(it)
             }

@@ -1,6 +1,7 @@
 package com.familyplanner.auth.data
 
 import com.familyplanner.common.User
+import com.familyplanner.common.schema.UserDbSchema
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -18,56 +19,53 @@ class UserRepository {
 
     fun addUser(name: String, birthday: String, email: String, uid: String) {
         val data = HashMap<String, Any>()
-        data["name"] = name
-        data["birthday"] = birthday
-        data["email"] = email
-        data["familyId"] = ""
-        data["hasFamily"] = false
-        data["fcmToken"] = ""
-        firestore.collection("users").document(uid).set(data)
+        data[UserDbSchema.NAME] = name
+        data[UserDbSchema.BIRTHDAY] = birthday
+        data[UserDbSchema.EMAIL] = email
+        data[UserDbSchema.FAMILY_ID] = ""
+        data[UserDbSchema.FCM_TOKEN] = ""
+        firestore.collection(UserDbSchema.USER_TABLE).document(uid).set(data)
     }
 
-    fun getUserById(userId: String): Flow<User> = firestore.collection("users").whereEqualTo(
+    fun getUserById(userId: String): Flow<User> = firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(
         FieldPath.documentId(), userId
     ).snapshots().map {
         val doc = it.documents[0]
         User(
             doc.id,
-            doc["name"].toString(),
-            doc["birthday"].toString(),
-            doc["hasFamily"] as Boolean,
-            doc["familyId"].toString(),
+            doc[UserDbSchema.NAME].toString(),
+            doc[UserDbSchema.BIRTHDAY].toString(),
+            doc[UserDbSchema.FAMILY_ID].toString(),
             auth.currentUser?.email ?: "",
-            doc.getGeoPoint("location")
+            doc.getGeoPoint(UserDbSchema.LOCATION)
         )
     }
 
     suspend fun getUserByIdOnce(userId: String): User {
-        val doc = firestore.collection("users").document(userId).get().await()
+        val doc = firestore.collection(UserDbSchema.USER_TABLE).document(userId).get().await()
         return User(
             doc.id,
-            doc["name"].toString(),
-            doc["birthday"].toString(),
-            doc["hasFamily"] as Boolean,
-            doc["familyId"].toString(),
+            doc[UserDbSchema.NAME].toString(),
+            doc[UserDbSchema.BIRTHDAY].toString(),
+            doc[UserDbSchema.FAMILY_ID].toString(),
             auth.currentUser?.email ?: "",
-            doc.getGeoPoint("location")
+            doc.getGeoPoint(UserDbSchema.LOCATION)
         )
     }
 
     fun updateUser(id: String, name: String, birthday: String) {
-        firestore.collection("users").whereEqualTo(FieldPath.documentId(), id).get()
+        firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), id).get()
             .addOnCompleteListener {
                 if (!it.result.isEmpty) {
                     for (doc in it.result) {
-                        doc.reference.update(mapOf("name" to name, "birthday" to birthday))
+                        doc.reference.update(mapOf(UserDbSchema.NAME to name, UserDbSchema.BIRTHDAY to birthday))
                     }
                 }
             }
     }
 
     fun setFcmToken(userId: String, token: String) {
-        firestore.collection("users").document(userId).update("fcmToken", token)
+        firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FCM_TOKEN, token)
     }
 
     fun checkPassword(password: String): Task<Void>? {
@@ -88,5 +86,9 @@ class UserRepository {
 
     suspend fun hasAccount(email: String): Boolean {
         return auth.fetchSignInMethodsForEmail(email).await().signInMethods?.isNotEmpty() ?: false
+    }
+
+    fun removeFcmToken(userId: String) {
+        firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FCM_TOKEN, "")
     }
 }

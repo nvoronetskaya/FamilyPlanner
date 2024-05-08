@@ -135,6 +135,8 @@ class EditTaskFragment : Fragment() {
                     binding.tvDeadline.isVisible = false
                 }
                 binding.cbContinuousTask.isChecked = task.isContinuous
+                binding.tvRepeatStart.isVisible = task.repeatType != RepeatType.ONCE
+                binding.tvRepeatFrom.isVisible = task.repeatType != RepeatType.ONCE
                 when (task.repeatType) {
                     RepeatType.ONCE -> binding.rbOnce.isChecked = true
                     RepeatType.EVERY_DAY -> binding.rbEveryDay.isChecked = true
@@ -331,7 +333,6 @@ class EditTaskFragment : Fragment() {
 
         viewModel.updateTask(
             binding.etName.text!!.trim().toString(),
-            binding.swDeadline.isChecked,
             if (binding.swDeadline.isChecked) LocalDate.parse(
                 binding.tvDeadline.text.trim().toString(), FamilyPlanner.uiDateFormatter
             ).toEpochDay() else null,
@@ -349,7 +350,6 @@ class EditTaskFragment : Fragment() {
                 binding.tvRepeatStart.text.trim().toString(), FamilyPlanner.uiDateFormatter
             ).toEpochDay() else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
-            binding.swHasLocation.isChecked,
             curPoint
         )
         findNavController().popBackStack()
@@ -423,7 +423,6 @@ class EditTaskFragment : Fragment() {
             { _, hour, minute ->
                 if (isStartTime) {
                     binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
-
                     if (binding.tvFinishTime.text.isNullOrBlank() || getTimeFromString(binding.tvFinishValue.text.toString()) < hour * 60 + minute) {
                         binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
                     }

@@ -44,7 +44,6 @@ class SignInViewModel : ViewModel() {
                 if (logIn.user == null) {
                     loggedIn.emit("Ошибка. Попробуйте позднее")
                 } else {
-                    userRepo.setFcmToken(logIn.user!!.uid, Firebase.messaging.token.await())
                     loggedIn.emit("")
                     FamilyPlanner.userId = logIn.user!!.uid
                 }

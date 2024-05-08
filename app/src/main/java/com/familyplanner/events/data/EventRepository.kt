@@ -2,6 +2,9 @@ package com.familyplanner.events.data
 
 import android.net.Uri
 import com.familyplanner.FamilyPlanner
+import com.familyplanner.common.schema.EventAttendeeDbSchema
+import com.familyplanner.common.schema.EventDbSchema
+import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.family.data.ApplicationStatus
 import com.familyplanner.tasks.model.UserFile
 import com.google.android.gms.tasks.Task
@@ -30,18 +33,18 @@ class EventRepository {
 
     fun addEvent(event: Event): String {
         val eventId = UUID.randomUUID().toString()
-        firestore.collection("events").document(eventId).set(event)
+        firestore.collection(EventDbSchema.EVENT_TABLE).document(eventId).set(event)
         return eventId
     }
 
     fun addInvitations(invitations: List<Invitation>, eventId: String) {
         for (invitation in invitations) {
             val attendeeData = mapOf<String, Any>(
-                "eventId" to eventId,
-                "userId" to invitation.userId,
-                "status" to if (invitation.userId != FamilyPlanner.userId) EventAttendeeStatus.UNKNOWN else EventAttendeeStatus.COMING
+                EventAttendeeDbSchema.EVENT_ID to eventId,
+                EventAttendeeDbSchema.USER_ID to invitation.userId,
+                EventAttendeeDbSchema.STATUS to if (invitation.userId != FamilyPlanner.userId) EventAttendeeStatus.UNKNOWN else EventAttendeeStatus.COMING
             )
-            firestore.collection("eventAttendees").add(attendeeData)
+            firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE).add(attendeeData)
         }
     }
 
@@ -58,29 +61,31 @@ class EventRepository {
     }
 
     fun getEventById(eventId: String): Flow<Event?> {
-        return firestore.collection("events").document(eventId).snapshots().map {
+        return firestore.collection(EventDbSchema.EVENT_TABLE).document(eventId).snapshots().map {
             it.toObject(Event::class.java)
         }
     }
 
     suspend fun getEventByIdOnce(eventId: String): Event? {
-        val event = firestore.collection("events").document(eventId).get().await()
+        val event = firestore.collection(EventDbSchema.EVENT_TABLE).document(eventId).get().await()
             .toObject(Event::class.java)
         event?.id = eventId
         return event
     }
 
     fun getEventAttendees(eventId: String): Flow<List<EventAttendee>> {
-        return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).snapshots()
+        return firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+            .whereEqualTo(EventAttendeeDbSchema.EVENT_ID, eventId).snapshots()
             .map { attendees ->
                 attendees.map {
                     val userName =
-                        firestore.collection("users").document(it["userId"].toString()).get()
-                            .await()["name"].toString()
+                        firestore.collection(UserDbSchema.USER_TABLE)
+                            .document(it[EventAttendeeDbSchema.USER_ID].toString()).get()
+                            .await()[UserDbSchema.NAME].toString()
                     EventAttendee(
-                        it["eventId"].toString(),
-                        it["userId"].toString(),
-                        EventAttendeeStatus.valueOf(it["status"].toString()),
+                        it[EventAttendeeDbSchema.EVENT_ID].toString(),
+                        it[EventAttendeeDbSchema.USER_ID].toString(),
+                        EventAttendeeStatus.valueOf(it[EventAttendeeDbSchema.STATUS].toString()),
                         userName
                     )
                 }
@@ -88,38 +93,43 @@ class EventRepository {
     }
 
     suspend fun getEventAttendeesOnce(eventId: String): List<EventAttendee> {
-        return firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).get().await()
+        return firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+            .whereEqualTo(EventAttendeeDbSchema.EVENT_ID, eventId).get().await()
             .map {
                 val userName =
-                    firestore.collection("users").document(it["userId"].toString()).get()
-                        .await()["name"].toString()
+                    firestore.collection(UserDbSchema.USER_TABLE)
+                        .document(it[EventAttendeeDbSchema.USER_ID].toString()).get()
+                        .await()[UserDbSchema.NAME].toString()
                 EventAttendee(
-                    it["eventId"].toString(),
-                    it["userId"].toString(),
-                    EventAttendeeStatus.valueOf(it["status"].toString()),
+                    it[EventAttendeeDbSchema.EVENT_ID].toString(),
+                    it[EventAttendeeDbSchema.USER_ID].toString(),
+                    EventAttendeeStatus.valueOf(it[EventAttendeeDbSchema.STATUS].toString()),
                     userName
                 )
             }
     }
 
     suspend fun changeComing(userId: String, eventId: String, isComing: Boolean) {
-        firestore.collection("eventAttendees").whereEqualTo("userId", userId)
-            .whereEqualTo("eventId", eventId).get()
+        firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+            .whereEqualTo(EventAttendeeDbSchema.USER_ID, userId)
+            .whereEqualTo(EventAttendeeDbSchema.EVENT_ID, eventId).get()
             .await().documents.forEach {
                 val status =
                     if (isComing) EventAttendeeStatus.COMING else EventAttendeeStatus.NOT_COMING
-                it.reference.update("status", status)
+                it.reference.update(EventAttendeeDbSchema.STATUS, status)
             }
     }
 
     fun deleteEvent(eventId: String) {
-        firestore.collection("events").document(eventId).delete().addOnSuccessListener {
-            firestore.collection("eventAttendees").whereEqualTo("eventId", eventId).get()
-                .addOnCompleteListener {
-                    it.result.documents.forEach { doc -> doc.reference.delete() }
-                }
-            storage.reference.child("event-$eventId").delete()
-        }
+        firestore.collection(EventDbSchema.EVENT_TABLE).document(eventId).delete()
+            .addOnSuccessListener {
+                firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+                    .whereEqualTo(EventAttendeeDbSchema.EVENT_ID, eventId).get()
+                    .addOnCompleteListener {
+                        it.result.documents.forEach { doc -> doc.reference.delete() }
+                    }
+                storage.reference.child("event-$eventId").delete()
+            }
     }
 
     fun downloadFile(path: String): Task<Uri> {
@@ -153,25 +163,26 @@ class EventRepository {
         attendees: Map<String, Invitation>
     ) {
         val data = mapOf<String, Any>(
-            "name" to name,
-            "description" to description,
-            "start" to start,
-            "finish" to finish
+            EventDbSchema.NAME to name,
+            EventDbSchema.DESCRIPTION to description,
+            EventDbSchema.START to start,
+            EventDbSchema.FINISH to finish
         )
-        firestore.collection("events").document(eventId).update(data).await()
+        firestore.collection(EventDbSchema.EVENT_TABLE).document(eventId).update(data).await()
         for (invitation in newInvitations) {
             if (invitation.isInvited != attendees[invitation.userId]?.isInvited) {
                 if (invitation.isInvited) {
                     val newInvitation = mapOf<String, Any>(
-                        "eventId" to eventId,
-                        "userId" to invitation.userId,
-                        "status" to EventAttendeeStatus.UNKNOWN
+                        EventAttendeeDbSchema.EVENT_ID to eventId,
+                        EventAttendeeDbSchema.USER_ID to invitation.userId,
+                        EventAttendeeDbSchema.STATUS to EventAttendeeStatus.UNKNOWN
                     )
-                    firestore.collection("eventAttendees").add(newInvitation)
+                    firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+                        .add(newInvitation)
                 } else {
-                    firestore.collection("eventAttendees")
-                        .whereEqualTo("eventId", eventId)
-                        .whereEqualTo("userId", invitation.userId).get()
+                    firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+                        .whereEqualTo(EventAttendeeDbSchema.EVENT_ID, eventId)
+                        .whereEqualTo(EventAttendeeDbSchema.USER_ID, invitation.userId).get()
                         .await().documents.forEach { it.reference.delete() }
                 }
             }
@@ -185,19 +196,21 @@ class EventRepository {
     ): Flow<List<Event>> {
         val userEvents = MutableSharedFlow<List<Event>>()
         scope.launch {
-            firestore.collection("eventAttendees").whereEqualTo("userId", userId).snapshots()
+            firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+                .whereEqualTo(EventAttendeeDbSchema.USER_ID, userId).snapshots()
                 .collect {
                     launch {
                         val eventsId =
-                            it.documents.map { document -> document["eventId"].toString() }
+                            it.documents.map { document -> document[EventAttendeeDbSchema.EVENT_ID].toString() }
                         if (eventsId.isEmpty()) {
                             userEvents.emit(listOf())
                         } else {
-                            firestore.collection("events").whereIn(FieldPath.documentId(), eventsId)
+                            firestore.collection(EventDbSchema.EVENT_TABLE)
+                                .whereIn(FieldPath.documentId(), eventsId)
                                 .snapshots()
                                 .collect {
                                     val documents =
-                                        it.documents.filter { doc -> doc.getLong("start")!! in start..finish }
+                                        it.documents.filter { doc -> doc.getLong(EventDbSchema.START)!! in start..finish }
                                     val result = if (documents.isEmpty()) {
                                         listOf()
                                     } else {
@@ -223,19 +236,22 @@ class EventRepository {
     ): Flow<List<Event>> {
         val userEvents = MutableSharedFlow<List<Event>>()
         scope.launch {
-            firestore.collection("eventAttendees").whereEqualTo("userId", userId)
-                .whereEqualTo("status", EventAttendeeStatus.COMING.name).snapshots().collect {
+            firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
+                .whereEqualTo(EventAttendeeDbSchema.USER_ID, userId)
+                .whereEqualTo(EventAttendeeDbSchema.STATUS, EventAttendeeStatus.COMING.name)
+                .snapshots().collect {
                     launch {
                         val eventsId =
-                            it.documents.map { document -> document["eventId"].toString() }
+                            it.documents.map { document -> document[EventAttendeeDbSchema.EVENT_ID].toString() }
                         if (eventsId.isEmpty()) {
                             userEvents.emit(listOf())
                         } else {
-                            firestore.collection("events").whereIn(FieldPath.documentId(), eventsId)
+                            firestore.collection(EventDbSchema.EVENT_TABLE)
+                                .whereIn(FieldPath.documentId(), eventsId)
                                 .snapshots()
                                 .collect {
                                     val documents =
-                                        it.documents.filter { doc -> doc.getLong("start")!! in start..finish }
+                                        it.documents.filter { doc -> doc.getLong(EventDbSchema.START)!! in start..finish }
                                     val result = if (documents.isEmpty()) {
                                         listOf()
                                     } else {

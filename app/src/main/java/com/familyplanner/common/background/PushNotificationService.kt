@@ -10,6 +10,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
+import com.familyplanner.common.schema.UserDbSchema
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -61,6 +62,6 @@ class PushNotificationService : FirebaseMessagingService() {
         if (FamilyPlanner.userId.isEmpty()) {
             return
         }
-        firestore.collection("users").document(FamilyPlanner.userId).update("fcmToken", token)
+        firestore.collection(UserDbSchema.USER_TABLE).document(FamilyPlanner.userId).update(UserDbSchema.FCM_TOKEN, token)
     }
 }

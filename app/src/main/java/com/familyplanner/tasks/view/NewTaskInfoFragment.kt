@@ -266,7 +266,7 @@ class NewTaskInfoFragment : Fragment() {
                 }
                 requireActivity().contentResolver.query(uri, null, null, null, null).use { cursor ->
                     val nameIndex = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    val sizeIndex = cursor!!.getColumnIndex(OpenableColumns.SIZE)
+                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
@@ -411,7 +411,6 @@ class NewTaskInfoFragment : Fragment() {
 
         viewModel.createTask(
             binding.etName.text!!.trim().toString(),
-            binding.swDeadline.isChecked,
             if (binding.swDeadline.isChecked) LocalDate.parse(
                 binding.tvDeadline.text.trim().toString(), FamilyPlanner.uiDateFormatter
             ).toEpochDay() else null,
@@ -429,7 +428,6 @@ class NewTaskInfoFragment : Fragment() {
                 binding.tvRepeatStart.text.trim().toString(), FamilyPlanner.uiDateFormatter
             ).toEpochDay() else null,
             Importance.values()[binding.spImportance.selectedItemPosition],
-            binding.swHasLocation.isChecked,
             curPoint,
             userId,
             familyId,

@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNoFamilyBinding
@@ -97,7 +98,7 @@ class NoFamilyFragment : Fragment() {
             code.hint = "Код присоединения"
             code.textSize = 17F
             code.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Удаление продукта")
+            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Присоединение к семье")
                 .setView(code, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (code.text.isNullOrBlank()) {

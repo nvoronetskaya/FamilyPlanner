@@ -65,7 +65,6 @@ class NewTaskViewModel : ViewModel() {
 
     fun createTask(
         title: String,
-        hasDeadline: Boolean,
         deadline: Long?,
         isContinuous: Boolean,
         startTime: Int,
@@ -75,7 +74,6 @@ class NewTaskViewModel : ViewModel() {
         daysOfWeek: Int,
         repeatStart: Long?,
         importance: Importance,
-        hasLocation: Boolean,
         location: Point?,
         userId: String,
         familyId: String,
@@ -84,7 +82,6 @@ class NewTaskViewModel : ViewModel() {
     ) {
         val newTask = Task()
         newTask.title = title
-        newTask.hasDeadline = hasDeadline
         newTask.deadline = deadline
         newTask.isContinuous = isContinuous
         newTask.startTime = startTime
@@ -94,7 +91,6 @@ class NewTaskViewModel : ViewModel() {
         newTask.daysOfWeek = daysOfWeek
         newTask.repeatStart = repeatStart
         newTask.importance = importance
-        newTask.hasLocation = hasLocation
         newTask.location =
             if (location != null) GeoPoint(location.latitude, location.longitude) else null
         newTask.createdBy = userId

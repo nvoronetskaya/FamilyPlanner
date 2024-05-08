@@ -2,6 +2,10 @@ package com.familyplanner.tasks.repository
 
 import android.net.Uri
 import com.familyplanner.common.User
+import com.familyplanner.common.schema.CommentDbSchema
+import com.familyplanner.common.schema.ObserverDbSchema
+import com.familyplanner.common.schema.TaskDbSchema
+import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.tasks.dto.CommentDto
 import com.familyplanner.tasks.dto.ObserverDto
 import com.familyplanner.tasks.model.Importance
@@ -36,14 +40,14 @@ class TaskRepository {
 
     suspend fun getCommonTasksForUser(userId: String): Flow<List<Task>> {
         scope.launch {
-            firestore.collection("observers")
-                .whereEqualTo("userId", userId).snapshots().collect {
-                    val tasksIds = it.map { it["taskId"].toString() }
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                .whereEqualTo(ObserverDbSchema.USER_ID, userId).snapshots().collect {
+                    val tasksIds = it.map { it[ObserverDbSchema.TASK_ID].toString() }
                     launch {
                         if (tasksIds.isEmpty()) {
                             userTasks.emit(listOf())
                         } else {
-                            firestore.collection("tasks").whereEqualTo("parentId", null).snapshots()
+                            firestore.collection(TaskDbSchema.TASK_TABLE).whereEqualTo(TaskDbSchema.PARENT_ID, null).snapshots()
                                 .collect { result ->
                                     val queryTasks = mutableListOf<Task>()
                                     for (doc in result.documents) {
@@ -69,27 +73,27 @@ class TaskRepository {
             return getCommonTasksForUser(userId)
         }
         scope.launch {
-            firestore.collection("observers").whereEqualTo("userId", userId).snapshots().collect {
-                val ids = it.map { it["taskId"].toString() }
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, userId).snapshots().collect {
+                val ids = it.map { it[ObserverDbSchema.TASK_ID].toString() }
                 launch {
                     if (ids.isEmpty()) {
                         userTasks.emit(listOf())
                     } else {
-                        firestore.collection("observers").whereEqualTo("userId", executorId)
+                        firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, executorId)
                             .snapshots()
                             .collect { result ->
                                 val tasksIds = result.filter {
-                                    it.getBoolean("isExecutor") ?: false && ids.contains(
+                                    it.getBoolean(ObserverDbSchema.EXECUTOR) ?: false && ids.contains(
                                         it.getString(
-                                            "taskId"
+                                            ObserverDbSchema.TASK_ID
                                         )
                                     )
-                                }.map { it["taskId"].toString() }
+                                }.map { it[ObserverDbSchema.TASK_ID].toString() }
                                 launch {
                                     if (tasksIds.isEmpty()) {
                                         userTasks.emit(listOf())
                                     } else {
-                                        firestore.collection("tasks").whereEqualTo("parentId", null)
+                                        firestore.collection(TaskDbSchema.TASK_TABLE).whereEqualTo(TaskDbSchema.PARENT_ID, null)
                                             .snapshots()
                                             .collect { result ->
                                                 val queryTasks = mutableListOf<Task>()
@@ -114,12 +118,12 @@ class TaskRepository {
     }
 
     suspend fun getTaskByIdOnce(taskId: String): Task? {
-        return firestore.collection("tasks").document(taskId).get().await()
+        return firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).get().await()
             .toObject(Task::class.java)
     }
 
     fun getTaskById(taskId: String): Flow<Task?> {
-        return firestore.collection("tasks").document(taskId).snapshots().map {
+        return firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).snapshots().map {
             val task = it.toObject(Task::class.java)
             task?.id = it.id
             task
@@ -127,19 +131,19 @@ class TaskRepository {
     }
 
     fun getTaskComments(taskId: String): Flow<List<CommentDto>> {
-        return firestore.collection("comments").whereEqualTo("taskId", taskId).snapshots().map {
+        return firestore.collection(CommentDbSchema.COMMENT_TABLE).whereEqualTo(CommentDbSchema.TASK_ID, taskId).snapshots().map {
             val comments = mutableListOf<CommentDto>()
             for (doc in it.documents) {
                 val userName =
-                    firestore.collection("users").document(doc["userId"].toString()).get()
-                        .await()["name"].toString()
+                    firestore.collection(UserDbSchema.USER_TABLE).document(doc[CommentDbSchema.USER_ID].toString()).get()
+                        .await()[UserDbSchema.NAME].toString()
                 val files = storage.reference.child(doc.id).listAll().await().items.map { it.path }
                 val comment = CommentDto(
                     doc.id,
-                    doc["userId"].toString(),
+                    doc[CommentDbSchema.USER_ID].toString(),
                     userName,
-                    doc.getLong("createdAt")!!,
-                    doc["text"].toString(),
+                    doc.getLong(CommentDbSchema.CREATED_AT)!!,
+                    doc[CommentDbSchema.TEXT].toString(),
                     files
                 )
                 comments.add(comment)
@@ -149,17 +153,17 @@ class TaskRepository {
     }
 
     fun getTaskObservers(taskId: String): Flow<List<ObserverDto>> {
-        return firestore.collection("observers").whereEqualTo("taskId", taskId).snapshots().map {
+        return firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).snapshots().map {
             val users = mutableListOf<ObserverDto>()
             for (doc in it.documents) {
                 val userName =
-                    firestore.collection("users").document(doc["userId"].toString()).get()
-                        .await()["name"].toString()
+                    firestore.collection(UserDbSchema.USER_TABLE).document(doc[ObserverDbSchema.USER_ID].toString()).get()
+                        .await()[UserDbSchema.NAME].toString()
                 val user = ObserverDto(
-                    doc["userId"].toString(),
+                    doc[ObserverDbSchema.USER_ID].toString(),
                     userName,
-                    doc.getBoolean("isExecutor") ?: false,
-                    doc["taskId"].toString()
+                    doc.getBoolean(ObserverDbSchema.EXECUTOR) ?: false,
+                    doc[ObserverDbSchema.TASK_ID].toString()
                 )
                 users.add(user)
             }
@@ -168,12 +172,12 @@ class TaskRepository {
     }
 
     fun addTask(task: Task): GoogleTask<DocumentReference> {
-        return firestore.collection("tasks").add(task)
+        return firestore.collection(TaskDbSchema.TASK_TABLE).add(task)
     }
 
     fun addCreatorObserver(taskId: String, userId: String) {
         val observer = Observer(userId, false, taskId)
-        firestore.collection("observers").add(observer)
+        firestore.collection(ObserverDbSchema.OBSERVER_TABLE).add(observer)
     }
 
     suspend fun tryUploadFiles(
@@ -199,19 +203,19 @@ class TaskRepository {
         executors: BooleanArray
     ) {
         val curObservers =
-            firestore.collection("observers").whereEqualTo("taskId", taskId).get().await()
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get().await()
         curObservers.forEach { it.reference.delete() }
         for (i in users.indices) {
             if (!observers[i]) {
                 continue
             }
             val observer = Observer(users[i].id, executors[i], taskId)
-            firestore.collection("observers").add(observer)
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE).add(observer)
         }
     }
 
     fun getSubtasks(taskId: String): Flow<List<Task>> {
-        return firestore.collection("tasks").whereEqualTo("parentId", taskId).snapshots().map {
+        return firestore.collection(TaskDbSchema.TASK_TABLE).whereEqualTo(TaskDbSchema.PARENT_ID, taskId).snapshots().map {
             val subTasks = mutableListOf<Task>()
             for (doc in it.documents) {
                 val task = doc.toObject(Task::class.java) ?: continue
@@ -233,22 +237,22 @@ class TaskRepository {
     fun addComment(userId: String, comment: String, taskId: String): GoogleTask<DocumentReference> {
         val data =
             mapOf<String, Any>(
-                "userId" to userId,
-                "text" to comment,
-                "createdAt" to System.currentTimeMillis(),
-                "taskId" to taskId
+                CommentDbSchema.USER_ID to userId,
+                CommentDbSchema.TEXT to comment,
+                CommentDbSchema.CREATED_AT to System.currentTimeMillis(),
+                CommentDbSchema.TASK_ID to taskId
             )
-        return firestore.collection("comments").add(data)
+        return firestore.collection(CommentDbSchema.COMMENT_TABLE).add(data)
     }
 
     fun changeTaskCompleted(task: Task, isCompleted: Boolean, completedById: String) {
         val today = LocalDate.now().toEpochDay()
         if (isCompleted) {
             val data = mapOf<String, Any?>(
-                "lastCompletionDate" to today,
-                "previousCompletionDate" to task.lastCompletionDate
+                TaskDbSchema.LAST_COMPLETION_DATE to today,
+                TaskDbSchema.PREVIOUS_COMPLETION_DATE to task.lastCompletionDate
             )
-            firestore.collection("tasks").document(task.id).update(data).addOnSuccessListener {
+            firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data).addOnSuccessListener {
                 val completion = mapOf<String, Any>(
                     "userId" to completedById,
                     "taskId" to task.id,
@@ -262,7 +266,7 @@ class TaskRepository {
                 "lastCompletionDate" to task.previousCompletionDate
             )
             TODO()
-            firestore.collection("tasks").document(task.id).update(data).addOnSuccessListener {
+            firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data).addOnSuccessListener {
                 firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
                     .whereEqualTo("completionDate", today).get().addOnCompleteListener {
                         it.result.documents.forEach { it.reference.delete() }
@@ -272,9 +276,9 @@ class TaskRepository {
     }
 
     fun deleteTask(taskId: String) {
-        val result = firestore.collection("tasks").document(taskId).delete().addOnSuccessListener {
+        val result = firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).delete().addOnSuccessListener {
             scope.launch {
-                firestore.collection("observers").whereEqualTo("taskId", taskId).get()
+                firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get()
                     .await().documents.forEach { it.reference.delete() }
                 storage.reference.child("task-$taskId").delete()
             }
@@ -282,16 +286,16 @@ class TaskRepository {
     }
 
     fun getObserver(taskId: String, userId: String): Flow<Observer?> {
-        return firestore.collection("observers").whereEqualTo("userId", userId)
-            .whereEqualTo("taskId", taskId).limit(1).snapshots().map {
+        return firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, userId)
+            .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).limit(1).snapshots().map {
                 it.documents.firstOrNull()?.toObject(Observer::class.java)
             }
     }
 
     suspend fun changeExecutorStatus(userId: String, taskId: String, isExecutor: Boolean) {
-        firestore.collection("observers").whereEqualTo("userId", userId)
-            .whereEqualTo("taskId", taskId).get().await()
-            .forEach { it.reference.update("isExecutor", isExecutor) }
+        firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, userId)
+            .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get().await()
+            .forEach { it.reference.update(ObserverDbSchema.EXECUTOR, isExecutor) }
     }
 
     suspend fun addFile(taskId: String, file: UserFile): Boolean {
@@ -309,19 +313,17 @@ class TaskRepository {
 
     fun updateTask(taskId: String, taskData: Task) {
         val newValues = mutableMapOf<String, Any?>()
-        newValues["title"] = taskData.title
-        newValues["hasDeadline"] = taskData.hasDeadline
-        newValues["deadline"] = taskData.deadline
-        newValues["isContinuous"] = taskData.isContinuous
-        newValues["startTime"] = taskData.startTime
-        newValues["finishTime"] = taskData.finishTime
-        newValues["repeatType"] = taskData.repeatType
-        newValues["nDays"] = taskData.nDays
-        newValues["daysOfWeek"] = taskData.daysOfWeek
-        newValues["repeatStart"] = taskData.repeatStart
-        newValues["importance"] = taskData.importance
-        newValues["hasLocation"] = taskData.hasLocation
-        newValues["location"] = taskData.location
-        firestore.collection("tasks").document(taskId).update(newValues)
+        newValues[TaskDbSchema.TITLE] = taskData.title
+        newValues[TaskDbSchema.DEADLINE] = taskData.deadline
+        newValues[TaskDbSchema.IS_CONTINUOUS] = taskData.isContinuous
+        newValues[TaskDbSchema.START_TIME] = taskData.startTime
+        newValues[TaskDbSchema.FINISH_TIME] = taskData.finishTime
+        newValues[TaskDbSchema.REPEAT_TYPE] = taskData.repeatType
+        newValues[TaskDbSchema.N_DAYS] = taskData.nDays
+        newValues[TaskDbSchema.DAYS_OF_WEEK] = taskData.daysOfWeek
+        newValues[TaskDbSchema.REPEAT_START] = taskData.repeatStart
+        newValues[TaskDbSchema.IMPORTANCE] = taskData.importance
+        newValues[TaskDbSchema.LOCATION] = taskData.location
+        firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).update(newValues)
     }
 }

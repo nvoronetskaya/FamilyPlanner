@@ -6,13 +6,12 @@ data class User(
     var id: String,
     var name: String,
     var birthday: String,
-    var hasFamily: Boolean,
     var familyId: String?,
     var email: String,
     val location: GeoPoint? = null
 ) {
     constructor() : this(
         "", "",
-        "", false, "", ""
+        "", "", ""
     )
 }

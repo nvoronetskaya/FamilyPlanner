@@ -314,7 +314,7 @@ class ShowTaskInfoFragment : Fragment() {
 
     private fun bindTask(task: Task) {
         binding.etName.setText(task.title)
-        if (task.hasDeadline) {
+        if (task.deadline != null) {
             binding.tvDeadline.visibility = View.VISIBLE
             binding.tvDeadlineDate.text =
                 FamilyPlanner.uiDateFormatter.format(LocalDate.ofEpochDay(task.deadline!!))
@@ -336,7 +336,7 @@ class ShowTaskInfoFragment : Fragment() {
             RepeatType.EACH_N_DAYS -> "каждые ${task.nDays} дней"
             RepeatType.DAYS_OF_WEEK -> getRepeatFromDays(task.daysOfWeek)
         }
-        if (task.hasLocation) {
+        if (task.location != null) {
             binding.map.mapWindow.map.mapObjects.addPlacemark().apply {
                 geometry = Point(task.location!!.latitude, task.location!!.longitude)
                 setIcon(ImageProvider.fromResource(requireContext(), R.drawable.location))

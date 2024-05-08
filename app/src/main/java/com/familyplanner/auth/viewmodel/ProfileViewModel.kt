@@ -35,6 +35,7 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun exit() {
+        userRepo.removeFcmToken(FamilyPlanner.userId)
         auth.signOut()
     }
 

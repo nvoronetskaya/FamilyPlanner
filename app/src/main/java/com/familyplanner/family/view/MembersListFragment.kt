@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
+import com.familyplanner.common.User
 import com.familyplanner.databinding.FragmentMembersBinding
 import com.familyplanner.family.adapters.ApplicationAdapter
 import com.familyplanner.family.adapters.MemberAdapter
@@ -56,7 +57,13 @@ class MembersListFragment : Fragment() {
         val manager = LinearLayoutManager(activity)
         binding.rvMembers.layoutManager = manager
         binding.rvMembers.adapter = adapter
-        applicationsAdapter = ApplicationAdapter(isAdmin, activity as MainActivity, viewModel)
+        applicationsAdapter = ApplicationAdapter(
+            isAdmin,
+            activity as MainActivity,
+            viewModel,
+            ::onApprove,
+            ::onReject
+        )
 
         val applicationsManager = LinearLayoutManager(activity)
         binding.rvApplicants.layoutManager = applicationsManager
@@ -79,7 +86,10 @@ class MembersListFragment : Fragment() {
                     viewModel.getFamily().collect {
                         requireActivity().runOnUiThread {
                             if (it == null) {
-                                MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog)
+                                MaterialAlertDialogBuilder(
+                                    activity as MainActivity,
+                                    R.style.alertDialog
+                                )
                                     .setMessage("Вы больше не являетесь участником данной семьи")
                                     .setCancelable(false)
                                     .setNeutralButton("Ок") { _, _ ->
@@ -129,8 +139,12 @@ class MembersListFragment : Fragment() {
             val familyName = EditText(activity)
             familyName.setText(binding.tvFamily.text)
             familyName.textSize = 17F
-            familyName.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Новое название семьи")
+            familyName.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Новое название семьи")
                 .setView(familyName, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (familyName.text.isNullOrBlank()) {
@@ -145,7 +159,10 @@ class MembersListFragment : Fragment() {
         }
 
         binding.llLeave.setOnClickListener {
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Выход из семьи")
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Выход из семьи")
                 .setMessage("Вы уверены, что хотите покинуть семью?")
                 .setPositiveButton("Да") { _, _ ->
                     viewModel.leave(userId)
@@ -156,7 +173,10 @@ class MembersListFragment : Fragment() {
         }
 
         binding.llDelete.setOnClickListener {
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Удаление семьи")
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Удаление семьи")
                 .setMessage("Вы уверены, что хотите удалить семью?")
                 .setPositiveButton("Да") { _, _ ->
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -183,6 +203,32 @@ class MembersListFragment : Fragment() {
         binding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }
+    }
+
+    private fun onApprove(applicant: User) {
+        if ((requireActivity() as MainActivity).isConnectedToInternet()) {
+            viewModel.approve(applicant.id)
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Нет подключения к сети. Проверьте соединение и попробуйте позднее",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun onReject(applicant: User) {
+        MaterialAlertDialogBuilder(
+            requireActivity(),
+            R.style.alertDialog
+        ).setTitle("Отклонение заявки")
+            .setMessage("Вы уверены, что хотите отклонить заявку пользователя ${applicant.name}?")
+            .setPositiveButton("Да") { _, _ ->
+                viewModel.reject(applicant.id)
+            }
+            .setNegativeButton("Отмена") { dialog, _ ->
+                dialog.cancel()
+            }.create().show()
     }
 
     override fun onDestroyView() {

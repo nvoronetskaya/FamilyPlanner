@@ -10,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
+import com.familyplanner.common.schema.UserDbSchema
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -30,8 +31,8 @@ class LocationService : Service() {
     private val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let {
-                firestore.collection("users").document(userId)
-                    .update("location", GeoPoint(it.latitude, it.longitude))
+                firestore.collection(UserDbSchema.USER_TABLE).document(userId)
+                    .update(UserDbSchema.LOCATION, GeoPoint(it.latitude, it.longitude))
                 notificationSender.onLocationUpdated(it.latitude, it.longitude)
             }
         }

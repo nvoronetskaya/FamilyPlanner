@@ -100,7 +100,6 @@ class EditTaskViewModel : ViewModel() {
 
     fun updateTask(
         title: String,
-        hasDeadline: Boolean,
         deadline: Long?,
         isContinuous: Boolean,
         startTime: Int,
@@ -110,12 +109,10 @@ class EditTaskViewModel : ViewModel() {
         daysOfWeek: Int,
         repeatStart: Long?,
         importance: Importance,
-        hasLocation: Boolean,
         location: Point?
     ) {
         val newTask = Task()
         newTask.title = title
-        newTask.hasDeadline = hasDeadline
         newTask.deadline = deadline
         newTask.isContinuous = isContinuous
         newTask.startTime = startTime
@@ -125,7 +122,6 @@ class EditTaskViewModel : ViewModel() {
         newTask.daysOfWeek = daysOfWeek
         newTask.repeatStart = repeatStart
         newTask.importance = importance
-        newTask.hasLocation = hasLocation
         newTask.location =
             if (location != null) GeoPoint(location.latitude, location.longitude) else null
 

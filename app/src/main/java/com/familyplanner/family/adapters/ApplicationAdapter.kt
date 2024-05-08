@@ -15,11 +15,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ApplicationAdapter(
     val isAdmin: Boolean,
     val activity: Context,
-    val viewModel: MembersListViewModel
+    val viewModel: MembersListViewModel,
+    val onApprove: (User) -> Unit,
+    val onReject: (User) -> Unit
 ) :
     RecyclerView.Adapter<ApplicationAdapter.ApplicationViewHolder>() {
     private val applications = MutableList<User>(0)
-    { User("", "", "", true, "", "") }
+    { User("", "", "", "", "") }
 
     inner class ApplicationViewHolder(private val binding: ViewholderApplicantBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -28,18 +30,11 @@ class ApplicationAdapter(
             binding.tvBirthday.text = applicant.birthday
             if (isAdmin) {
                 binding.ivApprove.setOnClickListener {
-                    viewModel.approve(applicant.id)
+                    onApprove(applicant)
                 }
 
                 binding.ivReject.setOnClickListener {
-                    MaterialAlertDialogBuilder(activity, R.style.alertDialog).setTitle("Отклонение заявки")
-                        .setMessage("Вы уверены, что хотите отклонить заявку пользователя ${applicant.name}?")
-                        .setPositiveButton("Да") { _, _ ->
-                            viewModel.reject(applicant.id)
-                        }
-                        .setNegativeButton("Отмена") { dialog, _ ->
-                            dialog.cancel()
-                        }.create().show()
+                    onReject(applicant)
                 }
             } else {
                 binding.ivApprove.visibility = View.GONE
