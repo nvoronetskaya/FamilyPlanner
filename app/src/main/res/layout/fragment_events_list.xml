@@ -92,7 +92,7 @@
         android:layout_marginVertical="10dp"
         app:boundsColor="@color/black"
         app:boundsWidth="1dp"
-        app:currentDayColor="@color/light_orange"
+        app:currentDayTextColor="@color/dark_red"
         app:dateTextSize="16sp"
         app:eventFillColor="@color/dark_orange"
         app:eventTextColor="@color/white"

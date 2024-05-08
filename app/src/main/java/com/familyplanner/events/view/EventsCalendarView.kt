@@ -16,6 +16,7 @@ import com.familyplanner.events.data.Event
 import com.familyplanner.events.data.EventAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Calendar
@@ -54,7 +55,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         textColor = attrsValues.getColor(R.styleable.EventsCalendarView_textColor, Color.BLACK)
         boundsColor = attrsValues.getColor(R.styleable.EventsCalendarView_boundsColor, Color.GRAY)
         currentDayColor =
-            attrsValues.getColor(R.styleable.EventsCalendarView_currentDayColor, Color.MAGENTA)
+            attrsValues.getColor(R.styleable.EventsCalendarView_currentDayTextColor, Color.MAGENTA)
         eventTextColor =
             attrsValues.getColor(R.styleable.EventsCalendarView_eventTextColor, Color.BLACK)
         eventFillColor =
@@ -204,6 +205,7 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
         drawGrid(canvas)
         var curInd = 0
         val yOffset = dateTextSize * 1.5f
+        val today = LocalDate.now()
         if ((monthStart.get(Calendar.DAY_OF_WEEK) + 5) % 7 != 0) {
             val previousMonth = currentDate
             previousMonth.add(Calendar.MONTH, -1)
@@ -229,12 +231,16 @@ class EventsCalendarView(context: Context, attrs: AttributeSet) : View(context, 
             val xPos = x * cellWidth
             val yPos = y * cellHeight + yOffset
             val xPosCenter = xPos + cellWidth / 2
+            if (monthEnd.get(Calendar.YEAR) == today.year && monthEnd.get(Calendar.MONTH) + 1 == today.monthValue && curDayOfMonth == today.dayOfMonth) {
+                textPaint.color = currentDayColor
+            }
             canvas.drawText(
                 curDayOfMonth.toString(),
                 xPosCenter,
                 yPos + textPaint.textSize,
                 textPaint
             )
+            textPaint.color = textColor
             var verticalOffset = if (cellHeight > dateTextSize * 3f) {
                 dateTextSize * 1.5f
             } else {

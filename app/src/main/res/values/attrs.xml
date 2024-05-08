@@ -3,7 +3,7 @@
     <declare-styleable name="EventsCalendarView">
         <attr name="textColor" format="color|reference" />
         <attr name="boundsColor" format="color|reference" />
-        <attr name="currentDayColor" format="color|reference" />
+        <attr name="currentDayTextColor" format="color|reference" />
         <attr name="eventTextColor" format="color|reference" />
         <attr name="eventFillColor" format="color|reference" />
         <attr name="eventTextSize" format="dimension" />
