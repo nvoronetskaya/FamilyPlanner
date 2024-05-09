@@ -47,7 +47,8 @@ class TaskRepository {
                         if (tasksIds.isEmpty()) {
                             userTasks.emit(listOf())
                         } else {
-                            firestore.collection(TaskDbSchema.TASK_TABLE).whereEqualTo(TaskDbSchema.PARENT_ID, null).snapshots()
+                            firestore.collection(TaskDbSchema.TASK_TABLE)
+                                .whereEqualTo(TaskDbSchema.PARENT_ID, null).snapshots()
                                 .collect { result ->
                                     val queryTasks = mutableListOf<Task>()
                                     for (doc in result.documents) {
@@ -73,46 +74,49 @@ class TaskRepository {
             return getCommonTasksForUser(userId)
         }
         scope.launch {
-            firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, userId).snapshots().collect {
-                val ids = it.map { it[ObserverDbSchema.TASK_ID].toString() }
-                launch {
-                    if (ids.isEmpty()) {
-                        userTasks.emit(listOf())
-                    } else {
-                        firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, executorId)
-                            .snapshots()
-                            .collect { result ->
-                                val tasksIds = result.filter {
-                                    it.getBoolean(ObserverDbSchema.EXECUTOR) ?: false && ids.contains(
-                                        it.getString(
-                                            ObserverDbSchema.TASK_ID
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                .whereEqualTo(ObserverDbSchema.USER_ID, userId).snapshots().collect {
+                    val ids = it.map { it[ObserverDbSchema.TASK_ID].toString() }
+                    launch {
+                        if (ids.isEmpty()) {
+                            userTasks.emit(listOf())
+                        } else {
+                            firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                                .whereEqualTo(ObserverDbSchema.USER_ID, executorId)
+                                .snapshots()
+                                .collect { result ->
+                                    val tasksIds = result.filter {
+                                        it.getBoolean(ObserverDbSchema.EXECUTOR) ?: false && ids.contains(
+                                            it.getString(
+                                                ObserverDbSchema.TASK_ID
+                                            )
                                         )
-                                    )
-                                }.map { it[ObserverDbSchema.TASK_ID].toString() }
-                                launch {
-                                    if (tasksIds.isEmpty()) {
-                                        userTasks.emit(listOf())
-                                    } else {
-                                        firestore.collection(TaskDbSchema.TASK_TABLE).whereEqualTo(TaskDbSchema.PARENT_ID, null)
-                                            .snapshots()
-                                            .collect { result ->
-                                                val queryTasks = mutableListOf<Task>()
-                                                for (doc in result.documents) {
-                                                    if (!tasksIds.contains(doc.id)) {
-                                                        continue
+                                    }.map { it[ObserverDbSchema.TASK_ID].toString() }
+                                    launch {
+                                        if (tasksIds.isEmpty()) {
+                                            userTasks.emit(listOf())
+                                        } else {
+                                            firestore.collection(TaskDbSchema.TASK_TABLE)
+                                                .whereEqualTo(TaskDbSchema.PARENT_ID, null)
+                                                .snapshots()
+                                                .collect { result ->
+                                                    val queryTasks = mutableListOf<Task>()
+                                                    for (doc in result.documents) {
+                                                        if (!tasksIds.contains(doc.id)) {
+                                                            continue
+                                                        }
+                                                        val task = doc.toObject(Task::class.java)!!
+                                                        task.id = doc.id
+                                                        queryTasks.add(task)
                                                     }
-                                                    val task = doc.toObject(Task::class.java)!!
-                                                    task.id = doc.id
-                                                    queryTasks.add(task)
+                                                    userTasks.emit(queryTasks)
                                                 }
-                                                userTasks.emit(queryTasks)
-                                            }
+                                        }
                                     }
                                 }
-                            }
+                        }
                     }
                 }
-            }
         }
         return userTasks
     }
@@ -131,48 +135,53 @@ class TaskRepository {
     }
 
     fun getTaskComments(taskId: String): Flow<List<CommentDto>> {
-        return firestore.collection(CommentDbSchema.COMMENT_TABLE).whereEqualTo(CommentDbSchema.TASK_ID, taskId).snapshots().map {
-            val comments = mutableListOf<CommentDto>()
-            for (doc in it.documents) {
-                val userName =
-                    firestore.collection(UserDbSchema.USER_TABLE).document(doc[CommentDbSchema.USER_ID].toString()).get()
-                        .await()[UserDbSchema.NAME].toString()
-                val files = storage.reference.child(doc.id).listAll().await().items.map { it.path }
-                val comment = CommentDto(
-                    doc.id,
-                    doc[CommentDbSchema.USER_ID].toString(),
-                    userName,
-                    doc.getLong(CommentDbSchema.CREATED_AT)!!,
-                    doc[CommentDbSchema.TEXT].toString(),
-                    files
-                )
-                comments.add(comment)
+        return firestore.collection(CommentDbSchema.COMMENT_TABLE)
+            .whereEqualTo(CommentDbSchema.TASK_ID, taskId).snapshots().map {
+                val comments = mutableListOf<CommentDto>()
+                for (doc in it.documents) {
+                    val userName =
+                        firestore.collection(UserDbSchema.USER_TABLE)
+                            .document(doc[CommentDbSchema.USER_ID].toString()).get()
+                            .await()[UserDbSchema.NAME].toString()
+                    val files =
+                        storage.reference.child(doc.id).listAll().await().items.map { it.path }
+                    val comment = CommentDto(
+                        doc.id,
+                        doc[CommentDbSchema.USER_ID].toString(),
+                        userName,
+                        doc.getLong(CommentDbSchema.CREATED_AT)!!,
+                        doc[CommentDbSchema.TEXT].toString(),
+                        files
+                    )
+                    comments.add(comment)
+                }
+                comments
             }
-            comments
-        }
     }
 
     fun getTaskObservers(taskId: String): Flow<List<ObserverDto>> {
-        return firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).snapshots().map {
-            val users = mutableListOf<ObserverDto>()
-            for (doc in it.documents) {
-                val userName =
-                    firestore.collection(UserDbSchema.USER_TABLE).document(doc[ObserverDbSchema.USER_ID].toString()).get()
-                        .await()[UserDbSchema.NAME].toString()
-                val user = ObserverDto(
-                    doc[ObserverDbSchema.USER_ID].toString(),
-                    userName,
-                    doc.getBoolean(ObserverDbSchema.EXECUTOR) ?: false,
-                    doc[ObserverDbSchema.TASK_ID].toString()
-                )
-                users.add(user)
+        return firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+            .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).snapshots().map {
+                val users = mutableListOf<ObserverDto>()
+                for (doc in it.documents) {
+                    val userName =
+                        firestore.collection(UserDbSchema.USER_TABLE)
+                            .document(doc[ObserverDbSchema.USER_ID].toString()).get()
+                            .await()[UserDbSchema.NAME].toString()
+                    val user = ObserverDto(
+                        doc[ObserverDbSchema.USER_ID].toString(),
+                        userName,
+                        doc.getBoolean(ObserverDbSchema.EXECUTOR) ?: false,
+                        doc[ObserverDbSchema.TASK_ID].toString()
+                    )
+                    users.add(user)
+                }
+                users
             }
-            users
-        }
     }
 
-    fun addTask(task: Task): GoogleTask<DocumentReference> {
-        return firestore.collection(TaskDbSchema.TASK_TABLE).add(task)
+    fun addTask(task: Task) {
+        firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).set(task)
     }
 
     fun addCreatorObserver(taskId: String, userId: String) {
@@ -203,7 +212,8 @@ class TaskRepository {
         executors: BooleanArray
     ) {
         val curObservers =
-            firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get().await()
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get().await()
         curObservers.forEach { it.reference.delete() }
         for (i in users.indices) {
             if (!observers[i]) {
@@ -215,15 +225,16 @@ class TaskRepository {
     }
 
     fun getSubtasks(taskId: String): Flow<List<Task>> {
-        return firestore.collection(TaskDbSchema.TASK_TABLE).whereEqualTo(TaskDbSchema.PARENT_ID, taskId).snapshots().map {
-            val subTasks = mutableListOf<Task>()
-            for (doc in it.documents) {
-                val task = doc.toObject(Task::class.java) ?: continue
-                task.id = doc.id
-                subTasks.add(task)
+        return firestore.collection(TaskDbSchema.TASK_TABLE)
+            .whereEqualTo(TaskDbSchema.PARENT_ID, taskId).snapshots().map {
+                val subTasks = mutableListOf<Task>()
+                for (doc in it.documents) {
+                    val task = doc.toObject(Task::class.java) ?: continue
+                    task.id = doc.id
+                    subTasks.add(task)
+                }
+                subTasks
             }
-            subTasks
-        }
     }
 
     fun getFilesForTask(taskId: String): GoogleTask<ListResult> {
@@ -252,48 +263,54 @@ class TaskRepository {
                 TaskDbSchema.LAST_COMPLETION_DATE to today,
                 TaskDbSchema.PREVIOUS_COMPLETION_DATE to task.lastCompletionDate
             )
-            firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data).addOnSuccessListener {
-                val completion = mapOf<String, Any>(
-                    "userId" to completedById,
-                    "taskId" to task.id,
-                    "completionDate" to today
-                )
-                firestore.collection("taskCompletion").add(completion)
-            }
+            firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
+                .addOnSuccessListener {
+                    val completion = mapOf<String, Any>(
+                        "userId" to completedById,
+                        "taskId" to task.id,
+                        "completionDate" to today
+                    )
+                    firestore.collection("taskCompletion").add(completion)
+                }
         } else {
             val data = mapOf<String, Any?>(
                 "previousCompletionDate" to null,
                 "lastCompletionDate" to task.previousCompletionDate
             )
             TODO()
-            firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data).addOnSuccessListener {
-                firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
-                    .whereEqualTo("completionDate", today).get().addOnCompleteListener {
-                        it.result.documents.forEach { it.reference.delete() }
-                    }
-            }
+            firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
+                .addOnSuccessListener {
+                    firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
+                        .whereEqualTo("completionDate", today).get().addOnCompleteListener {
+                            it.result.documents.forEach { it.reference.delete() }
+                        }
+                }
         }
     }
 
     fun deleteTask(taskId: String) {
-        val result = firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).delete().addOnSuccessListener {
-            scope.launch {
-                firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get()
-                    .await().documents.forEach { it.reference.delete() }
-                storage.reference.child("task-$taskId").delete()
+        val result = firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).delete()
+            .addOnSuccessListener {
+                scope.launch {
+                    firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                        .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get()
+                        .await().documents.forEach { it.reference.delete() }
+                    storage.reference.child("task-$taskId").delete()
+                }
             }
-        }
     }
 
     fun getObserver(taskId: String, userId: String): Flow<Observer?> {
-        return firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, userId)
+        return firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+            .whereEqualTo(ObserverDbSchema.USER_ID, userId)
             .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).limit(1).snapshots().map {
                 it.documents.firstOrNull()?.toObject(Observer::class.java)
             }
     }
 
     suspend fun changeExecutorStatus(userId: String, taskId: String, isExecutor: Boolean) {
-        firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.USER_ID, userId)
+        firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+            .whereEqualTo(ObserverDbSchema.USER_ID, userId)
             .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get().await()
             .forEach { it.reference.update(ObserverDbSchema.EXECUTOR, isExecutor) }
     }

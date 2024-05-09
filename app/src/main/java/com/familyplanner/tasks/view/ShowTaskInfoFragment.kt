@@ -43,7 +43,11 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 
 class ShowTaskInfoFragment : Fragment() {
@@ -244,7 +248,13 @@ class ShowTaskInfoFragment : Fragment() {
                 reason.hint = "Причина"
                 reason.textSize = 19F
                 reason.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setView(reason, 40, 0, 40, 0)
+                MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setView(
+                    reason,
+                    40,
+                    0,
+                    40,
+                    0
+                )
                     .setMessage("Укажите причину, по которой Вы не сможете выполнить задачу: ")
                     .setPositiveButton("Готово") { _, _ ->
                         if (reason.text.isNullOrBlank()) {
@@ -286,14 +296,18 @@ class ShowTaskInfoFragment : Fragment() {
                 }
                 requireActivity().contentResolver.query(uri, null, null, null, null).use { cursor ->
                     val nameIndex = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    val sizeIndex = cursor!!.getColumnIndex(OpenableColumns.SIZE)
+                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                     cursor.moveToFirst()
                     val name = cursor.getString(nameIndex)
                     val size = cursor.getDouble(sizeIndex)
                     try {
                         commentFilesAdapter.addFile(UserFile(uri, name, size))
                     } catch (e: IllegalArgumentException) {
-                        Toast.makeText(requireContext(), "Файл с таким именем уже добавлен", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Файл с таким именем уже добавлен",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -319,7 +333,19 @@ class ShowTaskInfoFragment : Fragment() {
         }
 
         if (task.isContinuous) {
-            val time = "${timeToString(task.startTime)}–${task.finishTime}"
+            val startDateTime =
+                LocalDateTime.now().atZone(ZoneOffset.UTC).withHour(task.startTime / 60)
+                    .withMinute(task.startTime % 60).withZoneSameInstant(ZoneId.systemDefault())
+            val finishDateTime =
+                LocalDateTime.now().atZone(ZoneOffset.UTC).withHour(task.finishTime / 60)
+                    .withMinute(task.finishTime % 60).withZoneSameInstant(ZoneId.systemDefault())
+            val time = String.format(
+                "Время начала и окончания задачи: %02d:%02d–%02d:%02d",
+                startDateTime.hour,
+                startDateTime.minute,
+                finishDateTime.hour,
+                finishDateTime.minute
+            )
             binding.tvContinuousTime.text = time
             binding.tvContinuousTime.visibility = View.VISIBLE
         } else {
@@ -368,7 +394,7 @@ class ShowTaskInfoFragment : Fragment() {
         return sb.substring(0, sb.length - 2)
     }
 
-    private fun timeToString(time: Int): String = "${time / 60}:${time % 60}"
+    private fun timeToString(time: Int): String = String.format("%02d:%02d", time / 60, time % 60)
 
     private fun downloadTaskFile(path: String) {
         downloadFile("task", path)

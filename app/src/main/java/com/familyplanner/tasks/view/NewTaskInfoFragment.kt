@@ -44,9 +44,11 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Calendar
+import kotlin.time.Duration.Companion.minutes
 
 class NewTaskInfoFragment : Fragment() {
     private var _binding: FragmentNewTaskBinding? = null
@@ -169,6 +171,14 @@ class NewTaskInfoFragment : Fragment() {
             setTime(isStartTime = false, calledByCheckbox = false)
         }
 
+        binding.tvStartValue.setOnClickListener {
+            setTime(isStartTime = true, calledByCheckbox = false)
+        }
+
+        binding.tvFinishValue.setOnClickListener {
+            setTime(isStartTime = false, calledByCheckbox = false)
+        }
+
         binding.rbOnce.setOnClickListener {
             binding.tvRepeatFrom.visibility = View.GONE
             binding.rbEachNDays.isChecked = false
@@ -259,10 +269,53 @@ class NewTaskInfoFragment : Fragment() {
         binding.spImportance.adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
         binding.spImportance.setSelection(0)
-
         userId = FamilyPlanner.userId
         familyId = requireArguments().getString("familyId")!!
         parentId = requireArguments().getString("parentId")
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val creationResult = viewModel.getCreationStatus()
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                creationResult.collect {
+                    requireActivity().runOnUiThread {
+                        when (it) {
+                            TaskCreationStatus.SUCCESS -> if (parentId != null) {
+                                findNavController().popBackStack()
+                            } else {
+                                val bundle = Bundle()
+                                bundle.putString("taskId", viewModel.getCreatedTaskId())
+                                bundle.putString("familyId", familyId)
+                                findNavController().navigate(
+                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                    bundle
+                                )
+                            }
+
+                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                val bundle = Bundle()
+                                bundle.putString("taskId", viewModel.getCreatedTaskId())
+                                bundle.putString("familyId", familyId)
+                                findNavController().navigate(
+                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                    bundle
+                                )
+                            }
+
+                            TaskCreationStatus.FAILED -> Toast.makeText(
+                                requireContext(),
+                                "Ошибка. Проверьте подключение к сети и повторите позднее",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -338,12 +391,12 @@ class NewTaskInfoFragment : Fragment() {
                 if (isStartTime) {
                     binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
 
-                    if (binding.tvFinishTime.text.isNullOrBlank() || getTimeFromString(binding.tvFinishValue.text.toString()) < hour * 60 + minute) {
+                    if (binding.tvFinishTime.text.isNullOrBlank()) {
                         binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
                     }
                 } else {
                     binding.tvFinishValue.text = String.format("%02d:%02d", hour, minute)
-                    if (binding.tvStartValue.text.isNullOrBlank() || getTimeFromString(binding.tvStartValue.text.toString()) > hour * 60 + minute) {
+                    if (binding.tvStartValue.text.isNullOrBlank()) {
                         binding.tvStartValue.text = String.format("%02d:%02d", hour, minute)
                     }
                 }
@@ -401,6 +454,7 @@ class NewTaskInfoFragment : Fragment() {
             binding.etName.error = "Текст задачи не может быть пустым"
             return
         }
+        binding.etName.error = null
         var weekDays = 0
         var type: RepeatType
         var eachNDays = 0
@@ -414,7 +468,7 @@ class NewTaskInfoFragment : Fragment() {
             }
             type = RepeatType.EACH_N_DAYS
             eachNDays = binding.etNumberOfDays.text.toString().toInt()
-        } else {
+        } else if (binding.rbDaysOfWeek.isChecked) {
             val iterator = binding.llWeekdays.children.iterator()
             var power = 1
             while (iterator.hasNext()) {
@@ -424,24 +478,40 @@ class NewTaskInfoFragment : Fragment() {
                 power *= 2
             }
             if (weekDays == 0) {
-                binding.rbDaysOfWeek.error = "Выберите хотя бы один день недели"
+                binding.tvRepeat.error = "Выберите хотя бы один день недели"
                 return
             }
             type = RepeatType.DAYS_OF_WEEK
+        } else {
+            binding.tvRepeat.error = "Выберите тип повтора задачи"
+            return
         }
-
+        binding.tvRepeat.error = null
+        val startTime: Int
+        val finishTime: Int
+        if (binding.cbContinuousTask.isChecked) {
+            val zonedStartTime = getTimeFromString(binding.tvStartValue.text.trim().toString())
+            val zonedFinishTime = getTimeFromString(binding.tvFinishValue.text.trim().toString())
+            val startDateTime =
+                LocalDateTime.now().atZone(ZoneId.systemDefault()).withHour(zonedStartTime / 60)
+                    .withMinute(zonedStartTime % 60).withZoneSameInstant(ZoneOffset.UTC)
+            val finishDateTime =
+                LocalDateTime.now().atZone(ZoneId.systemDefault()).withHour(zonedFinishTime / 60)
+                    .withMinute(zonedFinishTime % 60).withZoneSameInstant(ZoneOffset.UTC)
+            startTime = startDateTime.hour * 60 + startDateTime.minute
+            finishTime = finishDateTime.hour * 60 + finishDateTime.minute
+        } else {
+            startTime = 0
+            finishTime = 0
+        }
         viewModel.createTask(
             binding.etName.text!!.trim().toString(),
             if (binding.swDeadline.isChecked) LocalDate.parse(
                 binding.tvDeadline.text.trim().toString(), FamilyPlanner.uiDateFormatter
             ).toEpochDay() else null,
             binding.cbContinuousTask.isChecked,
-            if (binding.cbContinuousTask.isChecked) getTimeFromString(
-                binding.tvStartValue.text.trim().toString()
-            ) else 0,
-            if (binding.cbContinuousTask.isChecked) getTimeFromString(
-                binding.tvFinishValue.text.trim().toString()
-            ) else 0,
+            startTime,
+            finishTime,
             type,
             eachNDays,
             weekDays,
@@ -454,9 +524,9 @@ class NewTaskInfoFragment : Fragment() {
             userId,
             familyId,
             filesAdapter.getFiles(),
-            parentId
+            parentId,
+            (requireActivity() as MainActivity).isConnectedToInternet()
         )
-
         lifecycleScope.launch(Dispatchers.IO) {
             val creationResult = viewModel.getCreationStatus()
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

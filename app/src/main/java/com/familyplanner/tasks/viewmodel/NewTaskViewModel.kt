@@ -25,17 +25,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class NewTaskViewModel : ViewModel() {
     private val searchManager =
         SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
     private val session = searchManager.createSuggestSession()
     private val searchStatus = MutableSharedFlow<Status>()
-    private val addTask = MutableSharedFlow<TaskCreationStatus>()
     private var curAddress = ""
     private val familyRepo = FamilyRepository()
     private val tasksRepo = TaskRepository()
     private var createdTaskId: String? = null
+    private val addTask = MutableSharedFlow<TaskCreationStatus>()
 
     private val searchSessionListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
@@ -80,9 +81,11 @@ class NewTaskViewModel : ViewModel() {
         userId: String,
         familyId: String,
         files: List<UserFile>?,
-        parentId: String?
+        parentId: String?,
+        isConnected: Boolean
     ) {
         val newTask = Task()
+        newTask.id = UUID.randomUUID().toString()
         newTask.title = title
         newTask.deadline = deadline
         newTask.isContinuous = isContinuous
@@ -100,30 +103,26 @@ class NewTaskViewModel : ViewModel() {
         newTask.parentId = parentId
         newTask.address = address
 
-        tasksRepo.addTask(newTask).addOnCompleteListener {
+        viewModelScope.launch(Dispatchers.IO) {
+            tasksRepo.addTask(newTask)
+            tasksRepo.addCreatorObserver(newTask.id, userId)
             viewModelScope.launch(Dispatchers.IO) {
-                var result: TaskCreationStatus
-                if (!it.isSuccessful) {
-                    result = TaskCreationStatus.FAILED
-                } else {
-                    createdTaskId = it.result.id
-                    tasksRepo.addCreatorObserver(createdTaskId!!, userId)
-                    if (files != null) {
-                        result = if (!tasksRepo.tryUploadFiles(files, it.result.id)) {
-                            TaskCreationStatus.FILE_UPLOAD_FAILED
-                        } else {
-                            TaskCreationStatus.SUCCESS
-                        }
+                val result = if (!files.isNullOrEmpty()) {
+                    if (!isConnected || !tasksRepo.tryUploadFiles(files, newTask.id)) {
+                        TaskCreationStatus.FILE_UPLOAD_FAILED
                     } else {
-                        result = TaskCreationStatus.SUCCESS
+                        TaskCreationStatus.SUCCESS
                     }
+                } else {
+                    TaskCreationStatus.SUCCESS
                 }
                 addTask.emit(result)
             }
         }
+        createdTaskId = newTask.id
     }
 
     fun getAddress() = curAddress
-    fun getCreationStatus() = addTask
     fun getCreatedTaskId() = createdTaskId
+    fun getCreationStatus(): Flow<TaskCreationStatus> = addTask
 }

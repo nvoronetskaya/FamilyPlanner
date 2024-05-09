@@ -84,7 +84,7 @@ class CommentsListAdapter(private val onFileClick: (String) -> Unit, private val
 
     fun setComments(newComments: List<CommentDto>) {
         comments.clear()
-        comments.addAll(newComments)
+        comments.addAll(newComments.sortedBy { it.createdAt })
         notifyDataSetChanged()
     }
 }

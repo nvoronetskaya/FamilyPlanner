@@ -9,19 +9,10 @@ import com.familyplanner.tasks.dto.ObserverDto
 import com.familyplanner.tasks.dto.TaskWithDate
 import com.familyplanner.tasks.model.Observer
 import com.familyplanner.tasks.model.RepeatType
-import com.familyplanner.tasks.model.Status
 import com.familyplanner.tasks.model.Task
 import com.familyplanner.tasks.model.TaskCreationStatus
 import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.repository.TaskRepository
-import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.search.BusinessObjectMetadata
-import com.yandex.mapkit.search.Response
-import com.yandex.mapkit.search.SearchFactory
-import com.yandex.mapkit.search.SearchManagerType
-import com.yandex.mapkit.search.SearchOptions
-import com.yandex.mapkit.search.Session
-import com.yandex.mapkit.search.ToponymObjectMetadata
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,10 +23,6 @@ import java.time.LocalDate
 import kotlin.math.pow
 
 class TaskInfoViewModel : ViewModel() {
-    private val searchManager =
-        SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
-    private val searchStatus = MutableSharedFlow<Status>()
-    private var curAddress = MutableSharedFlow<String>(replay = 1)
     private var task: MutableSharedFlow<Task?> = MutableSharedFlow(replay = 1)
     private var comments: MutableSharedFlow<List<CommentDto>> = MutableSharedFlow(replay = 1)
     private var observers: MutableSharedFlow<List<ObserverDto>> = MutableSharedFlow(replay = 1)
@@ -46,35 +33,6 @@ class TaskInfoViewModel : ViewModel() {
     private val addComment = MutableSharedFlow<TaskCreationStatus>()
     private val curObserver = MutableSharedFlow<Observer?>(replay = 1)
 
-    private val searchSessionListener = object : Session.SearchListener {
-        override fun onSearchResponse(response: Response) {
-            val items = response.collection.children.mapNotNull {
-                it.obj?.metadataContainer?.getItem(ToponymObjectMetadata::class.java)?.address?.formattedAddress
-                    ?: it.obj?.metadataContainer?.getItem(BusinessObjectMetadata::class.java)?.address?.formattedAddress
-            }
-
-            viewModelScope.launch(Dispatchers.IO) {
-                curAddress.emit(items[0])
-            }
-            viewModelScope.launch(Dispatchers.IO) {
-                searchStatus.emit(Status.SUCCESS)
-            }
-        }
-
-        override fun onSearchError(p0: com.yandex.runtime.Error) {
-            viewModelScope.launch(Dispatchers.IO) {
-                searchStatus.emit(Status.ERROR)
-            }
-        }
-    }
-
-    fun getAddressByGeo(obj: Point): Flow<Status> {
-        searchManager.submit(obj, 21, SearchOptions(), searchSessionListener)
-        return searchStatus
-    }
-
-    fun getAddress(): Flow<String> = curAddress
-
     fun setTask(taskId: String) {
         if (taskId == this.taskId) {
             return
@@ -83,14 +41,6 @@ class TaskInfoViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
                 repo.getTaskById(taskId).collect {
-                    launch(Dispatchers.Main) {
-                        getAddressByGeo(
-                            Point(
-                                it?.location?.latitude ?: 0.0,
-                                it?.location?.longitude ?: 0.0
-                            )
-                        )
-                    }
                     task.emit(it)
                 }
             }
@@ -150,22 +100,22 @@ class TaskInfoViewModel : ViewModel() {
     fun addComment(userId: String, comment: String, files: List<UserFile>) {
         repo.addComment(userId, comment, taskId).addOnCompleteListener {
             viewModelScope.launch(Dispatchers.IO) {
-                val result: TaskCreationStatus
-                if (!it.isSuccessful) {
-                    result = TaskCreationStatus.FAILED
-                } else {
-                    val createdCommentId = it.result.id
-                    result = if (files.isNotEmpty()) {
-                        if (!repo.tryUploadFiles(files, createdCommentId, "comment")) {
-                            TaskCreationStatus.FILE_UPLOAD_FAILED
-                        } else {
-                            TaskCreationStatus.SUCCESS
-                        }
-                    } else {
-                        TaskCreationStatus.SUCCESS
-                    }
-                }
-                addComment.emit(result)
+//                val result: TaskCreationStatus = TaskCreationStatus.SUCCESS
+//                if (!it.isSuccessful) {
+//                    result = TaskCreationStatus.FAILED
+//                } else {
+//                    val createdCommentId = it.result.id
+//                    result = if (files.isNotEmpty()) {
+//                        if (!repo.tryUploadFiles(files, createdCommentId, "comment")) {
+//                            TaskCreationStatus.FILE_UPLOAD_FAILED
+//                        } else {
+//                            TaskCreationStatus.SUCCESS
+//                        }
+//                    } else {
+//                        TaskCreationStatus.SUCCESS
+//                    }
+//                }
+//                addComment.emit(result)
             }
         }
     }
@@ -180,7 +130,7 @@ class TaskInfoViewModel : ViewModel() {
         }
     }
 
-    fun getTasksWithDate(tasks: List<Task>): List<TaskWithDate> {
+    private fun getTasksWithDate(tasks: List<Task>): List<TaskWithDate> {
         val tasksForDate = mutableListOf<TaskWithDate>()
         for (task in tasks) {
             val taskWithDate = TaskWithDate(task, null)

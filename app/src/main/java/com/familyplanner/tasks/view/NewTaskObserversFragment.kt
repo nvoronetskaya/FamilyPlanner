@@ -29,7 +29,7 @@ class NewTaskObserversFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTaskObserversBinding.inflate(inflater, container, false)
         return binding.root
     }

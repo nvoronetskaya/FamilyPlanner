@@ -25,12 +25,10 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
-import com.familyplanner.events.adapters.InvitationAdapter
 import com.familyplanner.tasks.adapters.FileAdapter
 import com.familyplanner.tasks.model.Importance
 import com.familyplanner.tasks.model.RepeatType
 import com.familyplanner.tasks.model.Status
-import com.familyplanner.tasks.model.TaskCreationStatus
 import com.familyplanner.tasks.model.UserFile
 import com.familyplanner.tasks.viewmodel.EditTaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -44,6 +42,9 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.util.Calendar
 
 class EditTaskFragment : Fragment() {
@@ -102,7 +103,7 @@ class EditTaskFragment : Fragment() {
             val task = viewModel.getTask(taskId)
             requireActivity().runOnUiThread {
                 if (task == null) {
-                    Toast.makeText(requireContext(), "Мероприятие недоступно", Toast.LENGTH_SHORT)
+                    Toast.makeText(requireContext(), "Задача недоступна", Toast.LENGTH_SHORT)
                         .show()
                     findNavController().popBackStack()
                     return@runOnUiThread
@@ -117,7 +118,29 @@ class EditTaskFragment : Fragment() {
                     binding.swDeadline.isChecked = false
                     binding.tvDeadline.isVisible = false
                 }
+                if (task.isContinuous) {
+                    val startDateTime =
+                        LocalDateTime.now().atZone(ZoneOffset.UTC).withHour(task.startTime / 60)
+                            .withMinute(task.startTime % 60).withZoneSameInstant(ZoneId.systemDefault())
+                    val finishDateTime =
+                        LocalDateTime.now().atZone(ZoneOffset.UTC).withHour(task.finishTime / 60)
+                            .withMinute(task.finishTime % 60).withZoneSameInstant(ZoneId.systemDefault())
+                    binding.tvStartValue.text = String.format("%02d:%02d", startDateTime.hour, startDateTime.minute)
+                    binding.tvFinishValue.text = String.format("%02d:%02d", finishDateTime.hour, finishDateTime.minute)
+                    binding.cbContinuousTask.isChecked = true
+                    binding.tvStartValue.isVisible = true
+                    binding.tvStartTime.isVisible = true
+                    binding.tvFinishTime.isVisible = true
+                    binding.tvFinishValue.isVisible = true
+                } else {
+                    binding.cbContinuousTask.isChecked = false
+                    binding.tvStartValue.isVisible = false
+                    binding.tvStartTime.isVisible = false
+                    binding.tvFinishTime.isVisible = false
+                    binding.tvFinishValue.isVisible = false
+                }
                 binding.cbContinuousTask.isChecked = task.isContinuous
+
                 binding.tvRepeatStart.isVisible = task.repeatType != RepeatType.ONCE
                 binding.tvRepeatFrom.isVisible = task.repeatType != RepeatType.ONCE
                 when (task.repeatType) {
@@ -163,8 +186,8 @@ class EditTaskFragment : Fragment() {
     }
 
     private fun addListeners() {
-        binding.swDeadline.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
+        binding.swDeadline.setOnClickListener {
+            if (binding.swDeadline.isChecked) {
                 setDeadline(true)
                 binding.tvDeadline.visibility = View.VISIBLE
             } else {
@@ -176,8 +199,8 @@ class EditTaskFragment : Fragment() {
             setDeadline()
         }
 
-        binding.cbContinuousTask.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
+        binding.cbContinuousTask.setOnClickListener {
+            if (binding.cbContinuousTask.isChecked) {
                 setTime(isStartTime = true, calledByCheckbox = true)
                 binding.tvStartTime.visibility = View.VISIBLE
                 binding.tvFinishTime.visibility = View.VISIBLE
@@ -196,6 +219,14 @@ class EditTaskFragment : Fragment() {
         }
 
         binding.tvFinishTime.setOnClickListener {
+            setTime(isStartTime = false, calledByCheckbox = false)
+        }
+
+        binding.tvStartValue.setOnClickListener {
+            setTime(isStartTime = true, calledByCheckbox = false)
+        }
+
+        binding.tvFinishValue.setOnClickListener {
             setTime(isStartTime = false, calledByCheckbox = false)
         }
 

@@ -54,8 +54,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:paddingVertical="10dp"
-        android:background="@drawable/rounded_rectangle" >
+        android:background="@drawable/rounded_rectangle"
+        android:paddingVertical="10dp">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tf_name"
@@ -72,10 +72,10 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_name"
                 style="@style/editText"
-                android:inputType="textCapSentences"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:enabled="false" />
+                android:enabled="false"
+                android:inputType="textCapSentences" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -94,20 +94,20 @@
             style="@style/textBody"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical|start"
             android:layout_marginStart="10dp"
-            tools:text="22.01.2024"
+            android:gravity="center_vertical|start"
             app:layout_constraintBottom_toBottomOf="@id/tv_deadline"
-            app:layout_constraintStart_toEndOf="@id/tv_deadline" />
+            app:layout_constraintStart_toEndOf="@id/tv_deadline"
+            tools:text="22.01.2024" />
 
         <TextView
             android:id="@+id/tv_continuous_time"
             style="@style/textBody"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:gravity="center_vertical"
-            tools:text="14:00–"
-            app:layout_constraintStart_toStartOf="@id/tv_deadline_date"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_deadline_date" />
 
         <TextView
@@ -123,10 +123,10 @@
 
         <TextView
             android:id="@+id/tv_repeat_type"
-            android:layout_marginStart="10dp"
             style="@style/textBody"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:gravity="center_vertical"
             app:layout_constraintStart_toEndOf="@id/tv_repeat"
             app:layout_constraintTop_toTopOf="@id/tv_repeat"
@@ -137,8 +137,8 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="10dp"
-            app:layout_constrainedWidth="true"
             android:duplicateParentState="true"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="@id/tf_name"
             app:layout_constraintStart_toStartOf="@id/tf_name"
             app:layout_constraintTop_toBottomOf="@id/tv_repeat" />
@@ -157,19 +157,19 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp" >
+        android:layout_marginHorizontal="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layout_subtasks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:background="@drawable/rounded_rectangle" >
+                android:background="@drawable/rounded_rectangle">
 
                 <ImageView
                     android:id="@+id/iv_add_subtask"
@@ -360,9 +360,9 @@
                     android:orientation="horizontal"
                     android:scrollbars="horizontal"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintTop_toBottomOf="@id/rv_comment"
                     app:layout_constraintEnd_toEndOf="@id/tf_comment"
                     app:layout_constraintStart_toStartOf="@id/tf_comment"
+                    app:layout_constraintTop_toBottomOf="@id/rv_comment"
                     tools:listitem="@layout/viewholder_file" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -378,17 +378,17 @@
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="0dp"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintTop_toBottomOf="@id/rv_comment_files"
                     app:layout_constraintEnd_toStartOf="@id/iv_send"
-                    app:layout_constraintStart_toEndOf="@id/iv_attach">
+                    app:layout_constraintStart_toEndOf="@id/iv_attach"
+                    app:layout_constraintTop_toBottomOf="@id/rv_comment_files">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_comment"
                         style="@style/editText"
                         android:layout_width="match_parent"
-                        android:inputType="textCapSentences"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
+                        android:inputType="textCapSentences"
                         android:lineSpacingExtra="0dp" />
                 </com.google.android.material.textfield.TextInputLayout>
 

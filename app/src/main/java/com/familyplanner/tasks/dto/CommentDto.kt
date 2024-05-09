@@ -1,7 +1,5 @@
 package com.familyplanner.tasks.dto
 
-import com.google.type.DateTime
-
 data class CommentDto(
     val id: String,
     val userId: String,
