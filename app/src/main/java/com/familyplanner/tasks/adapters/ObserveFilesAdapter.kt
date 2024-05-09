@@ -3,9 +3,7 @@ package com.familyplanner.tasks.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderFileBinding
 
 class ObserveFilesAdapter(private var onFileClick: (String) -> Unit) :

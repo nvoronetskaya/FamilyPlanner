@@ -5,11 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderOtherCommentBinding
 import com.familyplanner.databinding.ViewholderUserCommentBinding
 import com.familyplanner.tasks.dto.CommentDto
 import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 class CommentsListAdapter(private val onFileClick: (String, String) -> Unit, private val userId: String) :
     RecyclerView.Adapter<CommentsListAdapter.BaseCommentViewHolder>() {
@@ -27,7 +31,10 @@ class CommentsListAdapter(private val onFileClick: (String, String) -> Unit, pri
         BaseCommentViewHolder(binding.root) {
         override fun onBindViewHolder(comment: CommentDto) {
             binding.tvComment.text = comment.text
-            binding.tvSentAt.text = formatter.format(comment.createdAt)
+            binding.tvSentAt.text = LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(comment.createdAt),
+                ZoneId.systemDefault()
+            ).format(FamilyPlanner.dateTimeFormatter)
             binding.rvFiles.layoutManager = layoutManager
             binding.rvFiles.adapter = filesAdapter
             binding.tvName.text = "Вы"
@@ -42,7 +49,10 @@ class CommentsListAdapter(private val onFileClick: (String, String) -> Unit, pri
         BaseCommentViewHolder(binding.root) {
         override fun onBindViewHolder(comment: CommentDto) {
             binding.tvComment.text = comment.text
-            binding.tvSentAt.text = formatter.format(comment.createdAt)
+            binding.tvSentAt.text = LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(comment.createdAt),
+                ZoneId.systemDefault()
+            ).format(FamilyPlanner.dateTimeFormatter)
             binding.rvFiles.layoutManager = layoutManager
             binding.rvFiles.adapter = filesAdapter
             binding.tvName.text = comment.userName

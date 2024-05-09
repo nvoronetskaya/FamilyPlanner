@@ -31,6 +31,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 class TaskRepository {
     private val firestore = Firebase.firestore
@@ -256,7 +259,8 @@ class TaskRepository {
             mapOf<String, Any>(
                 CommentDbSchema.USER_ID to userId,
                 CommentDbSchema.TEXT to comment,
-                CommentDbSchema.CREATED_AT to System.currentTimeMillis(),
+                CommentDbSchema.CREATED_AT to LocalDateTime.now().atZone(ZoneId.systemDefault())
+                    .withZoneSameInstant(ZoneOffset.UTC).toEpochSecond(),
                 CommentDbSchema.TASK_ID to taskId
             )
         return firestore.collection(CommentDbSchema.COMMENT_TABLE).document(commentId).set(data)

@@ -161,7 +161,10 @@ class EventInfoFragment : Fragment() {
             )
         }
         binding.tvCancel.setOnClickListener {
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Отмена мероприятия")
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Отмена мероприятия")
                 .setMessage("Вы уверены, что хотите отменить мероприятие?")
                 .setPositiveButton("Да") { _, _ ->
                     viewModel.deleteEvent(eventId)
