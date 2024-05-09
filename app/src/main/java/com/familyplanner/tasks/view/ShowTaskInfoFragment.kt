@@ -9,7 +9,6 @@ import android.os.Environment
 import android.provider.OpenableColumns
 import android.text.InputType
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -43,12 +42,10 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-
 
 class ShowTaskInfoFragment : Fragment() {
     private var _binding: FragmentTaskInfoBinding? = null
@@ -96,6 +93,9 @@ class ShowTaskInfoFragment : Fragment() {
         binding.rvCommentFiles.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvCommentFiles.adapter = commentFilesAdapter
+        if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+            Toast.makeText(requireContext(), "Ошибка сети. Файлы и комментарии недоступны", Toast.LENGTH_SHORT).show()
+        }
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -229,11 +229,20 @@ class ShowTaskInfoFragment : Fragment() {
         }
         binding.ivSend.setOnClickListener {
             val comment = binding.etComment.text.toString()
-            if (comment.isBlank()) {
-                binding.etComment.error = "Текст комментария не может быть пустым"
+            val files = commentFilesAdapter.getFiles()
+            if (comment.isBlank() && files.isEmpty()) {
+                binding.etComment.error = "Комментарий не может быть пустым"
                 return@setOnClickListener
             }
-            viewModel.addComment(userId, comment.trim(), commentFilesAdapter.getFiles())
+            if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Ошибка. Проверьте подключение к сети и повторите позднее",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            viewModel.addComment(userId, comment.trim(), files)
         }
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.ivAttach.setOnClickListener {
@@ -394,18 +403,20 @@ class ShowTaskInfoFragment : Fragment() {
         return sb.substring(0, sb.length - 2)
     }
 
-    private fun timeToString(time: Int): String = String.format("%02d:%02d", time / 60, time % 60)
-
     private fun downloadTaskFile(path: String) {
-        downloadFile("task", path)
+        downloadFile("task", path, taskId)
     }
 
-    private fun downloadCommentFile(path: String) {
-        downloadFile("comment", path)
+    private fun downloadCommentFile(commentId: String, path: String) {
+        downloadFile("comment", path, commentId)
     }
 
-    private fun downloadFile(prefix: String, path: String) {
-        val request = DownloadManager.Request(viewModel.downloadFile(prefix, taskId, path))
+    private fun downloadFile(prefix: String, path: String, objectId: String) {
+        if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+            Toast.makeText(requireContext(), "Нет сети. Файлы недоступны", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val request = DownloadManager.Request(viewModel.downloadFile(prefix, objectId, path))
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,

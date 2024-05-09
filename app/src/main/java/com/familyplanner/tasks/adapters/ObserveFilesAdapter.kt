@@ -3,10 +3,12 @@ package com.familyplanner.tasks.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderFileBinding
 
-class ObserveFilesAdapter(private val onFileClick: (String) -> Unit) :
+class ObserveFilesAdapter(private var onFileClick: (String) -> Unit) :
     RecyclerView.Adapter<ObserveFilesAdapter.ObserveFileViewHolder>() {
     private var paths: MutableList<String> = mutableListOf()
 
@@ -37,5 +39,9 @@ class ObserveFilesAdapter(private val onFileClick: (String) -> Unit) :
 
     override fun onBindViewHolder(holder: ObserveFileViewHolder, position: Int) {
         holder.onBindViewHolder(paths[position])
+    }
+
+    fun updateOnClick(newOnFileClick: (String) -> Unit) {
+        onFileClick = newOnFileClick
     }
 }

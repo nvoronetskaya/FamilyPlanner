@@ -144,7 +144,8 @@ class TaskRepository {
                             .document(doc[CommentDbSchema.USER_ID].toString()).get()
                             .await()[UserDbSchema.NAME].toString()
                     val files =
-                        storage.reference.child(doc.id).listAll().await().items.map { it.path }
+                        storage.reference.child("comment-${doc.id}").listAll()
+                            .await().items.map { it.name }
                     val comment = CommentDto(
                         doc.id,
                         doc[CommentDbSchema.USER_ID].toString(),
@@ -245,7 +246,12 @@ class TaskRepository {
         return storage.reference.child(path).downloadUrl
     }
 
-    fun addComment(userId: String, comment: String, taskId: String): GoogleTask<DocumentReference> {
+    fun addComment(
+        userId: String,
+        comment: String,
+        taskId: String,
+        commentId: String
+    ): GoogleTask<Void> {
         val data =
             mapOf<String, Any>(
                 CommentDbSchema.USER_ID to userId,
@@ -253,7 +259,7 @@ class TaskRepository {
                 CommentDbSchema.CREATED_AT to System.currentTimeMillis(),
                 CommentDbSchema.TASK_ID to taskId
             )
-        return firestore.collection(CommentDbSchema.COMMENT_TABLE).add(data)
+        return firestore.collection(CommentDbSchema.COMMENT_TABLE).document(commentId).set(data)
     }
 
     fun changeTaskCompleted(task: Task, isCompleted: Boolean, completedById: String) {

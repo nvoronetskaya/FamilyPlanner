@@ -11,7 +11,7 @@ import com.familyplanner.tasks.dto.CommentDto
 import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 
-class CommentsListAdapter(private val onFileClick: (String) -> Unit, private val userId: String) :
+class CommentsListAdapter(private val onFileClick: (String, String) -> Unit, private val userId: String) :
     RecyclerView.Adapter<CommentsListAdapter.BaseCommentViewHolder>() {
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm")
     private var comments = mutableListOf<CommentDto>()
@@ -19,7 +19,7 @@ class CommentsListAdapter(private val onFileClick: (String) -> Unit, private val
     abstract inner class BaseCommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         protected val layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-        protected val filesAdapter = ObserveFilesAdapter(onFileClick)
+        protected val filesAdapter = ObserveFilesAdapter {}
         abstract fun onBindViewHolder(comment: CommentDto)
     }
 
@@ -31,6 +31,9 @@ class CommentsListAdapter(private val onFileClick: (String) -> Unit, private val
             binding.rvFiles.layoutManager = layoutManager
             binding.rvFiles.adapter = filesAdapter
             binding.tvName.text = "Вы"
+            filesAdapter.updateOnClick { path ->
+                onFileClick(comment.id, path)
+            }
             filesAdapter.addPaths(comment.fileNames)
         }
     }

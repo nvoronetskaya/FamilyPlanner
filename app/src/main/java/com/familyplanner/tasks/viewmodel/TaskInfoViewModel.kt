@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
+import java.util.UUID
 import kotlin.math.pow
 
 class TaskInfoViewModel : ViewModel() {
@@ -98,25 +99,19 @@ class TaskInfoViewModel : ViewModel() {
     }
 
     fun addComment(userId: String, comment: String, files: List<UserFile>) {
-        repo.addComment(userId, comment, taskId).addOnCompleteListener {
-            viewModelScope.launch(Dispatchers.IO) {
-//                val result: TaskCreationStatus = TaskCreationStatus.SUCCESS
-//                if (!it.isSuccessful) {
-//                    result = TaskCreationStatus.FAILED
-//                } else {
-//                    val createdCommentId = it.result.id
-//                    result = if (files.isNotEmpty()) {
-//                        if (!repo.tryUploadFiles(files, createdCommentId, "comment")) {
-//                            TaskCreationStatus.FILE_UPLOAD_FAILED
-//                        } else {
-//                            TaskCreationStatus.SUCCESS
-//                        }
-//                    } else {
-//                        TaskCreationStatus.SUCCESS
-//                    }
-//                }
-//                addComment.emit(result)
+        val commentId = UUID.randomUUID().toString()
+        viewModelScope.launch(Dispatchers.IO) {
+            val result: TaskCreationStatus = if (files.isNotEmpty()) {
+                if (!repo.tryUploadFiles(files, commentId, "comment")) {
+                    TaskCreationStatus.FILE_UPLOAD_FAILED
+                } else {
+                    TaskCreationStatus.SUCCESS
+                }
+            } else {
+                TaskCreationStatus.SUCCESS
             }
+            repo.addComment(userId, comment, taskId, commentId)
+            addComment.emit(result)
         }
     }
 

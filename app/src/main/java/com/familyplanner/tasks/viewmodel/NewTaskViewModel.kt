@@ -106,18 +106,16 @@ class NewTaskViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             tasksRepo.addTask(newTask)
             tasksRepo.addCreatorObserver(newTask.id, userId)
-            viewModelScope.launch(Dispatchers.IO) {
-                val result = if (!files.isNullOrEmpty()) {
-                    if (!isConnected || !tasksRepo.tryUploadFiles(files, newTask.id)) {
-                        TaskCreationStatus.FILE_UPLOAD_FAILED
-                    } else {
-                        TaskCreationStatus.SUCCESS
-                    }
+            val result = if (!files.isNullOrEmpty()) {
+                if (!isConnected || !tasksRepo.tryUploadFiles(files, newTask.id)) {
+                    TaskCreationStatus.FILE_UPLOAD_FAILED
                 } else {
                     TaskCreationStatus.SUCCESS
                 }
-                addTask.emit(result)
+            } else {
+                TaskCreationStatus.SUCCESS
             }
+            addTask.emit(result)
         }
         createdTaskId = newTask.id
     }
