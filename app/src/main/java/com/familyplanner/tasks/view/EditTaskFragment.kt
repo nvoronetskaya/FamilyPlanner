@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -56,7 +57,7 @@ class EditTaskFragment : Fragment() {
     private val ATTACH_FILES = 10
     private lateinit var filesAdapter: FileAdapter
     private var curPoint: Point? = null
-    private lateinit var userId: String
+    private lateinit var taskId: String
     private lateinit var familyId: String
     private var parentId: String? = null
     private lateinit var imageProvider: ImageProvider
@@ -93,7 +94,7 @@ class EditTaskFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[EditTaskViewModel::class.java]
         imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.map_mark)
-        val taskId = requireArguments().getString("taskId") ?: ""
+        taskId = requireArguments().getString("taskId") ?: ""
         val options = listOf("Низкая", "Средняя", "Высокая")
         filesAdapter = FileAdapter(viewModel::removeFile)
         binding.rvFiles.layoutManager =
@@ -121,12 +122,16 @@ class EditTaskFragment : Fragment() {
                 if (task.isContinuous) {
                     val startDateTime =
                         LocalDateTime.now().atZone(ZoneOffset.UTC).withHour(task.startTime / 60)
-                            .withMinute(task.startTime % 60).withZoneSameInstant(ZoneId.systemDefault())
+                            .withMinute(task.startTime % 60)
+                            .withZoneSameInstant(ZoneId.systemDefault())
                     val finishDateTime =
                         LocalDateTime.now().atZone(ZoneOffset.UTC).withHour(task.finishTime / 60)
-                            .withMinute(task.finishTime % 60).withZoneSameInstant(ZoneId.systemDefault())
-                    binding.tvStartValue.text = String.format("%02d:%02d", startDateTime.hour, startDateTime.minute)
-                    binding.tvFinishValue.text = String.format("%02d:%02d", finishDateTime.hour, finishDateTime.minute)
+                            .withMinute(task.finishTime % 60)
+                            .withZoneSameInstant(ZoneId.systemDefault())
+                    binding.tvStartValue.text =
+                        String.format("%02d:%02d", startDateTime.hour, startDateTime.minute)
+                    binding.tvFinishValue.text =
+                        String.format("%02d:%02d", finishDateTime.hour, finishDateTime.minute)
                     binding.cbContinuousTask.isChecked = true
                     binding.tvStartValue.isVisible = true
                     binding.tvStartTime.isVisible = true
@@ -370,7 +375,10 @@ class EditTaskFragment : Fragment() {
             curPoint,
             if (curPoint != null) binding.tvAddress.text.toString() else null
         )
-        findNavController().popBackStack()
+        findNavController().navigate(
+            R.id.action_editTaskFragment_to_editTaskObserversFragment,
+            bundleOf("taskId" to taskId)
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -392,7 +400,11 @@ class EditTaskFragment : Fragment() {
                     try {
                         filesAdapter.addFile(UserFile(uri, name, size))
                     } catch (e: IllegalArgumentException) {
-                        Toast.makeText(requireContext(), "Файл с таким именем уже добавлен", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Файл с таким именем уже добавлен",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

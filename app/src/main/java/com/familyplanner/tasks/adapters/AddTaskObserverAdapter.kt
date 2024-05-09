@@ -4,39 +4,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.familyplanner.common.User
 import com.familyplanner.databinding.ViewholderAddObserverBinding
-import com.familyplanner.databinding.ViewholderObserverBinding
+import com.familyplanner.tasks.dto.AddObserverDto
 
 class AddTaskObserverAdapter(val createdBy: String) :
     RecyclerView.Adapter<AddTaskObserverAdapter.ObserverViewHolder>() {
-    private val members = mutableListOf<User>()
-    private var observers: BooleanArray = booleanArrayOf()
-    private var executors: BooleanArray = booleanArrayOf()
+    private val members = mutableListOf<AddObserverDto>()
 
     inner class ObserverViewHolder(private val binding: ViewholderAddObserverBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun onBind(position: Int) {
-            val isCreator = members[position].id.equals(createdBy)
+        fun onBind(member: AddObserverDto) {
+            val isCreator = member.userId.equals(createdBy)
             with(binding) {
-                tvName.text = if (isCreator) "Вы" else members[position].name
-                tvBirthday.text = members[position].birthday
-                cbMakeObserver.isChecked = observers[position] || isCreator
-                cbMakeExecutor.isChecked = executors[position]
-                cbMakeExecutor.visibility = if (observers[position]) View.VISIBLE else View.GONE
-                cbMakeObserver.setOnCheckedChangeListener { buttonView, isChecked ->
-                    observers[position] = isChecked
+                tvName.text = if (isCreator) "Вы" else members[position].userName
+                tvBirthday.text = member.birthday
+                cbMakeObserver.isChecked = member.isObserver || isCreator
+                cbMakeExecutor.isChecked = member.isExecutor
+                cbMakeExecutor.visibility = if (member.isObserver) View.VISIBLE else View.GONE
+                cbMakeObserver.setOnClickListener {
+                    member.isObserver = cbMakeObserver.isChecked
 
-                    if (isChecked) {
+                    if (cbMakeObserver.isChecked) {
                         binding.cbMakeExecutor.visibility = View.VISIBLE
                     } else {
                         binding.cbMakeExecutor.isChecked = false
-                        executors[position] = false
+                        member.isExecutor = false
                         binding.cbMakeExecutor.visibility = View.GONE
                     }
                 }
-                cbMakeExecutor.setOnCheckedChangeListener { buttonView, isChecked ->
-                    executors[position] = isChecked
+                cbMakeExecutor.setOnClickListener {
+                    member.isExecutor = cbMakeExecutor.isChecked
                 }
             }
         }
@@ -51,24 +48,20 @@ class AddTaskObserverAdapter(val createdBy: String) :
     override fun getItemCount(): Int = members.size
 
     override fun onBindViewHolder(holder: ObserverViewHolder, position: Int) {
-        holder.onBind(position)
+        holder.onBind(members[position])
     }
 
-    fun setData(members: List<User>) {
+    fun setData(members: List<AddObserverDto>) {
         if (this.members.isEmpty()) {
             this.members.addAll(members)
-            observers = BooleanArray(members.size) { false }
-            executors = BooleanArray(members.size) { false }
             for (i in 0 until this.members.size) {
-                if (this.members[i].id.equals(createdBy)) {
-                    observers[i] = true
+                if (this.members[i].userId.equals(createdBy)) {
+                    members[i].isObserver = true
                 }
             }
             notifyDataSetChanged()
         }
     }
 
-    fun getMembers(): List<User> = members
-    fun getObservers() = observers
-    fun getExecutors() = executors
+    fun getMembers(): List<AddObserverDto> = members
 }

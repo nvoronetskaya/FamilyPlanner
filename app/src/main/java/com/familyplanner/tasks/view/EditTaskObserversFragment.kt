@@ -4,24 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.R
 import com.familyplanner.databinding.FragmentTaskObserversBinding
 import com.familyplanner.tasks.adapters.AddTaskObserverAdapter
-import com.familyplanner.tasks.viewmodel.TaskObserversViewModel
+import com.familyplanner.tasks.viewmodel.EditTaskObserversViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class NewTaskObserversFragment : Fragment() {
+class EditTaskObserversFragment : Fragment() {
     private var _binding: FragmentTaskObserversBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: TaskObserversViewModel
+    private lateinit var viewModel: EditTaskObserversViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,40 +32,23 @@ class NewTaskObserversFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val familyId = requireArguments().getString("familyId")!!
         val taskId = requireArguments().getString("taskId")!!
-        viewModel = ViewModelProvider(this)[TaskObserversViewModel::class.java]
-
-        val adapter = AddTaskObserverAdapter(FamilyPlanner.userId)
-        binding.rvObservers.layoutManager = LinearLayoutManager(activity)
-        binding.rvObservers.adapter = adapter
-
+        viewModel = ViewModelProvider(this)[EditTaskObserversViewModel::class.java]
+        val observersAdapter = AddTaskObserverAdapter(FamilyPlanner.userId)
+        binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvObservers.adapter = observersAdapter
         lifecycleScope.launch(Dispatchers.IO) {
-            val members = viewModel.getObservers(familyId)
+            val observers = viewModel.getObservers(taskId)
             requireActivity().runOnUiThread {
-                adapter.setData(members)
+                observersAdapter.setData(observers)
             }
         }
-
-        binding.ivClose.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_newTaskObserversFragment_to_tasksListFragment,
-                bundleOf("familyId" to familyId)
-            )
-        }
-
         binding.ivDone.setOnClickListener {
-            viewModel.setObserversAndExecutors(taskId)
-            findNavController().navigate(
-                R.id.action_newTaskObserversFragment_to_tasksListFragment,
-                bundleOf("familyId" to familyId)
-            )
+            viewModel.updateObservers(taskId)
+            findNavController().popBackStack()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        binding.ivClose.setOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 }
