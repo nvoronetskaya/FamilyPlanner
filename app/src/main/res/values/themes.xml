@@ -161,7 +161,7 @@
     </style>
 
     <style name="overflow">
-        <item name="android:src">@drawable/more_options</item>
+        <item name="android:src">@drawable/ic_more_options</item>
     </style> 
     
     <style name="alertDialogShape">

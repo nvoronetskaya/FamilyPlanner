@@ -63,6 +63,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:shapeAppearanceOverlay="@style/fab_round"
-        app:srcCompat="@drawable/add"
+        app:srcCompat="@drawable/ic_add"
         app:tint="@color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,18 +1,17 @@
 package com.familyplanner.tasks.repository
 
 import android.net.Uri
-import com.familyplanner.common.User
 import com.familyplanner.common.schema.CommentDbSchema
 import com.familyplanner.common.schema.ObserverDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
-import com.familyplanner.tasks.dto.AddObserverDto
-import com.familyplanner.tasks.dto.CommentDto
-import com.familyplanner.tasks.dto.ObserverDto
+import com.familyplanner.tasks.data.AddObserverDto
+import com.familyplanner.tasks.data.CommentDto
+import com.familyplanner.tasks.data.ObserverDto
 import com.google.android.gms.tasks.Task as GoogleTask
-import com.familyplanner.tasks.model.Observer
-import com.familyplanner.tasks.model.Task
-import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.tasks.data.Observer
+import com.familyplanner.tasks.data.Task
+import com.familyplanner.tasks.data.UserFile
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.snapshots

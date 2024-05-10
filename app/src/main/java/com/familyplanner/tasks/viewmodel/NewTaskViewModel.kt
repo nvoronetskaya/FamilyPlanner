@@ -2,18 +2,16 @@ package com.familyplanner.tasks.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.familyplanner.family.data.FamilyRepository
-import com.familyplanner.tasks.model.Importance
-import com.familyplanner.tasks.model.RepeatType
-import com.familyplanner.tasks.model.Status
-import com.familyplanner.tasks.model.Task
-import com.familyplanner.tasks.model.TaskCreationStatus
-import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.family.repository.FamilyRepository
+import com.familyplanner.tasks.data.Importance
+import com.familyplanner.tasks.data.RepeatType
+import com.familyplanner.tasks.data.Status
+import com.familyplanner.tasks.data.Task
+import com.familyplanner.tasks.data.TaskCreationStatus
+import com.familyplanner.tasks.data.UserFile
 import com.familyplanner.tasks.repository.TaskRepository
 import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.storage.UploadTask
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.search.Address
 import com.yandex.mapkit.search.BusinessObjectMetadata
 import com.yandex.mapkit.search.Response
 import com.yandex.mapkit.search.SearchFactory

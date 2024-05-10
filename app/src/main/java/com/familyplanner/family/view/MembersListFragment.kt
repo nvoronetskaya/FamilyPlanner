@@ -7,9 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -19,9 +17,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.MainActivity
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
-import com.familyplanner.common.User
+import com.familyplanner.common.data.User
 import com.familyplanner.databinding.FragmentMembersBinding
 import com.familyplanner.family.adapters.ApplicationAdapter
 import com.familyplanner.family.adapters.MemberAdapter

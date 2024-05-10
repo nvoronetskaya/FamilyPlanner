@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderListNonObserverBinding
-import com.familyplanner.lists.model.NonObserver
+import com.familyplanner.lists.data.NonObserver
 
 class NonObserverAdapter : RecyclerView.Adapter<NonObserverAdapter.NonObserverViewHolder>() {
     private val nonObservers = mutableListOf<NonObserver>()

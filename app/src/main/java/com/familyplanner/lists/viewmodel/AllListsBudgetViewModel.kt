@@ -2,7 +2,7 @@ package com.familyplanner.lists.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.familyplanner.lists.model.BudgetDto
+import com.familyplanner.lists.data.BudgetDto
 import com.familyplanner.lists.repository.GroceryListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

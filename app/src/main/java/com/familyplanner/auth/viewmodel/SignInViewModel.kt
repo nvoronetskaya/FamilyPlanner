@@ -3,12 +3,10 @@ package com.familyplanner.auth.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
+import com.familyplanner.auth.repository.UserRepository
 import com.familyplanner.auth.network.AuthQueries
-import com.google.firebase.Firebase
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.messaging.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

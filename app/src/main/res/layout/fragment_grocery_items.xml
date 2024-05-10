@@ -21,7 +21,7 @@
             android:id="@+id/iv_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back" />
+            app:srcCompat="@drawable/ic_back" />
 
         <TextView
             android:id="@+id/tv_list_name"
@@ -107,6 +107,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:shapeAppearanceOverlay="@style/fab_round"
-        app:srcCompat="@drawable/add"
+        app:srcCompat="@drawable/ic_add"
         app:tint="@color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,15 +21,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.MainActivity
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewTaskBinding
 import com.familyplanner.tasks.adapters.FileAdapter
-import com.familyplanner.tasks.model.Importance
-import com.familyplanner.tasks.model.RepeatType
-import com.familyplanner.tasks.model.Status
-import com.familyplanner.tasks.model.TaskCreationStatus
-import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.tasks.data.Importance
+import com.familyplanner.tasks.data.RepeatType
+import com.familyplanner.tasks.data.Status
+import com.familyplanner.tasks.data.TaskCreationStatus
+import com.familyplanner.tasks.data.UserFile
 import com.familyplanner.tasks.viewmodel.NewTaskViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.yandex.mapkit.MapKitFactory
@@ -41,14 +41,11 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.Calendar
-import kotlin.time.Duration.Companion.minutes
 
 class NewTaskInfoFragment : Fragment() {
     private var _binding: FragmentNewTaskBinding? = null

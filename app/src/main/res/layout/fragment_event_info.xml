@@ -23,7 +23,7 @@
             android:id="@+id/iv_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back" />
+            app:srcCompat="@drawable/ic_back" />
 
         <TextView
             style="@style/textBar"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/edit" />
+            app:srcCompat="@drawable/ic_edit" />
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -207,7 +207,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_observers"
                     app:layout_constraintStart_toEndOf="@id/tv_observers"
                     app:layout_constraintTop_toTopOf="@id/tv_observers"
-                    app:srcCompat="@drawable/unfolded" />
+                    app:srcCompat="@drawable/ic_unfolded" />
 
                 <ImageView
                     android:id="@+id/iv_observers_folded"
@@ -218,7 +218,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_observers"
                     app:layout_constraintStart_toEndOf="@id/tv_observers"
                     app:layout_constraintTop_toTopOf="@id/tv_observers"
-                    app:srcCompat="@drawable/folded" />
+                    app:srcCompat="@drawable/ic_folded" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_observers"
@@ -251,7 +251,7 @@
         android:layout_marginBottom="20dp"
         android:text="@string/cancel_event"
         android:textColor="@color/red"
-        app:drawableStartCompat="@drawable/cancel_event"
+        app:drawableStartCompat="@drawable/ic_cancel_event"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

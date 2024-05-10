@@ -5,11 +5,11 @@ import com.familyplanner.common.schema.ProductDbSchema
 import com.familyplanner.common.schema.SpendingDbSchema
 import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.common.schema.UserListDbSchema
-import com.familyplanner.lists.model.BudgetDto
-import com.familyplanner.lists.model.GroceryList
-import com.familyplanner.lists.model.ListObserver
-import com.familyplanner.lists.model.NonObserver
-import com.familyplanner.lists.model.Product
+import com.familyplanner.lists.data.BudgetDto
+import com.familyplanner.lists.data.GroceryList
+import com.familyplanner.lists.data.ListObserver
+import com.familyplanner.lists.data.NonObserver
+import com.familyplanner.lists.data.Product
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.firestore
@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await

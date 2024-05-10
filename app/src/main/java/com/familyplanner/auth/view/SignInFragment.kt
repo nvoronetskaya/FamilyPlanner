@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.familyplanner.MainActivity
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.SignInViewModel
 import com.familyplanner.databinding.FragmentSignInBinding

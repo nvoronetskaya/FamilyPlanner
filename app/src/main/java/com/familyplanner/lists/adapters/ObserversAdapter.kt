@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderMemberBinding
-import com.familyplanner.lists.model.ListObserver
+import com.familyplanner.lists.data.ListObserver
 
 class ObserversAdapter(val canDeleteObservers: Boolean, val onDelete: (ListObserver) -> Unit) :
     RecyclerView.Adapter<ObserversAdapter.ObserverViewHolder>() {

@@ -2,14 +2,14 @@ package com.familyplanner.tasks.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.familyplanner.auth.data.UserRepository
-import com.familyplanner.common.User
-import com.familyplanner.family.data.FamilyRepository
-import com.familyplanner.tasks.dto.TaskWithDate
-import com.familyplanner.tasks.model.Importance
-import com.familyplanner.tasks.model.RepeatType
-import com.familyplanner.tasks.model.SortingType
-import com.familyplanner.tasks.model.Task
+import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.common.data.User
+import com.familyplanner.family.repository.FamilyRepository
+import com.familyplanner.tasks.data.TaskWithDate
+import com.familyplanner.tasks.data.Importance
+import com.familyplanner.tasks.data.RepeatType
+import com.familyplanner.tasks.data.SortingType
+import com.familyplanner.tasks.data.Task
 import com.familyplanner.tasks.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

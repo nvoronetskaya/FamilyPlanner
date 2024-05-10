@@ -4,13 +4,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import com.familyplanner.R
-import com.familyplanner.common.User
+import com.familyplanner.common.data.User
 import com.familyplanner.databinding.ViewholderApplicantBinding
 import com.familyplanner.family.viewmodel.MembersListViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ApplicationAdapter(
     val isAdmin: Boolean,

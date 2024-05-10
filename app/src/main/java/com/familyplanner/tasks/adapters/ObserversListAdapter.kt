@@ -1,13 +1,11 @@
 package com.familyplanner.tasks.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.familyplanner.common.User
 import com.familyplanner.databinding.ViewholderObserverBinding
-import com.familyplanner.tasks.dto.ObserverDto
+import com.familyplanner.tasks.data.ObserverDto
 
 class ObserversListAdapter(private val userId: String) :
     RecyclerView.Adapter<ObserversListAdapter.ObserverViewHolder>() {

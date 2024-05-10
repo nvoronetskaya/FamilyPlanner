@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderFileBinding
-import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.tasks.data.UserFile
 
 class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {

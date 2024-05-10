@@ -32,7 +32,7 @@
         app:layout_constraintBottom_toBottomOf="@id/iv_reject"
         app:layout_constraintEnd_toStartOf="@id/iv_reject"
         app:layout_constraintTop_toTopOf="@id/iv_reject"
-        app:srcCompat="@drawable/approve" />
+        app:srcCompat="@drawable/ic_approve" />
 
     <ImageView
         android:id="@+id/iv_reject"
@@ -41,5 +41,5 @@
         app:layout_constraintBottom_toBottomOf="@id/tv_birthday"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_name"
-        app:srcCompat="@drawable/reject" />
+        app:srcCompat="@drawable/ic_reject" />
 </androidx.constraintlayout.widget.ConstraintLayout>

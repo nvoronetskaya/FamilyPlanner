@@ -4,10 +4,10 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
+import com.familyplanner.auth.repository.UserRepository
 import com.familyplanner.events.data.Event
 import com.familyplanner.events.data.EventAttendee
-import com.familyplanner.events.data.EventRepository
+import com.familyplanner.events.repository.EventRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

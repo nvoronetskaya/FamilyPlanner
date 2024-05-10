@@ -19,14 +19,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.MainActivity
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentNewEventBinding
 import com.familyplanner.events.adapters.InvitationAdapter
 import com.familyplanner.events.viewmodel.NewEventViewModel
 import com.familyplanner.tasks.adapters.FileAdapter
-import com.familyplanner.tasks.model.TaskCreationStatus
-import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.tasks.data.TaskCreationStatus
+import com.familyplanner.tasks.data.UserFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime

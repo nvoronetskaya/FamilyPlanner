@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderListProductBinding
-import com.familyplanner.lists.model.GroceryList
+import com.familyplanner.lists.data.GroceryList
 
 class ListAdapter(
     val onEdited: (GroceryList, String) -> Unit,

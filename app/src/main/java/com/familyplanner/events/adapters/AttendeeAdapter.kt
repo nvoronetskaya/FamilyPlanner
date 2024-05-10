@@ -17,9 +17,9 @@ class AttendeeAdapter : RecyclerView.Adapter<AttendeeAdapter.AttendeeViewHolder>
         fun onBind(attendee: EventAttendee) {
             binding.tvName.text = attendee.userName
             val drawable = when (attendee.status) {
-                EventAttendeeStatus.UNKNOWN -> R.drawable.unknown
-                EventAttendeeStatus.NOT_COMING -> R.drawable.reject
-                EventAttendeeStatus.COMING -> R.drawable.approve
+                EventAttendeeStatus.UNKNOWN -> R.drawable.ic_unknown
+                EventAttendeeStatus.NOT_COMING -> R.drawable.ic_reject
+                EventAttendeeStatus.COMING -> R.drawable.ic_approve
             }
             binding.ivIsExecutor.setImageDrawable(
                 AppCompatResources.getDrawable(

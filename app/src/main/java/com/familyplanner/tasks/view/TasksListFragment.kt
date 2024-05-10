@@ -1,20 +1,16 @@
 package com.familyplanner.tasks.view
 
 import android.Manifest
-import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.pm.PackageManager
-import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
-import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -27,13 +23,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.MainActivity
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.BottomsheetTaskFiltersBinding
 import com.familyplanner.databinding.FragmentTasksListBinding
 import com.familyplanner.tasks.adapters.TaskAdapter
-import com.familyplanner.tasks.model.Importance
-import com.familyplanner.tasks.model.SortingType
+import com.familyplanner.tasks.data.Importance
+import com.familyplanner.tasks.data.SortingType
 import com.familyplanner.tasks.viewmodel.TasksListViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip

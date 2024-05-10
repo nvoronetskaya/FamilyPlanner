@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderBudgetBinding
-import com.familyplanner.lists.model.BudgetDto
+import com.familyplanner.lists.data.BudgetDto
 
 class ListBudgetAdapter : RecyclerView.Adapter<ListBudgetAdapter.BudgetViewHolder>() {
     private val budgetObjects = mutableListOf<BudgetDto>()

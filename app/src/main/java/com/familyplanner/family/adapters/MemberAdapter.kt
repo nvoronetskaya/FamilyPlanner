@@ -4,12 +4,10 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.R
-import com.familyplanner.common.User
+import com.familyplanner.common.data.User
 import com.familyplanner.databinding.ViewholderMemberBinding
 import com.familyplanner.family.viewmodel.MembersListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

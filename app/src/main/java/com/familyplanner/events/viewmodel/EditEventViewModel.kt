@@ -4,10 +4,10 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.events.data.Event
-import com.familyplanner.events.data.EventRepository
+import com.familyplanner.events.repository.EventRepository
 import com.familyplanner.events.data.Invitation
-import com.familyplanner.family.data.FamilyRepository
-import com.familyplanner.tasks.model.UserFile
+import com.familyplanner.family.repository.FamilyRepository
+import com.familyplanner.tasks.data.UserFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await

@@ -21,7 +21,7 @@
             android:id="@+id/iv_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back" />
+            app:srcCompat="@drawable/ic_back" />
 
         <TextView
             android:id="@+id/tv_family"
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/edit" />
+            app:srcCompat="@drawable/ic_edit" />
     </androidx.appcompat.widget.Toolbar>
 
     <com.google.android.material.tabs.TabLayout
@@ -150,7 +150,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/leave" />
+            app:srcCompat="@drawable/ic_leave" />
 
         <TextView
             style="@style/textBody"
@@ -174,7 +174,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/delete" />
+            app:srcCompat="@drawable/ic_delete" />
 
         <TextView
             style="@style/textBody"

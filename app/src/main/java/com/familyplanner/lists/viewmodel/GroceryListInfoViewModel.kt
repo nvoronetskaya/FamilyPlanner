@@ -3,11 +3,11 @@ package com.familyplanner.lists.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
-import com.familyplanner.lists.model.GroceryList
-import com.familyplanner.lists.model.ListObserver
-import com.familyplanner.lists.model.NonObserver
-import com.familyplanner.lists.model.Product
+import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.lists.data.GroceryList
+import com.familyplanner.lists.data.ListObserver
+import com.familyplanner.lists.data.NonObserver
+import com.familyplanner.lists.data.Product
 import com.familyplanner.lists.repository.GroceryListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

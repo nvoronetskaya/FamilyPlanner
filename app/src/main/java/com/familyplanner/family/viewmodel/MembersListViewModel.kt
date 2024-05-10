@@ -3,9 +3,9 @@ package com.familyplanner.family.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.common.User
-import com.familyplanner.family.data.FamilyRepository
-import com.familyplanner.family.model.Family
+import com.familyplanner.common.data.User
+import com.familyplanner.family.repository.FamilyRepository
+import com.familyplanner.family.data.Family
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

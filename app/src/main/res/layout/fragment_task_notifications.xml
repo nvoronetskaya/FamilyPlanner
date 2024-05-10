@@ -21,7 +21,7 @@
             android:id="@+id/iv_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back" />
+            app:srcCompat="@drawable/ic_back" />
 
         <TextView
             android:id="@+id/tv_notifiications"
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/done" />
+            app:srcCompat="@drawable/ic_done" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView

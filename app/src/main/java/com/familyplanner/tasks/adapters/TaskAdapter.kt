@@ -6,9 +6,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderTaskBinding
-import com.familyplanner.tasks.dto.TaskWithDate
-import com.familyplanner.tasks.model.RepeatType
-import com.familyplanner.tasks.model.Task
+import com.familyplanner.tasks.data.TaskWithDate
+import com.familyplanner.tasks.data.RepeatType
+import com.familyplanner.tasks.data.Task
 import java.time.LocalDate
 
 class TaskAdapter(

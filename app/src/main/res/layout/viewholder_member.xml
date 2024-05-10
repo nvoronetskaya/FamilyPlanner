@@ -30,5 +30,5 @@
         app:layout_constraintBottom_toBottomOf="@id/tv_birthday"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_name"
-        app:srcCompat="@drawable/remove" />
+        app:srcCompat="@drawable/ic_remove" />
 </androidx.constraintlayout.widget.ConstraintLayout>

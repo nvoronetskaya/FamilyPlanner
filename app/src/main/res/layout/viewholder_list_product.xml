@@ -43,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="@id/cb_list"
         app:layout_constraintEnd_toStartOf="@id/iv_delete"
         app:layout_constraintTop_toTopOf="@id/cb_list"
-        app:srcCompat="@drawable/edit"
+        app:srcCompat="@drawable/ic_edit"
         app:tint="@color/dark_gray" />
 
     <ImageView
@@ -57,7 +57,7 @@
         app:layout_constraintBottom_toBottomOf="@id/cb_list"
         app:layout_constraintEnd_toStartOf="@id/iv_delete"
         app:layout_constraintTop_toTopOf="@id/cb_list"
-        app:srcCompat="@drawable/done"
+        app:srcCompat="@drawable/ic_done"
         app:tint="@color/dark_gray" />
 
     <ImageView
@@ -70,5 +70,5 @@
         app:layout_constraintBottom_toBottomOf="@id/cb_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/cb_list"
-        app:srcCompat="@drawable/delete" />
+        app:srcCompat="@drawable/ic_delete" />
 </androidx.constraintlayout.widget.ConstraintLayout>

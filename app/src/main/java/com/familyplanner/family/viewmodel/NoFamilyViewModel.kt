@@ -3,16 +3,15 @@ package com.familyplanner.family.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
-import com.familyplanner.common.User
-import com.familyplanner.family.data.FamilyRepository
+import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.common.data.User
+import com.familyplanner.family.repository.FamilyRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 

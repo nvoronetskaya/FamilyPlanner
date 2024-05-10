@@ -3,9 +3,9 @@ package com.familyplanner.tasks.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
-import com.familyplanner.family.data.FamilyRepository
-import com.familyplanner.tasks.dto.AddObserverDto
+import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.family.repository.FamilyRepository
+import com.familyplanner.tasks.data.AddObserverDto
 import com.familyplanner.tasks.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -24,7 +24,7 @@
         android:theme="@style/Theme.FamilyPlanner"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".common.view.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +47,7 @@
             </intent-filter>
         </service>
         <service
-            android:name=".location.data.LocationService"
+            android:name=".location.service.LocationService"
             android:enabled="true"
             android:foregroundServiceType="location"
             android:exported="false">

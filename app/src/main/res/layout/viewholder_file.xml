@@ -13,7 +13,7 @@
         app:layout_constraintEnd_toEndOf="@id/tv_file_name"
         app:layout_constraintStart_toStartOf="@id/tv_file_name"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/file" />
+        app:srcCompat="@drawable/ic_file" />
 
     <ImageView
         android:id="@+id/iv_remove"
@@ -21,7 +21,7 @@
         android:layout_height="16dp"
         app:layout_constraintStart_toEndOf="@id/iv_file"
         app:layout_constraintTop_toTopOf="@id/iv_file"
-        app:srcCompat="@drawable/close" />
+        app:srcCompat="@drawable/ic_close" />
 
     <TextView
         android:id="@+id/tv_file_name"

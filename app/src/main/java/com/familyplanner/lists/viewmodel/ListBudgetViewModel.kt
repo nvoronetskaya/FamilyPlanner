@@ -2,7 +2,7 @@ package com.familyplanner.lists.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.lists.model.BudgetDto
+import com.familyplanner.lists.data.BudgetDto
 import com.familyplanner.lists.repository.GroceryListRepository
 import java.time.LocalDate
 

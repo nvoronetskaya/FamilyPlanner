@@ -3,8 +3,8 @@ package com.familyplanner.lists.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
-import com.familyplanner.lists.model.GroceryList
+import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.lists.data.GroceryList
 import com.familyplanner.lists.repository.GroceryListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -21,7 +21,7 @@
             android:id="@+id/iv_person"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/person" />
+            app:srcCompat="@drawable/ic_person" />
 
         <TextView
             android:id="@+id/tv_family"
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="5dp"
-            app:srcCompat="@drawable/tune" />
+            app:srcCompat="@drawable/ic_tune" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
@@ -101,6 +101,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:shapeAppearanceOverlay="@style/fab_round"
-        app:srcCompat="@drawable/add"
+        app:srcCompat="@drawable/ic_add"
         app:tint="@color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

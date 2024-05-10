@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderAddObserverBinding
-import com.familyplanner.tasks.dto.AddObserverDto
+import com.familyplanner.tasks.data.AddObserverDto
 
 class AddTaskObserverAdapter(val createdBy: String) :
     RecyclerView.Adapter<AddTaskObserverAdapter.ObserverViewHolder>() {

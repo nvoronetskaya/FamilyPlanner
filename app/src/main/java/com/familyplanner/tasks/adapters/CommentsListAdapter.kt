@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderOtherCommentBinding
 import com.familyplanner.databinding.ViewholderUserCommentBinding
-import com.familyplanner.tasks.dto.CommentDto
+import com.familyplanner.tasks.data.CommentDto
 import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.time.Instant

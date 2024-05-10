@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.navigation.NavDeepLinkBuilder
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.MainActivity
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.common.schema.UserDbSchema
 import com.google.firebase.firestore.ktx.firestore
@@ -49,7 +49,7 @@ class PushNotificationService : FirebaseMessagingService() {
                 .setArguments(bundleOf(key to sourceId)).createPendingIntent()
             val notification =
                 NotificationCompat.Builder(this, "DATA_UPDATES").setContentTitle(title)
-                    .setSmallIcon(R.drawable.notifications)
+                    .setSmallIcon(R.drawable.ic_notifications)
                     .setContentText(body)
                     .setContentIntent(link).build()
             val manager = NotificationManagerCompat.from(this)

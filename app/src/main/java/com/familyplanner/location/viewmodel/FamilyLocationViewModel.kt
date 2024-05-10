@@ -3,8 +3,8 @@ package com.familyplanner.location.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.data.UserRepository
-import com.familyplanner.family.data.FamilyRepository
+import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.family.repository.FamilyRepository
 import com.familyplanner.location.data.UserLocationDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

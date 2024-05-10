@@ -23,7 +23,7 @@
             android:id="@+id/iv_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/back" />
+            app:srcCompat="@drawable/ic_back" />
 
         <TextView
             style="@style/textBar"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/edit" />
+            app:srcCompat="@drawable/ic_edit" />
 
         <ImageView
             android:id="@+id/iv_notification"
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/notifications" />
+            app:srcCompat="@drawable/ic_notifications" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -178,7 +178,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_subtasks"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_subtasks"
-                    app:srcCompat="@drawable/add" />
+                    app:srcCompat="@drawable/ic_add" />
 
                 <TextView
                     android:id="@+id/tv_subtasks"
@@ -201,7 +201,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_subtasks"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_subtasks"
-                    app:srcCompat="@drawable/unfolded" />
+                    app:srcCompat="@drawable/ic_unfolded" />
 
                 <ImageView
                     android:id="@+id/iv_subtasks_folded"
@@ -212,7 +212,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_subtasks"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_subtasks"
-                    app:srcCompat="@drawable/folded" />
+                    app:srcCompat="@drawable/ic_folded" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_subtasks"
@@ -277,7 +277,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_observers"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_observers"
-                    app:srcCompat="@drawable/unfolded" />
+                    app:srcCompat="@drawable/ic_unfolded" />
 
                 <ImageView
                     android:id="@+id/iv_observers_folded"
@@ -287,7 +287,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tv_observers"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tv_observers"
-                    app:srcCompat="@drawable/folded" />
+                    app:srcCompat="@drawable/ic_folded" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_observers"
@@ -313,7 +313,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/delete_task"
                 android:textColor="@color/red"
-                app:drawableStartCompat="@drawable/delete" />
+                app:drawableStartCompat="@drawable/ic_delete" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -350,7 +350,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tf_comment"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tf_comment"
-                    app:srcCompat="@drawable/attach_file" />
+                    app:srcCompat="@drawable/ic_attach_file" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_comment_files"
@@ -399,7 +399,7 @@
                     app:layout_constraintBottom_toBottomOf="@id/tf_comment"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/tf_comment"
-                    app:srcCompat="@drawable/send" />
+                    app:srcCompat="@drawable/ic_send" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>
