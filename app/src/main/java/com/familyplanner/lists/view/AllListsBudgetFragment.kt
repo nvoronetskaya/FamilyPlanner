@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
@@ -20,11 +22,16 @@ import com.familyplanner.lists.adapters.ListBudgetAdapter
 import com.familyplanner.lists.model.BudgetDto
 import com.familyplanner.lists.viewmodel.AllListsBudgetViewModel
 import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IValueFormatter
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.github.mikephil.charting.utils.ViewPortHandler
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +43,7 @@ class AllListsBudgetFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: AllListsBudgetViewModel
     private val calendar = Calendar.getInstance()
+    private val graphFormatter = XAxisDateFormatter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,39 +62,45 @@ class AllListsBudgetFragment : Fragment() {
         binding.rvBudget.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBudget.adapter = budgetAdapter
         lifecycleScope.launch(Dispatchers.IO) {
-            val spendings = viewModel.getSpendings(familyId)
-            requireActivity().runOnUiThread {
-                if (binding.rvBudget.isVisible) {
-                    budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
-                } else {
-                    updateGraph(spendings)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getListsForFamily(familyId).collect {
+                    requireActivity().runOnUiThread {
+                        if (binding.rvBudget.isVisible) {
+                            budgetAdapter.setData(it.sortedByDescending { it.addedAt })
+                        } else {
+                            updateGraph(it)
+                        }
+                        binding.tvSumValue.text = it.sumOf { it.sumSpent }.toString()
+                        binding.tvDateStart.text =
+                            viewModel.getStartDate().format(FamilyPlanner.uiDateFormatter)
+                        binding.tvDateFinish.text =
+                            viewModel.getFinishDate().format(FamilyPlanner.uiDateFormatter)
+                    }
                 }
-                binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
-                binding.tvDateStart.text =
-                    viewModel.getStartDate().format(FamilyPlanner.uiDateFormatter)
-                binding.tvDateFinish.text =
-                    viewModel.getFinishDate().format(FamilyPlanner.uiDateFormatter)
             }
         }
         binding.ivAdd.isVisible = false
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.tvDateStart.setOnClickListener {
             setDate(it as TextView) {
-                val spendings = viewModel.updateStartDate(it)
-                budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
-                binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
+                viewModel.updateStartDate(it)
             }
         }
         binding.tvDateFinish.setOnClickListener {
             setDate(it as TextView) {
-                val spendings = viewModel.updateFinishDate(it)
-                budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
-                binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
+                viewModel.updateFinishDate(it)
             }
         }
         binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val isList = binding.tabs.getTabAt(0)!!.equals(tab)
+                viewModel.getLastSpendings()?.let {
+                    if (isList) {
+                        budgetAdapter.setData(it)
+                    } else {
+                        updateGraph(it)
+                    }
+                }
                 binding.rvBudget.isVisible = isList
                 binding.chart.isVisible = !isList
             }
@@ -117,8 +131,8 @@ class AllListsBudgetFragment : Fragment() {
         dialog.show()
     }
 
-    private fun updateGraph(completionHistory: List<BudgetDto>) {
-        val spendingsByList = completionHistory.groupBy { it.listId }
+    private fun updateGraph(spendingHistory: List<BudgetDto>) {
+        val spendingsByList = spendingHistory.groupBy { it.listId }
         val datasets = arrayListOf<ILineDataSet>()
         val startDate = viewModel.getStartDate().toEpochDay()
         val finishDate = viewModel.getFinishDate().toEpochDay()
@@ -143,11 +157,9 @@ class AllListsBudgetFragment : Fragment() {
         chart.data = LineData(datasets)
         val xAxis = chart.xAxis
         xAxis.labelCount = (finishDate - startDate + 1).toInt()
-        xAxis.valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float, axis: AxisBase): String {
-                return LocalDate.ofEpochDay(value.toLong()).format(FamilyPlanner.uiDateFormatter)
-            }
-        }
+        xAxis.valueFormatter = graphFormatter
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.labelRotationAngle = 315f
         chart.invalidate()
     }
 

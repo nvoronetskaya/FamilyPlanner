@@ -35,7 +35,7 @@ class GroceryListsViewModel : ViewModel() {
 
     fun addList(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            listsRepository.addList(name, userId)
+            listsRepository.addList(name, userId, familyId)
         }
     }
 

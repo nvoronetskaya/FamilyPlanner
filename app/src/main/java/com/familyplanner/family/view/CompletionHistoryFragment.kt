@@ -22,7 +22,9 @@ import com.familyplanner.databinding.FragmentStatsBinding
 import com.familyplanner.family.data.CompletionAdapter
 import com.familyplanner.family.data.CompletionDto
 import com.familyplanner.family.viewmodel.CompletionHistoryViewModel
+import com.familyplanner.lists.view.XAxisDateFormatter
 import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -39,6 +41,7 @@ class CompletionHistoryFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: CompletionHistoryViewModel
     private val calendar: Calendar = Calendar.getInstance()
+    private val graphFormatter = XAxisDateFormatter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -150,11 +153,9 @@ class CompletionHistoryFragment : Fragment() {
         chart.data = LineData(datasets)
         val xAxis = chart.xAxis
         xAxis.labelCount = (finishDate - startDate + 1).toInt()
-        xAxis.valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float, axis: AxisBase): String {
-                return LocalDate.ofEpochDay(value.toLong()).format(FamilyPlanner.uiDateFormatter)
-            }
-        }
+        xAxis.valueFormatter = graphFormatter
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+        xAxis.labelRotationAngle = 315f
         chart.invalidate()
     }
 
