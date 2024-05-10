@@ -30,7 +30,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="30dp"
             android:gravity="center_vertical"
-            android:text="Траты" />
+            android:text="@string/spendings" />
 
         <ImageView
             android:id="@+id/iv_add"
@@ -41,6 +41,30 @@
             app:srcCompat="@drawable/add"
             app:tint="@color/white" />
     </androidx.appcompat.widget.Toolbar>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:backgroundTint="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="#D8D8D8">
+
+        <com.google.android.material.tabs.TabItem
+            style="@style/textBody"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="@string/history" />
+
+        <com.google.android.material.tabs.TabItem
+            style="@style/textBody"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="@string/stats" />
+    </com.google.android.material.tabs.TabLayout>
 
     <LinearLayout
         android:id="@+id/date"
@@ -80,7 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="15dp"
         android:layout_marginStart="10dp"
-        android:text="Сумма: "
+        android:text="@string/sum"
         app:layout_constraintStart_toStartOf="@id/date"
         app:layout_constraintTop_toBottomOf="@id/date" />
 
@@ -100,7 +124,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="Список трат "
+        android:text="@string/spendings_list"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -116,4 +140,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_list"
         tools:listitem="@layout/viewholder_budget" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="15dp"
+        android:fontFamily="@font/roboto_serif"
+        android:visibility="gone"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date" />
 </androidx.constraintlayout.widget.ConstraintLayout>

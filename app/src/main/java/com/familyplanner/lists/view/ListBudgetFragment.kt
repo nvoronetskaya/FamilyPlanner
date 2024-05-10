@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -61,6 +62,7 @@ class ListBudgetFragment : Fragment() {
                     viewModel.getFinishDate().format(FamilyPlanner.uiDateFormatter)
             }
         }
+        binding.tabs.isVisible = false
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.ivAdd.setOnClickListener {
             val moneySpent = EditText(activity)

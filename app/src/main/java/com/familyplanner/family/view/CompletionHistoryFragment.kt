@@ -130,7 +130,7 @@ class CompletionHistoryFragment : Fragment() {
         val completionByUser = completionHistory.groupBy { it.userId }
         val datasets = arrayListOf<ILineDataSet>()
         val startDate = viewModel.getStartDay()
-        val finishDate = viewModel.getStartDay()
+        val finishDate = viewModel.getFinishDay()
         for (userId in completionByUser.keys) {
             val completionDates =
                 hashSetOf<Long>()

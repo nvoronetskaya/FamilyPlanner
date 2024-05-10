@@ -105,4 +105,9 @@
     <string name="start_date">Начало: </string>
     <string name="finish_date">Окончание: </string>
     <string name="delete_task">Удалить задачу</string>
+    <string name="history">История</string>
+    <string name="stats">Статистика</string>
+    <string name="spendings">Траты</string>
+    <string name="spendings_list">Список трат </string>
+    <string name="sum">Сумма: </string>
 </resources>

@@ -17,7 +17,15 @@ import com.familyplanner.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentSpendingsBinding
 import com.familyplanner.lists.adapters.ListBudgetAdapter
+import com.familyplanner.lists.model.BudgetDto
 import com.familyplanner.lists.viewmodel.AllListsBudgetViewModel
+import com.github.mikephil.charting.components.AxisBase
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -48,7 +56,11 @@ class AllListsBudgetFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val spendings = viewModel.getSpendings(familyId)
             requireActivity().runOnUiThread {
-                budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
+                if (binding.rvBudget.isVisible) {
+                    budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
+                } else {
+                    updateGraph(spendings)
+                }
                 binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
                 binding.tvDateStart.text =
                     viewModel.getStartDate().format(FamilyPlanner.uiDateFormatter)
@@ -72,6 +84,19 @@ class AllListsBudgetFragment : Fragment() {
                 binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
             }
         }
+        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val isList = binding.tabs.getTabAt(0)!!.equals(tab)
+                binding.rvBudget.isVisible = isList
+                binding.chart.isVisible = !isList
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
     }
 
     private fun setDate(dateHolder: TextView, onDateChosen: (LocalDate) -> Unit) {
@@ -90,6 +115,40 @@ class AllListsBudgetFragment : Fragment() {
         )
         dialog.datePicker.maxDate = calendar.timeInMillis
         dialog.show()
+    }
+
+    private fun updateGraph(completionHistory: List<BudgetDto>) {
+        val spendingsByList = completionHistory.groupBy { it.listId }
+        val datasets = arrayListOf<ILineDataSet>()
+        val startDate = viewModel.getStartDate().toEpochDay()
+        val finishDate = viewModel.getFinishDate().toEpochDay()
+        for (listId in spendingsByList.keys) {
+            val completionDates =
+                hashSetOf<Long>()
+            completionDates.addAll(spendingsByList[listId]!!.map {
+                it.addedAt.toLocalDate().toEpochDay()
+            }.sorted())
+            val userLine = arrayListOf<Entry>()
+            (startDate..finishDate).forEach { date ->
+                userLine.add(
+                    Entry(
+                        date.toFloat(),
+                        spendingsByList[listId]!!.sumOf { it.sumSpent }.toFloat()
+                    ),
+                )
+            }
+            datasets.add(LineDataSet(userLine, spendingsByList[listId]!![0].listName))
+        }
+        val chart = binding.chart
+        chart.data = LineData(datasets)
+        val xAxis = chart.xAxis
+        xAxis.labelCount = (finishDate - startDate + 1).toInt()
+        xAxis.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float, axis: AxisBase): String {
+                return LocalDate.ofEpochDay(value.toLong()).format(FamilyPlanner.uiDateFormatter)
+            }
+        }
+        chart.invalidate()
     }
 
     override fun onDestroyView() {
