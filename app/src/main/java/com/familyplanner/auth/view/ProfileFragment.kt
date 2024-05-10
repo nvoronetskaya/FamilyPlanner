@@ -49,6 +49,9 @@ class ProfileFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getUser().collect {
                     activity?.runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         binding.etName.setText(it.name)
                         binding.etEmail.setText(it.email)
                         binding.etBirthday.setText(it.birthday)

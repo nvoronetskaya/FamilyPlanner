@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -57,7 +58,6 @@ class MembersListFragment : Fragment() {
         binding.rvMembers.layoutManager = manager
         binding.rvMembers.adapter = adapter
         applicationsAdapter = ApplicationAdapter(
-            isAdmin,
             activity as MainActivity,
             viewModel,
             ::onApprove,
@@ -88,12 +88,10 @@ class MembersListFragment : Fragment() {
                                 MaterialAlertDialogBuilder(
                                     activity as MainActivity,
                                     R.style.alertDialog
-                                )
-                                    .setMessage("Вы больше не являетесь участником данной семьи")
-                                    .setCancelable(false)
-                                    .setNeutralButton("Ок") { _, _ ->
-                                        findNavController().popBackStack()
-                                    }.create().show()
+                                ).setMessage("Вы больше не являетесь участником данной семьи").setPositiveButton("Ок") { dialog, _ ->
+                                    dialog.dismiss()
+                                }
+                                    .create().show()
                             } else {
                                 binding.tvFamily.text = it.name
                                 binding.tvCode.text = it.id
@@ -120,6 +118,7 @@ class MembersListFragment : Fragment() {
             }
         }
         binding.llDelete.isVisible = isAdmin
+        (binding.tabs.getChildAt(0) as LinearLayout).getChildAt(1).isClickable = isAdmin
         binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 val isMembers = binding.tabs.getTabAt(0)!!.equals(tab)

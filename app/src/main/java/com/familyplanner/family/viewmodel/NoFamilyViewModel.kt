@@ -42,10 +42,8 @@ class NoFamilyViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val userDoc = user.replayCache[0]
             val userId = userDoc.id
-            familyRepo.createFamily(name, userId).addOnCompleteListener {
-                if (it.isSuccessful) {
-                    familyRepo.setUserToAdmin(userId, it.result.id)
-                } else {
+            familyRepo.createFamily(name, userId).continueWith {
+                if (!it.isSuccessful) {
                     viewModelScope.launch(Dispatchers.IO) {
                         errors.emit("Не удалось создать семью, попробуйте позднее")
                     }

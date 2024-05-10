@@ -10,7 +10,6 @@ import com.familyplanner.databinding.ViewholderApplicantBinding
 import com.familyplanner.family.viewmodel.MembersListViewModel
 
 class ApplicationAdapter(
-    val isAdmin: Boolean,
     val activity: Context,
     val viewModel: MembersListViewModel,
     val onApprove: (User) -> Unit,
@@ -25,17 +24,11 @@ class ApplicationAdapter(
         fun onBind(applicant: User) {
             binding.tvName.text = applicant.name
             binding.tvBirthday.text = applicant.birthday
-            if (isAdmin) {
-                binding.ivApprove.setOnClickListener {
-                    onApprove(applicant)
-                }
-
-                binding.ivReject.setOnClickListener {
-                    onReject(applicant)
-                }
-            } else {
-                binding.ivApprove.visibility = View.GONE
-                binding.ivReject.visibility = View.GONE
+            binding.ivApprove.setOnClickListener {
+                onApprove(applicant)
+            }
+            binding.ivReject.setOnClickListener {
+                onReject(applicant)
             }
         }
     }

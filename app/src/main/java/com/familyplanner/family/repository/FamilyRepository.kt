@@ -155,8 +155,7 @@ class FamilyRepository {
                     for (doc in it.result.documents) {
                         doc.reference.update(
                             mapOf(
-                                UserDbSchema.FAMILY_ID to "",
-                                UserDbSchema.IS_ADMIN to false
+                                UserDbSchema.FAMILY_ID to ""
                             )
                         )
                     }
@@ -191,11 +190,6 @@ class FamilyRepository {
         return firestore.collection(FamilyDbSchema.FAMILY_TABLE).add(data)
     }
 
-    fun setUserToAdmin(userId: String, familyId: String) {
-        firestore.collection(UserDbSchema.USER_TABLE).document(userId)
-            .update(mapOf(UserDbSchema.FAMILY_ID to familyId, UserDbSchema.IS_ADMIN to true))
-    }
-
     fun deleteFamily(familyId: String): Task<Void> {
         val task = firestore.collection(FamilyDbSchema.FAMILY_TABLE).document(familyId).delete()
         task.continueWith {
@@ -205,8 +199,7 @@ class FamilyRepository {
                         for (doc in it.result.documents) {
                             doc.reference.update(
                                 mapOf(
-                                    UserDbSchema.FAMILY_ID to "",
-                                    UserDbSchema.IS_ADMIN to false
+                                    UserDbSchema.FAMILY_ID to ""
                                 )
                             )
                         }

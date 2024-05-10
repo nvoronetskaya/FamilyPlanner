@@ -49,10 +49,16 @@ class NoFamilyFragment : Fragment() {
                                 binding.pbLoading.visibility = View.GONE
                                 val bundle = Bundle()
                                 bundle.putString("familyId", it.familyId)
-                                findNavController().navigate(R.id.action_noFamilyFragment_to_tasksListFragment, bundle)
+                                findNavController().navigate(
+                                    R.id.action_noFamilyFragment_to_tasksListFragment,
+                                    bundle
+                                )
                             }
                         } else {
                             activity?.runOnUiThread {
+                                if (_binding == null) {
+                                    return@runOnUiThread
+                                }
                                 binding.pbLoading.visibility = View.GONE
                                 binding.animNothingFound.visibility = View.VISIBLE
                                 binding.tvNoFamily.visibility = View.VISIBLE
@@ -79,10 +85,19 @@ class NoFamilyFragment : Fragment() {
             name.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             name.textSize = 17f
             name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Создание семьи").setView(name, 40, 0, 40, 0)
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Создание семьи").setView(name, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (name.text.isNullOrBlank()) {
                         name.error = "Введите название"
+                    } else if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Нет сети. Проверьте подключение и попробуйте позднее",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         viewModel.createFamily(name.text.trim().toString())
                     }
@@ -97,7 +112,10 @@ class NoFamilyFragment : Fragment() {
             code.hint = "Код присоединения"
             code.textSize = 17F
             code.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Присоединение к семье")
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Присоединение к семье")
                 .setView(code, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (code.text.isNullOrBlank()) {
