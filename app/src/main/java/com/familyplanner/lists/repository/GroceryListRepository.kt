@@ -151,7 +151,7 @@ class GroceryListRepository {
 
     fun deleteObserver(observerId: String, listId: String) {
         firestore.collection(UserListDbSchema.USER_LIST_TABLE).whereEqualTo(UserListDbSchema.LIST_ID, listId)
-            .whereEqualTo(UserListDbSchema.USER_ID, observerId).get().addOnCompleteListener {
+            .whereEqualTo(UserListDbSchema.USER_ID, observerId).get().continueWith {
                 for (doc in it.result.documents) {
                     doc.reference.delete()
                 }
@@ -177,7 +177,7 @@ class GroceryListRepository {
         firestore.collection(ListDbSchema.LIST_TABLE).document(listId).update(ListDbSchema.IS_COMPLETED, isCompleted)
         if (isCompleted) {
             firestore.collection(ProductDbSchema.PRODUCT_TABLE).whereEqualTo(ProductDbSchema.LIST_ID, listId).get()
-                .addOnCompleteListener {
+                .continueWith {
                     for (doc in it.result.documents) {
                         doc.reference.update(ProductDbSchema.IS_PURCHASED, true)
                     }
@@ -187,7 +187,7 @@ class GroceryListRepository {
 
     fun deleteList(listId: String) {
         firestore.collection(ProductDbSchema.PRODUCT_TABLE).whereEqualTo(ProductDbSchema.LIST_ID, listId).get()
-            .addOnCompleteListener {
+            .continueWith {
                 for (doc in it.result.documents) {
                     doc.reference.delete()
                 }

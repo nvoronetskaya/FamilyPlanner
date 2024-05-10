@@ -234,7 +234,7 @@ class TaskRepository {
                         firestore.collection(ObserverDbSchema.OBSERVER_TABLE).add(observer)
                     }
                 }
-            } 
+            }
     }
 
     fun getSubtasks(taskId: String): Flow<List<Task>> {
@@ -283,7 +283,7 @@ class TaskRepository {
                 TaskDbSchema.PREVIOUS_COMPLETION_DATE to task.lastCompletionDate
             )
             firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
-                .addOnSuccessListener {
+                .continueWith {
                     val completion = mapOf<String, Any>(
                         "userId" to completedById,
                         "taskId" to task.id,
@@ -298,9 +298,9 @@ class TaskRepository {
             )
             TODO()
             firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
-                .addOnSuccessListener {
+                .continueWith {
                     firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
-                        .whereEqualTo("completionDate", today).get().addOnCompleteListener {
+                        .whereEqualTo("completionDate", today).get().continueWith {
                             it.result.documents.forEach { it.reference.delete() }
                         }
                 }
@@ -309,7 +309,7 @@ class TaskRepository {
 
     fun deleteTask(taskId: String) {
         val result = firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).delete()
-            .addOnSuccessListener {
+            .continueWith {
                 scope.launch {
                     firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
                         .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get()

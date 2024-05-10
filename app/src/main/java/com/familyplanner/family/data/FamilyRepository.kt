@@ -115,17 +115,17 @@ class FamilyRepository {
     fun approveApplication(userId: String, familyId: String) {
         firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).whereEqualTo(ApplicationDbSchema.USER_ID, userId)
             .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get()
-            .addOnSuccessListener {
-                if (it.documents.isNotEmpty()) {
-                    for (doc in it.documents) {
+            .continueWith {
+                if (it.result.documents.isNotEmpty()) {
+                    for (doc in it.result.documents) {
                         doc.reference.update(mapOf(ApplicationDbSchema.STATUS to ApplicationStatus.APPROVED))
                     }
                 }
 
                 firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), userId).get()
-                    .addOnCompleteListener {
+                    .continueWith {
                         if (!it.result.isEmpty) {
-                            for (doc in it.result) {
+                            for (doc in it.result.documents) {
                                 if (doc[UserDbSchema.FAMILY_ID].toString().isEmpty()) {
                                     doc.reference.update(UserDbSchema.FAMILY_ID, familyId)
                                 }
@@ -150,9 +150,9 @@ class FamilyRepository {
 
     fun removeMember(userId: String) {
         firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), userId).get()
-            .addOnCompleteListener {
+            .continueWith {
                 if (!it.result.isEmpty) {
-                    for (doc in it.result) {
+                    for (doc in it.result.documents) {
                         doc.reference.update(
                             mapOf(
                                 UserDbSchema.FAMILY_ID to "",
@@ -198,11 +198,11 @@ class FamilyRepository {
 
     fun deleteFamily(familyId: String): Task<Void> {
         val task = firestore.collection(FamilyDbSchema.FAMILY_TABLE).document(familyId).delete()
-        task.addOnSuccessListener {
+        task.continueWith {
             firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(UserDbSchema.FAMILY_ID, familyId).get()
-                .addOnCompleteListener {
+                .continueWith {
                     if (!it.result.isEmpty) {
-                        for (doc in it.result) {
+                        for (doc in it.result.documents) {
                             doc.reference.update(
                                 mapOf(
                                     UserDbSchema.FAMILY_ID to "",
@@ -214,9 +214,9 @@ class FamilyRepository {
                 }
 
             firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get()
-                .addOnCompleteListener {
+                .continueWith {
                     if (!it.result.isEmpty) {
-                        for (doc in it.result) {
+                        for (doc in it.result.documents) {
                             doc.reference.delete()
                         }
                     }

@@ -55,7 +55,7 @@ class UserRepository {
 
     fun updateUser(id: String, name: String, birthday: String) {
         firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), id).get()
-            .addOnCompleteListener {
+            .continueWith {
                 if (!it.result.isEmpty) {
                     for (doc in it.result) {
                         doc.reference.update(mapOf(UserDbSchema.NAME to name, UserDbSchema.BIRTHDAY to birthday))

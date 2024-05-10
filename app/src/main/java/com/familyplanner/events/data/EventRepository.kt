@@ -122,10 +122,10 @@ class EventRepository {
 
     fun deleteEvent(eventId: String) {
         firestore.collection(EventDbSchema.EVENT_TABLE).document(eventId).delete()
-            .addOnSuccessListener {
+            .continueWith {
                 firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
                     .whereEqualTo(EventAttendeeDbSchema.EVENT_ID, eventId).get()
-                    .addOnCompleteListener {
+                    .continueWith {
                         it.result.documents.forEach { doc -> doc.reference.delete() }
                     }
                 storage.reference.child("event-$eventId").delete()
