@@ -22,8 +22,9 @@ def notify_invited_users(attendee: Event[DocumentSnapshot]) -> None:
         return
     attendee_info = attendee.data.to_dict()
     event = firestore_client.document(f"event/{attendee_info['eventId']}").get().to_dict()
-    print(event)
     user = firestore_client.document(f"user/{attendee_info['userId']}").get().to_dict()
+    if event['createdBy'] == attendee_info['userId']:
+        return
     data = {
         'type': 'EVENT',
         'sourceId': attendee_info['eventId'],
@@ -42,6 +43,8 @@ def notify_task_observers(observer: Event[DocumentSnapshot]) -> None:
     observer_info = observer.data.to_dict()
     task = firestore_client.document(f"task/{observer_info['taskId']}").get().to_dict()
     user = firestore_client.document(f"user/{observer_info['userId']}").get().to_dict()
+    if task['createdBy'] == observer['userId']:
+        return
     if observer_info.get('isExecutor'):
         body = f"Вы назначены исполнителем задачи {task['name']}"
     else:
@@ -131,3 +134,22 @@ def notify_attendees_on_event_change(event: Event[Change[DocumentSnapshot]]) -> 
         }
         message = messaging.Message(token=user['fcmToken'], data=data)
         messaging.send(message)
+
+
+@on_document_created(document="userList/{Id}")
+def notify_list_observers(userList: Event[DocumentSnapshot]) -> None:
+    if userList.data is None:
+        return
+    userListData = userList.data.to_dict()
+    list = firestore_client.document(f"list/{userListData['listId']}").get().to_dict()
+    if userListData['userId'] == list['createdBy']:
+        return
+    user = firestore_client.document(f"user/{userListData['userId']}").get().to_dict()
+    data = {
+        'type': 'LIST',
+        'sourceId': userListData['listId'],
+        'title': 'Новый список покупок',
+        'body': f'Вам доступен список покупок {list['name']}'
+    }
+    message = messaging.Message(token=user['fcmToken'], data=data)
+    messaging.send(message)

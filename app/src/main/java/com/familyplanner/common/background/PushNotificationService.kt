@@ -35,6 +35,9 @@ class PushNotificationService : FirebaseMessagingService() {
         } else if (sourceType.equals("EVENT")) {
             key = "eventId"
             navigateTo = if (sourceId != null) R.id.eventInfoFragment else null
+        } else if (sourceType.equals("LIST")) {
+            key = "listId"
+            navigateTo = R.id.groceryListInfoFragment
         } else {
             return
         }
