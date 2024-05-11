@@ -25,7 +25,6 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -129,29 +128,15 @@ class AllListsBudgetFragment : Fragment() {
     }
 
     private fun updateGraph(spendingHistory: List<BudgetDto>) {
-        val spendingsByList = spendingHistory.groupBy { it.listId }
-        val datasets = arrayListOf<ILineDataSet>()
+        val spendingsByDate = spendingHistory.groupBy { it.addedAt.toLocalDate().toEpochDay() }
         val startDate = viewModel.getStartDate().toEpochDay()
         val finishDate = viewModel.getFinishDate().toEpochDay()
-        for (listId in spendingsByList.keys) {
-            val completionDates =
-                hashSetOf<Long>()
-            completionDates.addAll(spendingsByList[listId]!!.map {
-                it.addedAt.toLocalDate().toEpochDay()
-            }.sorted())
-            val userLine = arrayListOf<Entry>()
-            (startDate..finishDate).forEach { date ->
-                userLine.add(
-                    Entry(
-                        date.toFloat(),
-                        spendingsByList[listId]!!.sumOf { it.sumSpent }.toFloat()
-                    ),
-                )
-            }
-            datasets.add(LineDataSet(userLine, spendingsByList[listId]!![0].listName))
+        val spendingsLine = arrayListOf<Entry>()
+        spendingsByDate.keys.sorted().forEach {
+            spendingsLine.add(Entry(it.toFloat(), spendingsByDate[it]!!.sumOf { budget -> budget.sumSpent }.toFloat()))
         }
         val chart = binding.chart
-        chart.data = LineData(datasets)
+        chart.data = LineData(LineDataSet(spendingsLine, "Сумма расходов"))
         val xAxis = chart.xAxis
         xAxis.labelCount = (finishDate - startDate + 1).toInt()
         xAxis.valueFormatter = graphFormatter
