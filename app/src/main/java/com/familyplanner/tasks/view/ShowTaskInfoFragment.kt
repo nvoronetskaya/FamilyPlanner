@@ -148,6 +148,7 @@ class ShowTaskInfoFragment : Fragment() {
                             if (_binding == null) {
                                 return@runOnUiThread
                             }
+                            binding.ivAddSubtask.isVisible = it.size < 10
                             subtasksAdapter.setTasks(it)
                             binding.layoutSubtasks.isVisible = it.isNotEmpty()
                         }
@@ -229,7 +230,6 @@ class ShowTaskInfoFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("parentId", taskId)
             bundle.putString("familyId", task!!.familyId)
-            bundle.putString("userId", userId)
             findNavController().navigate(R.id.action_showTaskInfoFragment_to_newTaskInfoFragment)
         }
         binding.ivSubtasksUnfolded.setOnClickListener {

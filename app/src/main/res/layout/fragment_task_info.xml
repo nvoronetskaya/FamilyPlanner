@@ -48,6 +48,14 @@
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
             app:srcCompat="@drawable/ic_notifications" />
+
+        <ImageView
+            android:id="@+id/iv_add_subtask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="15dp"
+            app:srcCompat="@drawable/ic_add" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -170,15 +178,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/rounded_rectangle">
-
-                <ImageView
-                    android:id="@+id/iv_add_subtask"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@id/tv_subtasks"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/tv_subtasks"
-                    app:srcCompat="@drawable/ic_add" />
 
                 <TextView
                     android:id="@+id/tv_subtasks"

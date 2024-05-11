@@ -1,10 +1,11 @@
-package com.familyplanner.family.data
+package com.familyplanner.family.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderStatsBinding
+import com.familyplanner.family.data.CompletionDto
 import java.time.LocalDate
 
 class CompletionAdapter(val onClick: (String) -> Unit) :

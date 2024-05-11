@@ -6,12 +6,12 @@ import com.familyplanner.common.schema.CompletionDbSchema
 import com.familyplanner.common.schema.ObserverDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
-import com.familyplanner.common.schema.UserListDbSchema
 import com.familyplanner.tasks.data.AddObserverDto
 import com.familyplanner.tasks.data.CommentDto
 import com.familyplanner.tasks.data.ObserverDto
 import com.google.android.gms.tasks.Task as GoogleTask
 import com.familyplanner.tasks.data.Observer
+import com.familyplanner.tasks.data.RepeatType
 import com.familyplanner.tasks.data.Task
 import com.familyplanner.tasks.data.UserFile
 import com.google.firebase.Firebase
@@ -31,6 +31,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import kotlin.math.pow
 
 class TaskRepository {
     private val firestore = Firebase.firestore
@@ -47,8 +48,7 @@ class TaskRepository {
                         if (tasksIds.isEmpty()) {
                             userTasks.emit(listOf())
                         } else {
-                            firestore.collection(TaskDbSchema.TASK_TABLE)
-                                .whereEqualTo(TaskDbSchema.PARENT_ID, null).snapshots()
+                            firestore.collection(TaskDbSchema.TASK_TABLE).snapshots()
                                 .collect { result ->
                                     val queryTasks = mutableListOf<Task>()
                                     for (doc in result.documents) {
@@ -97,7 +97,6 @@ class TaskRepository {
                                             userTasks.emit(listOf())
                                         } else {
                                             firestore.collection(TaskDbSchema.TASK_TABLE)
-                                                .whereEqualTo(TaskDbSchema.PARENT_ID, null)
                                                 .snapshots()
                                                 .collect { result ->
                                                     val queryTasks = mutableListOf<Task>()
@@ -285,6 +284,28 @@ class TaskRepository {
             )
             firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
                 .continueWith {
+                    firestore.collection(TaskDbSchema.TASK_TABLE)
+                        .whereEqualTo(TaskDbSchema.PARENT_ID, task.id).get().continueWith {
+                            for (subtask in it.result.documents) {
+                                if (subtask.getLong(TaskDbSchema.LAST_COMPLETION_DATE) == today || !isTaskForToday(
+                                        subtask.toObject(Task::class.java)!!,
+                                        today
+                                    )
+                                ) {
+                                    continue
+                                }
+                                subtask.reference.update(data)
+                                val completion = mapOf<String, Any>(
+                                    CompletionDbSchema.USER_ID to completedById,
+                                    CompletionDbSchema.TASK_ID to subtask.id,
+                                    CompletionDbSchema.COMPLETION_DATE to today
+                                )
+                                firestore.collection(CompletionDbSchema.COMPLETION_TABLE)
+                                    .add(completion)
+                            }
+                        }
+                }
+                .continueWith {
                     val completion = mapOf<String, Any>(
                         CompletionDbSchema.USER_ID to completedById,
                         CompletionDbSchema.TASK_ID to task.id,
@@ -319,15 +340,15 @@ class TaskRepository {
                         }
                     firestore.collection(CompletionDbSchema.COMPLETION_TABLE)
                         .whereEqualTo(CompletionDbSchema.TASK_ID, taskId).get().continueWith {
-                        it.result.documents.forEach { it.reference.delete() }
-                    }
+                            it.result.documents.forEach { it.reference.delete() }
+                        }
                     firestore.collection(CommentDbSchema.COMMENT_TABLE)
                         .whereEqualTo(CommentDbSchema.TASK_ID, taskId).get().continueWith {
-                        it.result.documents.forEach {
-                            it.reference.delete()
-                            storage.reference.child("comment-${it.id}").delete()
+                            it.result.documents.forEach {
+                                it.reference.delete()
+                                storage.reference.child("comment-${it.id}").delete()
+                            }
                         }
-                    }
                     storage.reference.child("task-$taskId").delete()
                 }
             }
@@ -389,11 +410,11 @@ class TaskRepository {
             }
         firestore.collection(CommentDbSchema.COMMENT_TABLE)
             .whereEqualTo(CommentDbSchema.USER_ID, userId).get().continueWith {
-            it.result.documents.forEach {
-                it.reference.delete()
-                storage.reference.child("comment-${it.id}").delete()
+                it.result.documents.forEach {
+                    it.reference.delete()
+                    storage.reference.child("comment-${it.id}").delete()
+                }
             }
-        }
     }
 
     fun removeTasksForFamily(familyId: String) {
@@ -411,5 +432,39 @@ class TaskRepository {
                 }
                 taskIds.forEach { deleteTask(it) }
             }
+    }
+
+    private fun isTaskForToday(
+        task: Task,
+        today: Long,
+    ): Boolean {
+        return when (task.repeatType) {
+            RepeatType.ONCE -> {
+                (task.deadline != null && task.deadline!! <= today || task.deadline == null) && (task.lastCompletionDate == today || task.lastCompletionDate == null)
+            }
+
+            RepeatType.EVERY_DAY -> {
+                task.repeatStart != null && task.repeatStart!! <= today
+            }
+
+            RepeatType.DAYS_OF_WEEK -> {
+                val startDate =
+                    if (task.lastCompletionDate != null) task.lastCompletionDate!! + 1 else task.repeatStart
+                var isForToday = false
+                for (i in startDate!!..today) {
+                    if (task.daysOfWeek and (2.0.pow(LocalDate.ofEpochDay(today).dayOfWeek.value - 1))
+                            .toInt() > 0
+                    ) {
+                        isForToday = true
+                        break
+                    }
+                }
+                isForToday
+            }
+
+            RepeatType.EACH_N_DAYS -> {
+                task.lastCompletionDate == null || task.lastCompletionDate!! + task.nDays <= today
+            }
+        }
     }
 }

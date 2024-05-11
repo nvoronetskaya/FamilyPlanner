@@ -4,8 +4,6 @@ import com.familyplanner.common.data.User
 import com.familyplanner.common.schema.ApplicationDbSchema
 import com.familyplanner.common.schema.CompletionDbSchema
 import com.familyplanner.common.schema.FamilyDbSchema
-import com.familyplanner.common.schema.ListDbSchema
-import com.familyplanner.common.schema.SpendingDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.events.repository.EventRepository
@@ -13,7 +11,6 @@ import com.familyplanner.family.data.Application
 import com.familyplanner.family.data.ApplicationStatus
 import com.familyplanner.family.data.CompletionDto
 import com.familyplanner.family.data.Family
-import com.familyplanner.lists.data.BudgetDto
 import com.familyplanner.lists.repository.GroceryListRepository
 import com.familyplanner.tasks.repository.TaskRepository
 import com.google.android.gms.tasks.Task
@@ -29,9 +26,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 class FamilyRepository {
     private val eventRepo = EventRepository()

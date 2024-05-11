@@ -19,7 +19,7 @@ import com.familyplanner.FamilyPlanner
 import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentStatsBinding
-import com.familyplanner.family.data.CompletionAdapter
+import com.familyplanner.family.adapters.CompletionAdapter
 import com.familyplanner.family.data.CompletionDto
 import com.familyplanner.family.viewmodel.CompletionHistoryViewModel
 import com.familyplanner.lists.view.XAxisDateFormatter

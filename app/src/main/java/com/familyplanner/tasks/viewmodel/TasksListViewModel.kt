@@ -139,7 +139,7 @@ class TasksListViewModel : ViewModel() {
                         val startDate =
                             if (task.task.lastCompletionDate != null) task.task.lastCompletionDate!! + 1 else task.task.repeatStart
                         for (i in startDate!!..dateEpochDay) {
-                            if (task.task.daysOfWeek and 2.0.pow(date.dayOfWeek.value)
+                            if (task.task.daysOfWeek and 2.0.pow(date.dayOfWeek.value - 1)
                                     .toInt() > 0
                             ) {
                                 task.date = i
