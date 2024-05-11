@@ -21,7 +21,7 @@ class NewListViewModel : ViewModel() {
             members.clear()
             members.addAll(
                 familyRepo.getFamilyMembersOnce(familyId)
-                    .map { Invitation(it.id, it.name, it.birthday, false) })
+                    .map { Invitation(it.id, it.name, it.birthday, true) })
         }
         this.familyId = familyId
         return members

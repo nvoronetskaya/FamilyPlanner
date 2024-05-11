@@ -5,22 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.familyplanner.databinding.FragmentNewEventBinding
 import com.familyplanner.databinding.FragmentNewListBinding
-import com.familyplanner.events.adapters.AttendeeAdapter
 import com.familyplanner.events.adapters.InvitationAdapter
-import com.familyplanner.events.viewmodel.NewEventViewModel
 import com.familyplanner.lists.viewmodel.NewListViewModel
-import com.familyplanner.tasks.adapters.FileAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class NewListFragment : Fragment() {
     private var _binding: FragmentNewListBinding? = null

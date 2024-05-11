@@ -1,14 +1,10 @@
 package com.familyplanner.lists.view
 
-import android.graphics.Typeface
 import android.os.Bundle
-import android.text.InputFilter
-import android.text.InputType
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -18,7 +14,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
 import com.familyplanner.databinding.FragmentGroceryListsBinding
 import com.familyplanner.lists.adapters.ListAdapter

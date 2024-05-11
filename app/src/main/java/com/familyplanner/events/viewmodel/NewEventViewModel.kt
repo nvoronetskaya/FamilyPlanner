@@ -29,7 +29,7 @@ class NewEventViewModel : ViewModel() {
             familyId = userRepo.getUserByIdOnce(userId).familyId ?: ""
             attendees.emit(
                 familyRepo.getFamilyMembersOnce(familyId)
-                    .map { Invitation(it.id, it.name, it.birthday, false) })
+                    .map { Invitation(it.id, it.name, it.birthday, true) })
         }
     }
 
