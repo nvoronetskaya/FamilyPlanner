@@ -8,11 +8,14 @@ import com.familyplanner.common.schema.ListDbSchema
 import com.familyplanner.common.schema.SpendingDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
+import com.familyplanner.events.repository.EventRepository
 import com.familyplanner.family.data.Application
 import com.familyplanner.family.data.ApplicationStatus
 import com.familyplanner.family.data.CompletionDto
 import com.familyplanner.family.data.Family
 import com.familyplanner.lists.data.BudgetDto
+import com.familyplanner.lists.repository.GroceryListRepository
+import com.familyplanner.tasks.repository.TaskRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldPath
@@ -31,6 +34,9 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 class FamilyRepository {
+    private val eventRepo = EventRepository()
+    private val listRepo = GroceryListRepository()
+    private val taskRepo = TaskRepository()
     private val firestore = Firebase.firestore
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -179,6 +185,10 @@ class FamilyRepository {
                         )
                     }
                 }
+            }.continueWith {
+                eventRepo.removeEventsForUser(userId)
+                listRepo.removeListsForUser(userId)
+                taskRepo.removeTasksForUser(userId)
             }
     }
 
@@ -226,7 +236,6 @@ class FamilyRepository {
                         }
                     }
                 }
-
             firestore.collection(ApplicationDbSchema.APPLICATION_TABLE)
                 .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get()
                 .continueWith {
@@ -236,6 +245,9 @@ class FamilyRepository {
                         }
                     }
                 }
+            eventRepo.removeEventsForFamily(familyId)
+            listRepo.removeListsForFamily(familyId)
+            taskRepo.removeTasksForFamily(familyId)
         }
 
         return task

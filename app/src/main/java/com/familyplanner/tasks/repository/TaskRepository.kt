@@ -6,6 +6,7 @@ import com.familyplanner.common.schema.CompletionDbSchema
 import com.familyplanner.common.schema.ObserverDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
+import com.familyplanner.common.schema.UserListDbSchema
 import com.familyplanner.tasks.data.AddObserverDto
 import com.familyplanner.tasks.data.CommentDto
 import com.familyplanner.tasks.data.ObserverDto
@@ -298,8 +299,10 @@ class TaskRepository {
             )
             firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
                 .continueWith {
-                    firestore.collection(CompletionDbSchema.COMPLETION_TABLE).whereEqualTo(CompletionDbSchema.TASK_ID, task.id)
-                        .whereEqualTo(CompletionDbSchema.COMPLETION_DATE, today).get().continueWith {
+                    firestore.collection(CompletionDbSchema.COMPLETION_TABLE)
+                        .whereEqualTo(CompletionDbSchema.TASK_ID, task.id)
+                        .whereEqualTo(CompletionDbSchema.COMPLETION_DATE, today).get()
+                        .continueWith {
                             it.result.documents.forEach { it.reference.delete() }
                         }
                 }
@@ -307,12 +310,24 @@ class TaskRepository {
     }
 
     fun deleteTask(taskId: String) {
-        val result = firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).delete()
+        firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).delete()
             .continueWith {
                 scope.launch {
                     firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
-                        .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get()
-                        .await().documents.forEach { it.reference.delete() }
+                        .whereEqualTo(ObserverDbSchema.TASK_ID, taskId).get().continueWith {
+                            it.result.documents.forEach { it.reference.delete() }
+                        }
+                    firestore.collection(CompletionDbSchema.COMPLETION_TABLE)
+                        .whereEqualTo(CompletionDbSchema.TASK_ID, taskId).get().continueWith {
+                        it.result.documents.forEach { it.reference.delete() }
+                    }
+                    firestore.collection(CommentDbSchema.COMMENT_TABLE)
+                        .whereEqualTo(CommentDbSchema.TASK_ID, taskId).get().continueWith {
+                        it.result.documents.forEach {
+                            it.reference.delete()
+                            storage.reference.child("comment-${it.id}").delete()
+                        }
+                    }
                     storage.reference.child("task-$taskId").delete()
                 }
             }
@@ -361,5 +376,40 @@ class TaskRepository {
         newValues[TaskDbSchema.LOCATION] = taskData.location
         newValues[TaskDbSchema.ADDRESS] = taskData.address
         firestore.collection(TaskDbSchema.TASK_TABLE).document(taskId).update(newValues)
+    }
+
+    fun removeTasksForUser(userId: String) {
+        firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+            .whereEqualTo(ObserverDbSchema.USER_ID, userId).get().continueWith {
+                it.result.documents.forEach { it.reference.delete() }
+            }
+        firestore.collection(CompletionDbSchema.COMPLETION_TABLE)
+            .whereEqualTo(CompletionDbSchema.USER_ID, userId).get().continueWith {
+                it.result.documents.forEach { it.reference.delete() }
+            }
+        firestore.collection(CommentDbSchema.COMMENT_TABLE)
+            .whereEqualTo(CommentDbSchema.USER_ID, userId).get().continueWith {
+            it.result.documents.forEach {
+                it.reference.delete()
+                storage.reference.child("comment-${it.id}").delete()
+            }
+        }
+    }
+
+    fun removeTasksForFamily(familyId: String) {
+        firestore.collection(TaskDbSchema.TASK_TABLE)
+            .whereEqualTo(TaskDbSchema.FAMILY_ID, familyId).get().continueWith {
+                val taskIds = it.result.documents.map { it.id }
+                var i = 0
+                while (i < taskIds.size) {
+                    firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                        .whereIn(ObserverDbSchema.TASK_ID, taskIds.subList(i, i + 30)).get()
+                        .continueWith {
+                            it.result.documents.forEach { it.reference.delete() }
+                        }
+                    i += 30
+                }
+                taskIds.forEach { deleteTask(it) }
+            }
     }
 }

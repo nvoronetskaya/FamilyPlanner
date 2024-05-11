@@ -43,17 +43,12 @@ class TasksListViewModel : ViewModel() {
         this.userId = userId
         viewModelScope.launch(Dispatchers.IO) {
             launch {
+                familyId = userRepo.getUserByIdOnce(userId).familyId
                 userFilter.emit(userId)
-                userRepo.getUserById(userId).collect {
-                    familyId = it.familyId
-                    if (familyId.isNullOrEmpty()) {
-                        return@collect
-                    }
-                    adminId = familyRepo.getFamilyByIdOnce(familyId!!)?.createdBy
-                    familyRepo.getFamilyMembers(familyId!!).collect { members ->
-                        users.clear()
-                        users.addAll(members)
-                    }
+                adminId = familyRepo.getFamilyByIdOnce(familyId!!)?.createdBy
+                familyRepo.getFamilyMembers(familyId!!).collect { members ->
+                    users.clear()
+                    users.addAll(members)
                 }
             }
             launch {

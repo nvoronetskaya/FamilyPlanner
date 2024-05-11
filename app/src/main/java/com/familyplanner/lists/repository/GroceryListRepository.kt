@@ -204,14 +204,22 @@ class GroceryListRepository {
     }
 
     fun deleteList(listId: String) {
-        firestore.collection(ProductDbSchema.PRODUCT_TABLE)
-            .whereEqualTo(ProductDbSchema.LIST_ID, listId).get()
-            .continueWith {
-                for (doc in it.result.documents) {
-                    doc.reference.delete()
+        firestore.collection(ListDbSchema.LIST_TABLE).document(listId).delete().continueWith {
+            firestore.collection(ProductDbSchema.PRODUCT_TABLE)
+                .whereEqualTo(ProductDbSchema.LIST_ID, listId).get()
+                .continueWith {
+                    for (doc in it.result.documents) {
+                        doc.reference.delete()
+                    }
                 }
+            firestore.collection(UserListDbSchema.USER_LIST_TABLE)
+                .whereEqualTo(UserListDbSchema.LIST_ID, listId).get().continueWith {
+                    it.result.documents.forEach { it.reference.delete() }
+                }
+            firestore.collection(SpendingDbSchema.SPENDING_TABLE).whereEqualTo(SpendingDbSchema.LIST_ID, listId).get().continueWith {
+                it.result.documents.forEach { it.reference.delete() }
             }
-        firestore.collection(ListDbSchema.LIST_TABLE).document(listId).delete()
+        }
     }
 
     fun changeListName(listId: String, newName: String) {
@@ -352,5 +360,33 @@ class GroceryListRepository {
             )
         }
         return result
+    }
+
+    fun removeListsForUser(userId: String) {
+        firestore.collection(UserListDbSchema.USER_LIST_TABLE)
+            .whereEqualTo(UserListDbSchema.USER_ID, userId).get().continueWith {
+                it.result.documents.forEach { it.reference.delete() }
+            }
+        firestore.collection(SpendingDbSchema.SPENDING_TABLE)
+            .whereEqualTo(SpendingDbSchema.USER_ID, userId).get().continueWith {
+                it.result.documents.forEach { it.reference.delete() }
+            }
+    }
+
+    fun removeListsForFamily(familyId: String) {
+        firestore.collection(ListDbSchema.LIST_TABLE)
+            .whereEqualTo(ListDbSchema.FAMILY_ID, familyId).get().continueWith {
+                val listIds = it.result.documents.map { it.id }
+                var i = 0
+                while (i < listIds.size) {
+                    firestore.collection(UserListDbSchema.USER_LIST_TABLE)
+                        .whereIn(UserListDbSchema.LIST_ID, listIds.subList(i, i + 30)).get()
+                        .continueWith {
+                            it.result.documents.forEach { it.reference.delete() }
+                        }
+                    i += 30
+                }
+                listIds.forEach { deleteList(it) }
+            }
     }
 }
