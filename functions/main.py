@@ -113,3 +113,21 @@ def notify_attendees_event_cancel(event: Event[DocumentSnapshot | None]) -> None
         }
         message = messaging.Message(token=user['fcmToken'], data=data)
         messaging.send(message)
+
+
+@on_document_updated(document="event/{Id}")
+def notify_attendees_on_event_change(event: Event[Change[DocumentSnapshot]]) -> None:
+    if event.data is None:
+        return
+    old_value = event.data.before.to_dict()
+    attendees = firestore_client.collection('eventAttendee').where('eventId', '==', event.data.after.id).get()
+    for attendee in attendees:
+        user = firestore_client.document(f"user/{attendee.to_dict()['userId']}").get().to_dict()
+        data = {
+            'type': 'EVENT',
+            'sourceId': event.data.after.id,
+            'title': 'Мероприятие изменено',
+            'body': f'Мероприятие {old_value['name']} было изменено. Нажмите, чтобы увидеть подробности'
+        }
+        message = messaging.Message(token=user['fcmToken'], data=data)
+        messaging.send(message)
