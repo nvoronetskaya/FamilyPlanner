@@ -4,6 +4,7 @@ import com.familyplanner.common.data.User
 import com.familyplanner.common.schema.ApplicationDbSchema
 import com.familyplanner.common.schema.CompletionDbSchema
 import com.familyplanner.common.schema.FamilyDbSchema
+import com.familyplanner.common.schema.ObserverDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.events.repository.EventRepository
@@ -65,32 +66,32 @@ class FamilyRepository {
     fun getFamilyMembers(familyId: String): Flow<List<User>> =
         firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(UserDbSchema.FAMILY_ID, familyId)
             .snapshots().map {
-            val users = mutableListOf<User>()
-            for (doc in it.documents) {
-                val user = User(
-                    doc.id,
-                    doc[UserDbSchema.NAME].toString(),
-                    doc[UserDbSchema.BIRTHDAY].toString(),
-                    doc[UserDbSchema.FAMILY_ID].toString(),
-                    doc[UserDbSchema.EMAIL].toString(),
-                    doc.getGeoPoint(UserDbSchema.LOCATION)
-                )
-                users.add(user)
+                val users = mutableListOf<User>()
+                for (doc in it.documents) {
+                    val user = User(
+                        doc.id,
+                        doc[UserDbSchema.NAME].toString(),
+                        doc[UserDbSchema.BIRTHDAY].toString(),
+                        doc[UserDbSchema.FAMILY_ID].toString(),
+                        doc[UserDbSchema.EMAIL].toString(),
+                        doc.getGeoPoint(UserDbSchema.LOCATION)
+                    )
+                    users.add(user)
+                }
+                users
             }
-            users
-        }
 
     suspend fun getFamilyMembersOnce(familyId: String): List<User> =
         firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(UserDbSchema.FAMILY_ID, familyId)
             .get().await().map {
-            User(
-                it.id,
-                it[UserDbSchema.NAME].toString(),
-                it[UserDbSchema.BIRTHDAY].toString(),
-                it[UserDbSchema.FAMILY_ID].toString(),
-                it[UserDbSchema.EMAIL].toString()
-            )
-        }
+                User(
+                    it.id,
+                    it[UserDbSchema.NAME].toString(),
+                    it[UserDbSchema.BIRTHDAY].toString(),
+                    it[UserDbSchema.FAMILY_ID].toString(),
+                    it[UserDbSchema.EMAIL].toString()
+                )
+            }
 
     fun getApplicationsToFamily(familyId: String): Flow<List<Application>> =
         firestore.collection(ApplicationDbSchema.APPLICATION_TABLE)
@@ -189,15 +190,15 @@ class FamilyRepository {
     fun getUserById(userId: String): Flow<User> =
         firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(FieldPath.documentId(), userId)
             .snapshots().map {
-            val doc = it.documents[0]
-            User(
-                doc.id,
-                doc[UserDbSchema.NAME].toString(),
-                doc[UserDbSchema.BIRTHDAY].toString(),
-                doc[UserDbSchema.FAMILY_ID].toString(),
-                doc[UserDbSchema.EMAIL].toString()
-            )
-        }
+                val doc = it.documents[0]
+                User(
+                    doc.id,
+                    doc[UserDbSchema.NAME].toString(),
+                    doc[UserDbSchema.BIRTHDAY].toString(),
+                    doc[UserDbSchema.FAMILY_ID].toString(),
+                    doc[UserDbSchema.EMAIL].toString()
+                )
+            }
 
     fun applyToFamily(userId: String, familyId: String) {
         val data = HashMap<String, Any>()
@@ -247,17 +248,14 @@ class FamilyRepository {
         return task
     }
 
-    fun getCompletionHistory(
-        familyId: String,
-        start: Long,
-        finish: Long
-    ): Flow<List<CompletionDto>> {
+    fun getCompletionHistory(userId: String, start: Long, finish: Long): Flow<List<CompletionDto>> {
         val history = MutableSharedFlow<List<CompletionDto>>()
         scope.launch {
-            firestore.collection(TaskDbSchema.TASK_TABLE)
-                .whereEqualTo(TaskDbSchema.FAMILY_ID, familyId).snapshots().collect {
-                    val taskIds = it.documents.map { doc -> doc.id }
-                    if (taskIds.isEmpty()) {
+            firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
+                .whereEqualTo(ObserverDbSchema.USER_ID, userId).snapshots().collect {
+                    val observerTaskIds =
+                        it.documents.map { observer -> observer[ObserverDbSchema.TASK_ID].toString() }
+                    if (observerTaskIds.isEmpty()) {
                         history.emit(listOf())
                     } else {
                         launch {
@@ -267,7 +265,11 @@ class FamilyRepository {
                                     start
                                 ).snapshots().collect {
                                     val documents =
-                                        it.documents.filter { it.getLong(CompletionDbSchema.COMPLETION_DATE)!! <= finish }
+                                        it.documents.filter {
+                                            it.getLong(
+                                                CompletionDbSchema.COMPLETION_DATE
+                                            )!! <= finish && observerTaskIds.contains(it[CompletionDbSchema.TASK_ID].toString())
+                                        }
                                     val result = documents.map {
                                         val userName =
                                             firestore.collection(UserDbSchema.USER_TABLE)

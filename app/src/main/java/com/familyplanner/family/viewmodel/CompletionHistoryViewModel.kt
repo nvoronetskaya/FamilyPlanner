@@ -2,6 +2,7 @@ package com.familyplanner.family.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.family.data.CompletionDto
 import com.familyplanner.family.repository.FamilyRepository
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +36,7 @@ class CompletionHistoryViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             collectHistory?.cancelAndJoin()
             collectHistory = launch(Dispatchers.IO) {
-                familyRepo.getCompletionHistory(this@CompletionHistoryViewModel.familyId, startDay, finishDay).collect {
+                familyRepo.getCompletionHistory(this@CompletionHistoryViewModel.familyId, FamilyPlanner.userId, startDay, finishDay).collect {
                     completionHistory.emit(it)
                 }
             }
