@@ -73,7 +73,10 @@ class ListsListFragment : Fragment() {
             }
         }
         binding.fabAdd.setOnClickListener {
-            createAddListDialog()
+            findNavController().navigate(
+                R.id.action_listsListFragment_to_newListFragment,
+                bundleOf("familyId" to viewModel.getFamilyId())
+            )
         }
         binding.ivSpendings.setOnClickListener {
             findNavController().navigate(
@@ -98,30 +101,11 @@ class ListsListFragment : Fragment() {
         _binding = null
     }
 
-    private fun createAddListDialog() {
-        val name = EditText(activity)
-        name.hint = "Название списка"
-        name.textSize = 17F
-        name.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(19))
-        name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-        name.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-        MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog)
-            .setTitle("Добавление списка")
-            .setView(name, 40, 0, 40, 0)
-            .setPositiveButton("Готово") { _, _ ->
-                if (name.text.isNullOrBlank()) {
-                    name.error = "Введите название"
-                } else {
-                    viewModel.addList(name.text.trim().toString())
-                }
-            }
-            .setNegativeButton("Отмена") { dialog, _ ->
-                dialog.cancel()
-            }.show()
-    }
-
     private fun onListDelete(list: GroceryList) {
-        MaterialAlertDialogBuilder(requireActivity(), R.style.alertDialog).setTitle("Удаление списка")
+        MaterialAlertDialogBuilder(
+            requireActivity(),
+            R.style.alertDialog
+        ).setTitle("Удаление списка")
             .setMessage("Вы уверены, что хотите удалить список ${list.name}?")
             .setPositiveButton("Да") { _, _ ->
                 viewModel.removeList(list)

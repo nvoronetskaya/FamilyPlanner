@@ -155,6 +155,9 @@
         <action
             android:id="@+id/action_listsListFragment_to_allListsBudgetFragment"
             app:destination="@id/allListsBudgetFragment" />
+        <action
+            android:id="@+id/action_listsListFragment_to_newListFragment"
+            app:destination="@id/newListFragment" />
     </fragment>
     <fragment
         android:id="@+id/groceryListInfoFragment"
@@ -225,4 +228,8 @@
         android:id="@+id/editTaskObserversFragment"
         android:name="com.familyplanner.tasks.view.EditTaskObserversFragment"
         android:label="EditTaskObserversFragment" />
+    <fragment
+        android:id="@+id/newListFragment"
+        android:name="com.familyplanner.lists.view.NewListFragment"
+        android:label="NewListFragment" />
 </navigation>

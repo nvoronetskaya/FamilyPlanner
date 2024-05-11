@@ -110,4 +110,5 @@
     <string name="spendings">Траты</string>
     <string name="spendings_list">Список трат </string>
     <string name="sum">Сумма: </string>
+    <string name="new_list">Новый список</string>
 </resources>

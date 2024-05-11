@@ -73,6 +73,7 @@ class ShowTaskInfoFragment : Fragment() {
         viewModel = ViewModelProvider(this)[TaskInfoViewModel::class.java]
         viewModel.setTask(taskId)
 
+        var createdById = ""
         var task: Task? = null
         val commentsAdapter = CommentsListAdapter(::downloadCommentFile, userId)
         val observersAdapter = ObserversListAdapter(userId)
@@ -114,6 +115,7 @@ class ShowTaskInfoFragment : Fragment() {
                                 findNavController().popBackStack()
                                 return@runOnUiThread
                             }
+                            createdById = it.createdBy
                             if (_binding == null) {
                                 return@runOnUiThread
                             }
@@ -148,7 +150,7 @@ class ShowTaskInfoFragment : Fragment() {
                             if (_binding == null) {
                                 return@runOnUiThread
                             }
-                            binding.ivAddSubtask.isVisible = it.size < 10
+                            binding.ivAddSubtask.isVisible = it.size < 10 && createdById == userId
                             subtasksAdapter.setTasks(it)
                             binding.layoutSubtasks.isVisible = it.isNotEmpty()
                         }

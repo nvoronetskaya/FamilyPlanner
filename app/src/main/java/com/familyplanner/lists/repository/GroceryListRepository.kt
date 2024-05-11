@@ -5,6 +5,7 @@ import com.familyplanner.common.schema.ProductDbSchema
 import com.familyplanner.common.schema.SpendingDbSchema
 import com.familyplanner.common.schema.UserDbSchema
 import com.familyplanner.common.schema.UserListDbSchema
+import com.familyplanner.events.data.Invitation
 import com.familyplanner.lists.data.BudgetDto
 import com.familyplanner.lists.data.GroceryList
 import com.familyplanner.lists.data.ListObserver
@@ -167,7 +168,7 @@ class GroceryListRepository {
             }
     }
 
-    fun addList(name: String, createdBy: String, familyId: String) {
+    fun addList(name: String, createdBy: String, familyId: String, members: List<Invitation>) {
         val listData =
             mapOf<String, Any>(
                 ListDbSchema.NAME to name,
@@ -177,8 +178,10 @@ class GroceryListRepository {
             )
         val listId = UUID.randomUUID().toString()
         firestore.collection(ListDbSchema.LIST_TABLE).document(listId).set(listData)
-        firestore.collection(UserListDbSchema.USER_LIST_TABLE)
-            .add(mapOf(UserListDbSchema.USER_ID to createdBy, UserListDbSchema.LIST_ID to listId))
+        members.forEach {
+            firestore.collection(UserListDbSchema.USER_LIST_TABLE)
+                .add(mapOf(UserListDbSchema.USER_ID to it.userId, UserListDbSchema.LIST_ID to listId))
+        }
     }
 
     private suspend fun changeListCompleted(listId: String) {
