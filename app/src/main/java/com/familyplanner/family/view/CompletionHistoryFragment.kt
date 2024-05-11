@@ -53,7 +53,11 @@ class CompletionHistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[CompletionHistoryViewModel::class.java]
-        val familyId = requireArguments().getString("familyId") ?: findNavController().popBackStack()
+        val familyId = requireArguments().getString("familyId")
+        if (familyId == null) {
+            findNavController().popBackStack()
+            return
+        }
         binding.tvDateStart.text =
             LocalDate.ofEpochDay(viewModel.getStartDay()).format(FamilyPlanner.uiDateFormatter)
         binding.tvDateFinish.text =
@@ -61,10 +65,9 @@ class CompletionHistoryFragment : Fragment() {
         binding.rvHistory.layoutManager = LinearLayoutManager(requireContext())
         val adapter = CompletionAdapter(::openTask)
         binding.rvHistory.adapter = adapter
-        TODO("Добавить поиск по айди семьи")
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getHistory().collect {
+                viewModel.setFamily(familyId).collect {
                     requireActivity().runOnUiThread {
                         if (_binding == null) {
                             return@runOnUiThread

@@ -2,6 +2,7 @@ package com.familyplanner.tasks.repository
 
 import android.net.Uri
 import com.familyplanner.common.schema.CommentDbSchema
+import com.familyplanner.common.schema.CompletionDbSchema
 import com.familyplanner.common.schema.ObserverDbSchema
 import com.familyplanner.common.schema.TaskDbSchema
 import com.familyplanner.common.schema.UserDbSchema
@@ -284,22 +285,21 @@ class TaskRepository {
             firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
                 .continueWith {
                     val completion = mapOf<String, Any>(
-                        "userId" to completedById,
-                        "taskId" to task.id,
-                        "completionDate" to today
+                        CompletionDbSchema.USER_ID to completedById,
+                        CompletionDbSchema.TASK_ID to task.id,
+                        CompletionDbSchema.COMPLETION_DATE to today
                     )
-                    firestore.collection("taskCompletion").add(completion)
+                    firestore.collection(CompletionDbSchema.COMPLETION_TABLE).add(completion)
                 }
         } else {
             val data = mapOf<String, Any?>(
-                "previousCompletionDate" to null,
-                "lastCompletionDate" to task.previousCompletionDate
+                TaskDbSchema.PREVIOUS_COMPLETION_DATE to null,
+                TaskDbSchema.LAST_COMPLETION_DATE to task.previousCompletionDate
             )
-            TODO()
             firestore.collection(TaskDbSchema.TASK_TABLE).document(task.id).update(data)
                 .continueWith {
-                    firestore.collection("taskCompletion").whereEqualTo("taskId", task.id)
-                        .whereEqualTo("completionDate", today).get().continueWith {
+                    firestore.collection(CompletionDbSchema.COMPLETION_TABLE).whereEqualTo(CompletionDbSchema.TASK_ID, task.id)
+                        .whereEqualTo(CompletionDbSchema.COMPLETION_DATE, today).get().continueWith {
                             it.result.documents.forEach { it.reference.delete() }
                         }
                 }

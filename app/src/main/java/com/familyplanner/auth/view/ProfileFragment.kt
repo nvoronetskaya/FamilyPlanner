@@ -163,14 +163,15 @@ class ProfileFragment : Fragment() {
                     password.error = resources.getString(R.string.enter_password)
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        TODO()
                         val checkTask = viewModel.checkPassword(password.text.toString())
                         if (checkTask == null) {
-                            Toast.makeText(
-                                requireContext(),
-                                resources.getString(R.string.error_check_data),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            requireActivity().runOnUiThread {
+                                Toast.makeText(
+                                    requireContext(),
+                                    resources.getString(R.string.error_check_data),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         } else {
                             checkTask.addOnCompleteListener {
                                 requireActivity().runOnUiThread {
