@@ -52,6 +52,9 @@ class ListBudgetFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val spendings = viewModel.getSpendings(listId)
             requireActivity().runOnUiThread {
+                if (_binding == null) {
+                    return@runOnUiThread
+                }
                 budgetAdapter.setData(spendings)
                 binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
                 binding.tvDateStart.text =

@@ -103,6 +103,9 @@ class EditTaskFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val task = viewModel.getTask(taskId)
             requireActivity().runOnUiThread {
+                if (_binding == null) {
+                    return@runOnUiThread
+                }
                 if (task == null) {
                     Toast.makeText(requireContext(), "Задача недоступна", Toast.LENGTH_SHORT)
                         .show()
@@ -529,15 +532,16 @@ class EditTaskFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getAddressByGeo(point).collect {
-                    if (it == Status.SUCCESS) {
-                        activity?.runOnUiThread {
+                    activity?.runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
+                        if (it == Status.SUCCESS) {
                             curPoint = point
                             binding.tvAddress.visibility = View.VISIBLE
                             binding.tvAddress.text = viewModel.getAddress()
                             bottomSheet?.cancel()
-                        }
-                    } else {
-                        activity?.runOnUiThread {
+                        } else {
                             Toast.makeText(
                                 activity,
                                 "Ошибка. Проверьте подключение к сети и повторите позднее",

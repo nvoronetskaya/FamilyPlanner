@@ -123,6 +123,9 @@ class ProfileFragment : Fragment() {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     changePasswordResult.collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             if (it.isEmpty()) {
                                 Toast.makeText(
                                     requireContext(),
@@ -160,6 +163,7 @@ class ProfileFragment : Fragment() {
                     password.error = resources.getString(R.string.enter_password)
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
+                        TODO()
                         val checkTask = viewModel.checkPassword(password.text.toString())
                         if (checkTask == null) {
                             Toast.makeText(

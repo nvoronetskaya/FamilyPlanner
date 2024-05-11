@@ -18,7 +18,7 @@ import com.familyplanner.events.viewmodel.EventsListViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class  EventsListFragment : Fragment() {
+class EventsListFragment : Fragment() {
     private var _binding: FragmentEventsListBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: EventsListViewModel
@@ -66,6 +66,9 @@ class  EventsListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getEvents().collect {
                     requireActivity().runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         binding.calendar.updateEvents(it, viewModel.currentMonth())
                         binding.tvCurMonth.text = viewModel.currentMonthString()
                     }

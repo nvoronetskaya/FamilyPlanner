@@ -42,12 +42,13 @@ class SignInFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isLoggedIn().collect {
-                    if (it.isEmpty()) {
-                        activity?.runOnUiThread {
-                            findNavController().navigate(R.id.action_signInFragment_to_noFamilyFragment)
+                    activity?.runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
                         }
-                    } else {
-                        activity?.runOnUiThread {
+                        if (it.isEmpty()) {
+                            findNavController().navigate(R.id.action_signInFragment_to_noFamilyFragment)
+                        } else {
                             binding.bEnter.isEnabled = true
                             Toast.makeText(
                                 activity,
@@ -85,7 +86,10 @@ class SignInFragment : Fragment() {
             email.hint = "Адрес почты"
             email.textSize = 17F
             email.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-            MaterialAlertDialogBuilder(activity as MainActivity, R.style.alertDialog).setTitle("Сброс пароля").setView(email, 40, 0, 40, 0)
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Сброс пароля").setView(email, 40, 0, 40, 0)
                 .setPositiveButton("Готово") { _, _ ->
                     if (email.text.isNullOrBlank()) {
                         email.error = "Введите почту"

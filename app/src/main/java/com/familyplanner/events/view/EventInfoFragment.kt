@@ -84,6 +84,9 @@ class EventInfoFragment : Fragment() {
                 launch {
                     viewModel.getEvent().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             if (it == null) {
                                 Toast.makeText(
                                     requireContext(),
@@ -113,6 +116,9 @@ class EventInfoFragment : Fragment() {
                 launch {
                     viewModel.getAttendees().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             attendeeAdapter.setData(it)
                             val curUser =
                                 it.firstOrNull { attendee -> attendee.userId.equals(FamilyPlanner.userId) }
@@ -133,6 +139,9 @@ class EventInfoFragment : Fragment() {
                 launch {
                     viewModel.getFiles().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             binding.llFiles.isVisible = it.isNotEmpty()
                             filesAdapter.addPaths(it)
                         }

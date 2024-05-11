@@ -2,7 +2,7 @@ package com.familyplanner.auth.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.common.repository.UserRepository
 import com.familyplanner.auth.generateCode
 import com.familyplanner.auth.sendSignUpCode
 import com.google.android.gms.tasks.Task

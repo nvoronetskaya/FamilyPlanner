@@ -94,7 +94,11 @@ class ShowTaskInfoFragment : Fragment() {
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvCommentFiles.adapter = commentFilesAdapter
         if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
-            Toast.makeText(requireContext(), "Ошибка сети. Файлы и комментарии недоступны", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Ошибка сети. Файлы и комментарии недоступны",
+                Toast.LENGTH_SHORT
+            ).show()
         }
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -110,6 +114,9 @@ class ShowTaskInfoFragment : Fragment() {
                                 findNavController().popBackStack()
                                 return@runOnUiThread
                             }
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             task = it
                             bindTask(it)
                         }
@@ -118,6 +125,9 @@ class ShowTaskInfoFragment : Fragment() {
                 launch {
                     viewModel.getComments().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             commentsAdapter.setComments(it)
                         }
                     }
@@ -125,6 +135,9 @@ class ShowTaskInfoFragment : Fragment() {
                 launch {
                     viewModel.getObservers().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             observersAdapter.setObservers(it)
                         }
                     }
@@ -132,6 +145,9 @@ class ShowTaskInfoFragment : Fragment() {
                 launch {
                     viewModel.getSubtasks().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             subtasksAdapter.setTasks(it)
                             binding.layoutSubtasks.isVisible = it.isNotEmpty()
                         }
@@ -149,6 +165,9 @@ class ShowTaskInfoFragment : Fragment() {
                                 binding.layoutFiles.isVisible = false
                                 return@runOnUiThread
                             }
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             binding.layoutFiles.isVisible = it.isNotEmpty()
                             filesAdapter.addPaths(it)
                         }
@@ -158,6 +177,9 @@ class ShowTaskInfoFragment : Fragment() {
                     val creationStatus = viewModel.getCreationStatus()
                     creationStatus.collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             when (it) {
                                 TaskCreationStatus.SUCCESS -> {
                                     commentFilesAdapter.clearFiles()
@@ -193,6 +215,9 @@ class ShowTaskInfoFragment : Fragment() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
+                                if (_binding == null) {
+                                    return@runOnUiThread
+                                }
                                 binding.cbBecomeExecutor.isChecked = it.isExecutor
                             }
                         }
@@ -413,7 +438,8 @@ class ShowTaskInfoFragment : Fragment() {
 
     private fun downloadFile(prefix: String, path: String, objectId: String) {
         if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
-            Toast.makeText(requireContext(), "Нет сети. Файлы недоступны", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Нет сети. Файлы недоступны", Toast.LENGTH_SHORT)
+                .show()
             return
         }
         val request = DownloadManager.Request(viewModel.downloadFile(prefix, objectId, path))

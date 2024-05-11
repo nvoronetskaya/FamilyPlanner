@@ -40,6 +40,9 @@ class EditTaskObserversFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val observers = viewModel.getObservers(taskId)
             requireActivity().runOnUiThread {
+                if (_binding == null) {
+                    return@runOnUiThread
+                }
                 observersAdapter.setData(observers)
             }
         }

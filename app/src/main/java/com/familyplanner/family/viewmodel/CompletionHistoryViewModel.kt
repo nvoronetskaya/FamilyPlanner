@@ -15,19 +15,27 @@ import java.time.LocalDate
 class CompletionHistoryViewModel : ViewModel() {
     private val completionHistory = MutableSharedFlow<List<CompletionDto>>(replay = 1)
     private var startDay: Long = LocalDate.now().toEpochDay() - 7
+    private var familyId = ""
     private var finishDay: Long = LocalDate.now().toEpochDay()
     private var collectHistory: Job? = null
     private val familyRepo = FamilyRepository()
 
-    init {
-        startUpdates()
+    fun setFamily(familyId: String): Flow<List<CompletionDto>> {
+        startUpdates(familyId, startDay, finishDay)
+        return completionHistory
     }
 
-    private fun startUpdates() {
+    private fun startUpdates(familyId: String, startDate: Long, finishDate: Long) {
+        if (familyId == this.familyId && startDate == startDay && finishDate == finishDay) {
+            return
+        }
+        this.familyId = familyId
+        this.startDay = startDate
+        this.finishDay = finishDate
         viewModelScope.launch(Dispatchers.IO) {
             collectHistory?.cancelAndJoin()
             collectHistory = launch(Dispatchers.IO) {
-                familyRepo.getCompletionHistory(startDay, finishDay).collect {
+                familyRepo.getCompletionHistory(this@CompletionHistoryViewModel.familyId, startDay, finishDay).collect {
                     completionHistory.emit(it)
                 }
             }
@@ -36,13 +44,13 @@ class CompletionHistoryViewModel : ViewModel() {
     }
 
     fun updateStart(date: Long) {
-        startDay = date
-        startUpdates()
+        val newFinish = if (date > this.finishDay) date else this.finishDay
+        startUpdates(familyId, date, newFinish)
     }
 
     fun updateFinish(date: Long) {
-        finishDay = date
-        startUpdates()
+        val newStart = if (date < this.startDay) date else this.startDay
+        startUpdates(familyId, newStart, date)
     }
 
     fun getStartDay() = startDay

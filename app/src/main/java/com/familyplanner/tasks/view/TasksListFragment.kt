@@ -80,6 +80,9 @@ class TasksListFragment : Fragment(), MenuProvider {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getTasks().collect {
                     activity?.runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         if (it.isEmpty()) {
                             binding.rvTasks.visibility = View.GONE
                             binding.ivNoTasks.visibility = View.VISIBLE
@@ -102,12 +105,12 @@ class TasksListFragment : Fragment(), MenuProvider {
             bundle.putString("parentId", null)
             bundle.putString("familyId", viewModel.getFamilyId())
             findNavController().navigate(
-                R.id.action_tasksListFragment_to_newTaskInfoFragment,
+                R.id.newTaskInfoFragment,
                 bundle
             )
         }
         binding.ivPerson.setOnClickListener {
-            findNavController().navigate(R.id.action_tasksListFragment_to_profileFragment)
+            findNavController().navigate(R.id.profileFragment)
         }
         binding.tvDate.text = String.format(
             "%02d.%02d.%d",
@@ -146,7 +149,7 @@ class TasksListFragment : Fragment(), MenuProvider {
 
     private fun onTaskClicked(taskId: String) {
         findNavController().navigate(
-            R.id.action_tasksListFragment_to_showTaskInfoFragment,
+            R.id.showTaskInfoFragment,
             bundleOf("taskId" to taskId)
         )
     }
@@ -280,11 +283,11 @@ class TasksListFragment : Fragment(), MenuProvider {
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.members -> findNavController().navigate(
-                R.id.action_tasksListFragment_to_membersListFragment,
+                R.id.membersListFragment,
                 bundleOf("isAdmin" to viewModel.isAdmin())
             )
 
-            R.id.stats -> TODO()
+            R.id.stats -> findNavController().navigate(R.id.completionHistoryFragment, bundleOf("familyId" to viewModel.getFamilyId()))
         }
         return true
     }

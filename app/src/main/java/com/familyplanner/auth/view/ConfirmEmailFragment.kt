@@ -62,6 +62,9 @@ class ConfirmEmailFragment : Fragment() {
                     val changeTask = viewModel.changeEmail(password, email)
                     changeTask?.await()
                     requireActivity().runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         if (changeTask == null || !changeTask.isSuccessful) {
                             Toast.makeText(
                                 requireContext(),

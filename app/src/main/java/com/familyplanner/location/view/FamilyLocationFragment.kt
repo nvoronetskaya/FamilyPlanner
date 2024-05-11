@@ -14,10 +14,8 @@ import com.familyplanner.databinding.FragmentLocationBinding
 import com.familyplanner.location.viewmodel.FamilyLocationViewModel
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.map.IconStyle
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class FamilyLocationFragment : Fragment() {
@@ -52,6 +50,9 @@ class FamilyLocationFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getFamilyMembers().collect {
                     requireActivity().runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         binding.map.mapWindow.map.mapObjects.clear()
                         it.forEach {
                             binding.map.mapWindow.map.mapObjects.addPlacemark().apply {

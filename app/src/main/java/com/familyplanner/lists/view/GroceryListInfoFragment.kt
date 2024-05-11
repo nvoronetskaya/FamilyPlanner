@@ -76,6 +76,9 @@ class GroceryListInfoFragment : Fragment() {
                 launch {
                     viewModel.getListInfo().collect {
                         activity?.runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             if (it == null) {
                                 Toast.makeText(
                                     requireContext(),
@@ -92,6 +95,9 @@ class GroceryListInfoFragment : Fragment() {
                 launch {
                     viewModel.getListProducts().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             productsAdapter.updateData(it)
                         }
                     }
@@ -99,6 +105,9 @@ class GroceryListInfoFragment : Fragment() {
                 launch {
                     viewModel.getListObservers().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             observerAdapter.updateData(it)
                         }
                     }

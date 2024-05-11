@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.common.repository.UserRepository
 import com.familyplanner.events.data.Event
 import com.familyplanner.events.data.EventAttendee
 import com.familyplanner.events.repository.EventRepository

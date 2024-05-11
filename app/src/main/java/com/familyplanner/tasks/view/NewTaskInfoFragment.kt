@@ -74,15 +74,16 @@ class NewTaskInfoFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.IO) {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.getAddressByGeo(p1).collect {
-                        if (it == Status.SUCCESS) {
-                            activity?.runOnUiThread {
+                        activity?.runOnUiThread {
+                            if (it == Status.SUCCESS) {
+                                if (_binding == null) {
+                                    return@runOnUiThread
+                                }
                                 curPoint = p1
                                 binding.tvAddress.visibility = View.VISIBLE
                                 binding.tvAddress.text = viewModel.getAddress()
                                 bottomSheet?.cancel()
-                            }
-                        } else {
-                            activity?.runOnUiThread {
+                            } else {
                                 Toast.makeText(
                                     activity,
                                     "Ошибка. Проверьте подключение к сети и повторите позднее",

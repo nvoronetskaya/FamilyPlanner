@@ -2,7 +2,7 @@ package com.familyplanner.tasks.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.common.repository.UserRepository
 import com.familyplanner.common.data.User
 import com.familyplanner.family.repository.FamilyRepository
 import com.familyplanner.tasks.data.TaskWithDate

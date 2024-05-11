@@ -46,6 +46,9 @@ class NewTaskObserversFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val members = viewModel.getObservers(familyId)
             requireActivity().runOnUiThread {
+                if (_binding == null) {
+                    return@runOnUiThread
+                }
                 adapter.setData(members)
             }
         }

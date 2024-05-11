@@ -1,4 +1,4 @@
-package com.familyplanner.auth.repository
+package com.familyplanner.common.repository
 
 import com.familyplanner.common.data.User
 import com.familyplanner.common.schema.UserDbSchema

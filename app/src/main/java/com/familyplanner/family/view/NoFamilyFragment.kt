@@ -3,6 +3,7 @@ package com.familyplanner.family.view
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.familyplanner.common.view.MainActivity
 import com.familyplanner.R
@@ -44,21 +46,20 @@ class NoFamilyFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.getUser().collect {
-                        if (!it.familyId.isNullOrEmpty()) {
-                            activity?.runOnUiThread {
+                        activity?.runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
+                            if (!it.familyId.isNullOrEmpty()) {
                                 binding.pbLoading.visibility = View.GONE
                                 val bundle = Bundle()
                                 bundle.putString("familyId", it.familyId)
                                 findNavController().navigate(
-                                    R.id.action_noFamilyFragment_to_tasksListFragment,
-                                    bundle
+                                    R.id.tasksListFragment,
+                                    bundle,
+                                    NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
                                 )
-                            }
-                        } else {
-                            activity?.runOnUiThread {
-                                if (_binding == null) {
-                                    return@runOnUiThread
-                                }
+                            } else {
                                 binding.pbLoading.visibility = View.GONE
                                 binding.animNothingFound.visibility = View.VISIBLE
                                 binding.tvNoFamily.visibility = View.VISIBLE
@@ -67,24 +68,24 @@ class NoFamilyFragment : Fragment() {
                             }
                         }
                     }
-                }
 
-                launch {
-                    viewModel.getErrors().collect {
-                        activity?.runOnUiThread {
-                            Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                    launch {
+                        viewModel.getErrors().collect {
+                            activity?.runOnUiThread {
+                                Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
             }
         }
-
         binding.bCreate.setOnClickListener {
             val name = EditText(activity)
             name.hint = "Название семьи"
             name.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             name.textSize = 17f
-            name.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            name.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
             MaterialAlertDialogBuilder(
                 activity as MainActivity,
                 R.style.alertDialog
@@ -111,7 +112,8 @@ class NoFamilyFragment : Fragment() {
             val code = EditText(activity)
             code.hint = "Код присоединения"
             code.textSize = 17F
-            code.typeface = Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            code.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
             MaterialAlertDialogBuilder(
                 activity as MainActivity,
                 R.style.alertDialog

@@ -71,6 +71,9 @@ class NewEventFragment : Fragment() {
                 launch {
                     viewModel.getAttendees().collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             if (it.isNotEmpty()) {
                                 attendeesAdapter.setData(it)
                             }
@@ -81,6 +84,9 @@ class NewEventFragment : Fragment() {
                     val creationResult = viewModel.getCreationStatus()
                     creationResult.collect {
                         requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
+                            }
                             binding.pbLoading.isVisible = false
                             when (it) {
                                 TaskCreationStatus.SUCCESS -> findNavController().popBackStack()

@@ -64,6 +64,9 @@ class ListsListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getGroceryLists().collect {
                     requireActivity().runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         listsAdapter.updateData(it)
                     }
                 }

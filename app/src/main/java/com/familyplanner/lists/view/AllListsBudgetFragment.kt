@@ -59,6 +59,9 @@ class AllListsBudgetFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getListsForFamily(familyId).collect {
                     requireActivity().runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         if (binding.rvBudget.isVisible) {
                             budgetAdapter.setData(it.sortedByDescending { it.addedAt })
                         } else {

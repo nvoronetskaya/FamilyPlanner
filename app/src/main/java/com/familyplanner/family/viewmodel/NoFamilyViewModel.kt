@@ -3,7 +3,7 @@ package com.familyplanner.family.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.familyplanner.FamilyPlanner
-import com.familyplanner.auth.repository.UserRepository
+import com.familyplanner.common.repository.UserRepository
 import com.familyplanner.common.data.User
 import com.familyplanner.family.repository.FamilyRepository
 import com.google.firebase.auth.ktx.auth

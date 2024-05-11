@@ -41,29 +41,32 @@ class EnterEmailFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getLetterSent().collect { errorMessage ->
-                    if (errorMessage.isBlank()) {
-                        val emailAddress = binding.etEmail.text?.trim().toString()
-                        val bundle = Bundle()
-                        bundle.putString("email", emailAddress)
-                        bundle.putString("code", viewModel.getConfirmationCode())
-                        bundle.putBoolean("changeEmail", isChangeEmail)
-                        bundle.putString("password", password)
-                        activity?.runOnUiThread {
+                    activity?.runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
+                        if (errorMessage.isBlank()) {
+                            val emailAddress = binding.etEmail.text?.trim().toString()
+                            val bundle = Bundle()
+                            bundle.putString("email", emailAddress)
+                            bundle.putString("code", viewModel.getConfirmationCode())
+                            bundle.putBoolean("changeEmail", isChangeEmail)
+                            bundle.putString("password", password)
                             binding.pbLoading.visibility = View.GONE
                             findNavController().navigate(
                                 R.id.action_enterEmailFragment_to_confirmEmailFragment,
                                 bundle
                             )
-                        }
-                    } else {
-                        activity?.runOnUiThread {
-                            binding.pbLoading.visibility = View.GONE
-                            Toast.makeText(
-                                activity,
-                                errorMessage,
-                                Toast.LENGTH_LONG
-                            ).show()
-                            binding.bNext.isEnabled = true
+                        } else {
+                            activity?.runOnUiThread {
+                                binding.pbLoading.visibility = View.GONE
+                                Toast.makeText(
+                                    activity,
+                                    errorMessage,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                binding.bNext.isEnabled = true
+                            }
                         }
                     }
                 }

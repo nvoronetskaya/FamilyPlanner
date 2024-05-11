@@ -57,7 +57,7 @@ class AllListsBudgetViewModel : ViewModel() {
     }
 
     fun updateFinishDate(finishDate: LocalDate) {
-        val newStart = if (finishDate < this.startDate) startDate else this.startDate
+        val newStart = if (finishDate < this.startDate) finishDate else this.startDate
         startUpdates(this.familyId, newStart, finishDate)
     }
 

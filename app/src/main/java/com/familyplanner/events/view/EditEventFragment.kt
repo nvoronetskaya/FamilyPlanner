@@ -78,6 +78,9 @@ class EditEventFragment : Fragment() {
             viewModel.prepareData(eventId, familyId)
             val event = viewModel.getEvent()
             requireActivity().runOnUiThread {
+                if (_binding == null) {
+                    return@runOnUiThread
+                }
                 if (event == null) {
                     Toast.makeText(
                         requireContext(),

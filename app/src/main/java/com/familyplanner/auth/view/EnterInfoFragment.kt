@@ -44,6 +44,9 @@ class EnterInfoFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isLoggedIn().collect {
                     activity?.runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
                         binding.pbLoading.visibility = View.GONE
                         if (it.isBlank()) {
                             findNavController().navigate(
