@@ -28,13 +28,13 @@ class PushNotificationService : FirebaseMessagingService() {
         val title = message.data["title"]
         val body = message.data["body"]
         val key: String
-        val navigateTo: Int
+        val navigateTo: Int?
         if (sourceType.equals("TASK")) {
             key = "taskId"
             navigateTo = R.id.showTaskInfoFragment
         } else if (sourceType.equals("EVENT")) {
             key = "eventId"
-            navigateTo = R.id.eventInfoFragment
+            navigateTo = if (sourceId != null) R.id.eventInfoFragment else null
         } else {
             return
         }
@@ -45,13 +45,13 @@ class PushNotificationService : FirebaseMessagingService() {
             PackageManager.PERMISSION_GRANTED
         ) {
             val link = NavDeepLinkBuilder(this).setComponentName(MainActivity::class.java)
-                .setGraph(R.navigation.navigation).setDestination(navigateTo)
-                .setArguments(bundleOf(key to sourceId)).createPendingIntent()
+                .setGraph(R.navigation.navigation).setArguments(bundleOf(key to sourceId))
+            navigateTo?.let { link.setDestination(navigateTo) }
             val notification =
                 NotificationCompat.Builder(this, "DATA_UPDATES").setContentTitle(title)
                     .setSmallIcon(R.drawable.ic_notifications)
                     .setContentText(body)
-                    .setContentIntent(link).build()
+                    .setContentIntent(link.createPendingIntent()).build()
             val manager = NotificationManagerCompat.from(this)
             manager.notify(System.currentTimeMillis().toInt(), notification)
         }
@@ -62,6 +62,7 @@ class PushNotificationService : FirebaseMessagingService() {
         if (FamilyPlanner.userId.isEmpty()) {
             return
         }
-        firestore.collection(UserDbSchema.USER_TABLE).document(FamilyPlanner.userId).update(UserDbSchema.FCM_TOKEN, token)
+        firestore.collection(UserDbSchema.USER_TABLE).document(FamilyPlanner.userId)
+            .update(UserDbSchema.FCM_TOKEN, token)
     }
 }
