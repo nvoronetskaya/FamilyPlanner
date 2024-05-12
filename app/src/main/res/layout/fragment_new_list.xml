@@ -59,6 +59,7 @@
             android:id="@+id/et_name"
             style="@style/editText"
             android:layout_width="350dp"
+            android:maxLength="15"
             android:layout_height="wrap_content"
             android:inputType="textCapSentences" />
     </com.google.android.material.textfield.TextInputLayout>

@@ -36,7 +36,7 @@ class CompletionHistoryViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             collectHistory?.cancelAndJoin()
             collectHistory = launch(Dispatchers.IO) {
-                familyRepo.getCompletionHistory(this@CompletionHistoryViewModel.familyId, FamilyPlanner.userId, startDay, finishDay).collect {
+                familyRepo.getCompletionHistory(FamilyPlanner.userId, startDay, finishDay).collect {
                     completionHistory.emit(it)
                 }
             }

@@ -6,6 +6,7 @@ import com.familyplanner.common.repository.UserRepository
 import com.familyplanner.auth.generateCode
 import com.familyplanner.auth.sendSignUpCode
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.sun.mail.smtp.SMTPAddressFailedException
@@ -21,13 +22,19 @@ class ConfirmEmailViewModel : ViewModel() {
     fun sendConfirmationLetter(address: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val message: String
-            if (!userRepo.hasAccount(address)) {
-                code = generateCode()
-                message =
-                    "Здравствуйте! \nДля продолжения регистрации в \"Семейном планировщике\" введите следующий код подтверждения: $code"
-            } else {
-                message =
-                    "Вы уже зарегистрированы в приложении \"Семейный планировщик\". В случае утери пароля воспользуйтесь функцией его восстановления"
+            try {
+                if (!userRepo.hasAccount(address)) {
+                    code = generateCode()
+                    message =
+                        "Здравствуйте! \nДля продолжения регистрации в \"Семейном планировщике\" введите следующий код подтверждения: $code"
+                } else {
+                    message =
+                        "Вы уже зарегистрированы в приложении \"Семейный планировщик\". В случае утери пароля воспользуйтесь функцией его восстановления"
+                }
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                letterSent
+                    .emit("Некорректный адрес почты")
+                return@launch
             }
             try {
                 sendSignUpCode(address, message, "Регистрация в Семейном помощнике")

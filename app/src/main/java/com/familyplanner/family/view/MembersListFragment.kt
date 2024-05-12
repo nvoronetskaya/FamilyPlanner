@@ -2,6 +2,7 @@ package com.familyplanner.family.view
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputFilter
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
@@ -126,93 +127,94 @@ class MembersListFragment : Fragment() {
                     }
                 }
             }
-            binding.llDelete.isVisible = isAdmin
-            (binding.tabs.getChildAt(0) as LinearLayout).getChildAt(1).isClickable = isAdmin
-            binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    val isMembers = binding.tabs.getTabAt(0)!!.equals(tab)
-                    binding.rvMembers.isVisible = isMembers
-                    binding.rvApplicants.isVisible = !isMembers
-                }
-
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                }
-
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                }
-            })
-
-            binding.ivEdit.setOnClickListener {
-                val familyName = EditText(activity)
-                familyName.setText(binding.tvFamily.text)
-                familyName.textSize = 17F
-                familyName.typeface =
-                    Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
-                familyName.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                MaterialAlertDialogBuilder(
-                    activity as MainActivity,
-                    R.style.alertDialog
-                ).setTitle("Новое название семьи")
-                    .setView(familyName, 40, 0, 40, 0)
-                    .setPositiveButton("Готово") { _, _ ->
-                        if (familyName.text.isNullOrBlank()) {
-                            familyName.error = "Введите название"
-                        } else {
-                            viewModel.updateFamilyName(familyName.text.trim().toString())
-                        }
-                    }
-                    .setNegativeButton("Отмена") { dialog, _ ->
-                        dialog.cancel()
-                    }.show()
+        }
+        binding.llDelete.isVisible = isAdmin
+        (binding.tabs.getChildAt(0) as LinearLayout).getChildAt(1).isClickable = isAdmin
+        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val isMembers = binding.tabs.getTabAt(0)!!.equals(tab)
+                binding.rvMembers.isVisible = isMembers
+                binding.rvApplicants.isVisible = !isMembers
             }
 
-            binding.llLeave.setOnClickListener {
-                MaterialAlertDialogBuilder(
-                    activity as MainActivity,
-                    R.style.alertDialog
-                ).setTitle("Выход из семьи")
-                    .setMessage("Вы уверены, что хотите покинуть семью?")
-                    .setPositiveButton("Да") { _, _ ->
-                        viewModel.leave(userId)
-                    }
-                    .setNegativeButton("Отмена") { dialog, _ ->
-                        dialog.cancel()
-                    }.create().show()
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
             }
 
-            binding.llDelete.setOnClickListener {
-                MaterialAlertDialogBuilder(
-                    activity as MainActivity,
-                    R.style.alertDialog
-                ).setTitle("Удаление семьи")
-                    .setMessage("Вы уверены, что хотите удалить семью?")
-                    .setPositiveButton("Да") { _, _ ->
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                                viewModel.deleteFamily().collect {
-                                    requireActivity().runOnUiThread {
-                                        if (it) {
-                                            findNavController().popBackStack()
-                                        } else {
-                                            Toast.makeText(
-                                                activity,
-                                                "Ошибка. Проверьте подключение к сети и попробуйте позднее",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
+        binding.ivEdit.isVisible = isAdmin
+        binding.ivEdit.setOnClickListener {
+            val familyName = EditText(activity)
+            familyName.setText(binding.tvFamily.text)
+            familyName.textSize = 17F
+            familyName.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(15))
+            familyName.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            familyName.inputType = InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Новое название семьи")
+                .setView(familyName, 40, 0, 40, 0)
+                .setPositiveButton("Готово") { _, _ ->
+                    if (familyName.text.isNullOrBlank()) {
+                        familyName.error = "Введите название"
+                    } else {
+                        viewModel.updateFamilyName(familyName.text.trim().toString())
+                    }
+                }
+                .setNegativeButton("Отмена") { dialog, _ ->
+                    dialog.cancel()
+                }.create().show()
+        }
+
+        binding.llLeave.setOnClickListener {
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Выход из семьи")
+                .setMessage("Вы уверены, что хотите покинуть семью?")
+                .setPositiveButton("Да") { _, _ ->
+                    viewModel.leave(userId)
+                }
+                .setNegativeButton("Отмена") { dialog, _ ->
+                    dialog.cancel()
+                }.create().show()
+        }
+
+        binding.llDelete.setOnClickListener {
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Удаление семьи")
+                .setMessage("Вы уверены, что хотите удалить семью?")
+                .setPositiveButton("Да") { _, _ ->
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                            viewModel.deleteFamily().collect {
+                                requireActivity().runOnUiThread {
+                                    if (it) {
+                                        findNavController().popBackStack()
+                                    } else {
+                                        Toast.makeText(
+                                            activity,
+                                            "Ошибка. Проверьте подключение к сети и попробуйте позднее",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
                         }
                     }
-                    .setNegativeButton("Отмена") { dialog, _ ->
-                        dialog.cancel()
-                    }.create().show()
-            }
+                }
+                .setNegativeButton("Отмена") { dialog, _ ->
+                    dialog.cancel()
+                }.create().show()
+        }
 
-            binding.ivBack.setOnClickListener {
-                findNavController().popBackStack()
-            }
+        binding.ivBack.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 

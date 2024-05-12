@@ -23,6 +23,7 @@ import com.familyplanner.databinding.FragmentNewEventBinding
 import com.familyplanner.events.adapters.InvitationAdapter
 import com.familyplanner.events.viewmodel.EditEventViewModel
 import com.familyplanner.tasks.adapters.FileAdapter
+import com.familyplanner.tasks.data.SizeExceededException
 import com.familyplanner.tasks.data.UserFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -244,6 +245,12 @@ class EditEventFragment : Fragment() {
                         Toast.makeText(
                             requireContext(),
                             "Файл с таким именем уже прикреплён",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: SizeExceededException) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Суммарный размер файлов не может превышать 5 МБ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

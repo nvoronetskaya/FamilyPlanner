@@ -32,6 +32,7 @@ import com.familyplanner.tasks.adapters.ObserveFilesAdapter
 import com.familyplanner.tasks.adapters.ObserversListAdapter
 import com.familyplanner.tasks.adapters.TaskAdapter
 import com.familyplanner.tasks.data.RepeatType
+import com.familyplanner.tasks.data.SizeExceededException
 import com.familyplanner.tasks.data.Task
 import com.familyplanner.tasks.data.TaskCreationStatus
 import com.familyplanner.tasks.data.UserFile
@@ -342,6 +343,12 @@ class ShowTaskInfoFragment : Fragment() {
                         Toast.makeText(
                             requireContext(),
                             "Файл с таким именем уже добавлен",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } catch (e: SizeExceededException) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Суммарный размер файлов не может превышать 5 МБ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

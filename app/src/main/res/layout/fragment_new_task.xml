@@ -70,6 +70,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
                     style="@style/editText"
+                    android:maxLength="30"
                     android:layout_width="350dp"
                     android:layout_height="wrap_content"
                     android:inputType="textCapSentences" />

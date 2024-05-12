@@ -27,7 +27,7 @@
         android:enabled="false"
         android:gravity="start|center_vertical"
         android:maxLines="1"
-        android:maxLength="19"
+        android:maxLength="15"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="@id/cb_list"
         app:layout_constraintStart_toEndOf="@id/cb_list"

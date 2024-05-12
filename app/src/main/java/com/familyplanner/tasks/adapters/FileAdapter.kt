@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderFileBinding
+import com.familyplanner.tasks.data.SizeExceededException
 import com.familyplanner.tasks.data.UserFile
 
 class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
@@ -38,6 +39,9 @@ class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
     fun addFile(file: UserFile) {
         if (files.any { it.name.equals(file.name) }) {
             throw IllegalArgumentException()
+        }
+        if (files.sumOf { it.size } + file.size > 5 * 1024) {
+            throw SizeExceededException()
         }
         files.add(file)
         notifyItemInserted(files.size - 1)
