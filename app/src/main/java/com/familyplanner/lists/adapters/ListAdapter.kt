@@ -31,6 +31,8 @@ class ListAdapter(
             }
             binding.ivDelete.visibility =
                 if (userId.equals(list.createdBy)) View.VISIBLE else View.GONE
+            binding.ivEdit.visibility =
+                if (userId.equals(list.createdBy)) View.VISIBLE else View.GONE
             binding.etName.setText(list.name)
             binding.ivEdit.setOnClickListener {
                 binding.etName.isEnabled = true

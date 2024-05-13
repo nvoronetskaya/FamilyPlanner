@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.databinding.ViewholderListProductBinding
 import com.familyplanner.lists.data.Product
 
 class ProductAdapter(
+    val isListCreator: Boolean,
     val onEdited: (Product, String) -> Unit,
     val onStatusChanged: (Product, Boolean) -> Unit,
     val onDelete: (Product) -> Unit
@@ -28,6 +30,8 @@ class ProductAdapter(
                 }
             }
             binding.etName.setText(product.name)
+            binding.ivEdit.isVisible = isListCreator
+            binding.ivDelete.isVisible = isListCreator
             binding.ivEdit.setOnClickListener {
                 binding.etName.isEnabled = true
                 binding.etName.requestFocus()

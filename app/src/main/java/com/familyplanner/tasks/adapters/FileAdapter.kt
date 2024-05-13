@@ -10,7 +10,7 @@ import com.familyplanner.tasks.data.UserFile
 class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
     RecyclerView.Adapter<FileAdapter.FileViewHolder>() {
     private val files = mutableListOf<UserFile>()
-
+    private val MAX_SIZE_BYTE = 5 * 1024 * 1024
     inner class FileViewHolder(private val binding: ViewholderFileBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun onBind(file: UserFile) {
@@ -40,7 +40,7 @@ class FileAdapter(val onRemove: ((String) -> Unit)? = null) :
         if (files.any { it.name.equals(file.name) }) {
             throw IllegalArgumentException()
         }
-        if (files.sumOf { it.size } + file.size > 5 * 1024) {
+        if (files.sumOf { it.size } + file.size > MAX_SIZE_BYTE) {
             throw SizeExceededException()
         }
         files.add(file)

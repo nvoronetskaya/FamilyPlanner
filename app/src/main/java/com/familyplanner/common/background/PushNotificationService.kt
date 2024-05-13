@@ -47,16 +47,22 @@ class PushNotificationService : FirebaseMessagingService() {
             ) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            val link = NavDeepLinkBuilder(this).setComponentName(MainActivity::class.java)
-                .setGraph(R.navigation.navigation).setArguments(bundleOf(key to sourceId))
-            navigateTo?.let { link.setDestination(navigateTo) }
+
+
             val notification =
                 NotificationCompat.Builder(this, "DATA_UPDATES").setContentTitle(title)
                     .setSmallIcon(R.drawable.ic_notifications)
                     .setContentText(body)
-                    .setContentIntent(link.createPendingIntent()).build()
+
+
+            navigateTo?.let {
+                val link = NavDeepLinkBuilder(this).setComponentName(MainActivity::class.java)
+                    .setGraph(R.navigation.navigation).setArguments(bundleOf(key to sourceId))
+                    .setDestination(navigateTo)
+                notification.setContentIntent(link.createPendingIntent())
+            }
             val manager = NotificationManagerCompat.from(this)
-            manager.notify(System.currentTimeMillis().toInt(), notification)
+            manager.notify(System.currentTimeMillis().toInt(), notification.build())
         }
     }
 

@@ -103,6 +103,7 @@ class EditTaskFragment : Fragment() {
         binding.rvFiles.adapter = filesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             val task = viewModel.getTask(taskId)
+            filesAdapter.setData(viewModel.getFiles())
             requireActivity().runOnUiThread {
                 if (_binding == null) {
                     return@runOnUiThread
@@ -412,7 +413,7 @@ class EditTaskFragment : Fragment() {
                     } catch (e: SizeExceededException) {
                         Toast.makeText(
                             requireContext(),
-                            "Суммарный размер файлов не может превышать 5 МБ",
+                            "Превышен лимит в 5 МБ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

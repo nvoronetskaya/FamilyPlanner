@@ -233,7 +233,7 @@ class ShowTaskInfoFragment : Fragment() {
             val bundle = Bundle()
             bundle.putString("parentId", taskId)
             bundle.putString("familyId", task!!.familyId)
-            findNavController().navigate(R.id.action_showTaskInfoFragment_to_newTaskInfoFragment)
+            findNavController().navigate(R.id.action_showTaskInfoFragment_to_newTaskInfoFragment, bundle)
         }
         binding.ivSubtasksUnfolded.setOnClickListener {
             binding.ivSubtasksUnfolded.visibility = View.GONE
@@ -348,7 +348,7 @@ class ShowTaskInfoFragment : Fragment() {
                     } catch (e: SizeExceededException) {
                         Toast.makeText(
                             requireContext(),
-                            "Суммарный размер файлов не может превышать 5 МБ",
+                            "Превышен лимит в 5 МБ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

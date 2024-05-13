@@ -3,7 +3,7 @@
         android:id="@+id/home"
         android:enabled="true"
         android:icon="@drawable/ic_home"
-        android:title="@string/common"/>
+        android:title="Задачи"/>
 
     <item
         android:id="@+id/map"

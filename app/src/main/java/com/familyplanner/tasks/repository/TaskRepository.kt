@@ -298,7 +298,8 @@ class TaskRepository {
                                 val completion = mapOf<String, Any>(
                                     CompletionDbSchema.USER_ID to completedById,
                                     CompletionDbSchema.TASK_ID to subtask.id,
-                                    CompletionDbSchema.COMPLETION_DATE to today
+                                    CompletionDbSchema.COMPLETION_DATE to today,
+                                    CompletionDbSchema.TASK_NAME to subtask[TaskDbSchema.TITLE].toString()
                                 )
                                 firestore.collection(CompletionDbSchema.COMPLETION_TABLE)
                                     .add(completion)
@@ -309,7 +310,8 @@ class TaskRepository {
                     val completion = mapOf<String, Any>(
                         CompletionDbSchema.USER_ID to completedById,
                         CompletionDbSchema.TASK_ID to task.id,
-                        CompletionDbSchema.COMPLETION_DATE to today
+                        CompletionDbSchema.COMPLETION_DATE to today,
+                        CompletionDbSchema.TASK_NAME to task.title
                     )
                     firestore.collection(CompletionDbSchema.COMPLETION_TABLE).add(completion)
                 }

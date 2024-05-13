@@ -43,12 +43,12 @@ def notify_task_observers(observer: Event[DocumentSnapshot]) -> None:
     observer_info = observer.data.to_dict()
     task = firestore_client.document(f"task/{observer_info['taskId']}").get().to_dict()
     user = firestore_client.document(f"user/{observer_info['userId']}").get().to_dict()
-    if task['createdBy'] == observer['userId']:
+    if task['createdBy'] == observer_info['userId']:
         return
     if observer_info.get('isExecutor'):
         body = f"Вы назначены исполнителем задачи {task['name']}"
     else:
-        body = f"Доступна задача {task['name']}"
+        body = f"Доступна задача {task['title']}"
     data = {
         'type': 'TASK',
         'sourceId': observer_info['taskId'],
@@ -73,7 +73,7 @@ def notify_new_executors(observer: Event[Change[DocumentSnapshot]]) -> None:
         'type': 'TASK',
         'sourceId': new_value['taskId'],
         'title': 'Новая задача',
-        'body': f'Вы назначены исполнителем задачи {task['name']}'
+        'body': f'Вы назначены исполнителем задачи {task['title']}'
     }
     message = messaging.Message(token=user['fcmToken'], data=data)
     messaging.send(message)
@@ -90,9 +90,9 @@ def notify_executors_on_task_change(task: Event[Change[DocumentSnapshot]]) -> No
         user = firestore_client.document(f"user/{observer.to_dict()['userId']}").get().to_dict()
         data = {
             'type': 'TASK',
-            'sourceId': new_value['taskId'],
+            'sourceId': task.id,
             'title': 'Задача изменена',
-            'body': f'Задача {old_value['name']} была изменена. Нажмите, чтобы увидеть подробности'
+            'body': f'Задача {old_value['title']} была изменена. Нажмите, чтобы увидеть подробности'
         }
         message = messaging.Message(token=user['fcmToken'], data=data)
         messaging.send(message)
@@ -106,7 +106,7 @@ def notify_attendees_event_cancel(event: Event[DocumentSnapshot | None]) -> None
     event_data = event.data.to_dict()
     for attendee in attendees:
         attendee_data = attendee.to_dict()
-        if attendee_data['status'] == 'NOT_COMING':
+        if 'NOT_COMING' in attendee_data.values():
             continue
         user = firestore_client.document(f"user/{attendee_data['userId']}").get().to_dict()
         data = {
@@ -141,15 +141,15 @@ def notify_list_observers(userList: Event[DocumentSnapshot]) -> None:
     if userList.data is None:
         return
     userListData = userList.data.to_dict()
-    list = firestore_client.document(f"list/{userListData['listId']}").get().to_dict()
-    if userListData['userId'] == list['createdBy']:
+    grocery_list = firestore_client.document(f"list/{userListData['listId']}").get().to_dict()
+    if userListData['userId'] == grocery_list['createdBy']:
         return
     user = firestore_client.document(f"user/{userListData['userId']}").get().to_dict()
     data = {
         'type': 'LIST',
         'sourceId': userListData['listId'],
         'title': 'Новый список покупок',
-        'body': f'Вам доступен список покупок {list['name']}'
+        'body': f'Вам доступен список покупок {grocery_list['name']}'
     }
     message = messaging.Message(token=user['fcmToken'], data=data)
     messaging.send(message)

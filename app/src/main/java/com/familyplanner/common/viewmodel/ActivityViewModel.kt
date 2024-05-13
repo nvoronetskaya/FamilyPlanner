@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.familyplanner.common.repository.UserRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ActivityViewModel : ViewModel() {
     private val auth = Firebase.auth
@@ -60,4 +62,12 @@ class ActivityViewModel : ViewModel() {
     fun getHasFamilyUpdates(): Flow<Boolean> = hasFamilyFlow
 
     fun getHasFamily(): Boolean = hasFamily
+
+    fun updateFcmToken() {
+        viewModelScope.launch(Dispatchers.IO) {
+            auth.currentUser?.uid?.let {
+                userRepository.setFcmToken(it, Firebase.messaging.token.await())
+            }
+        }
+    }
 }

@@ -38,6 +38,7 @@ class LocationNotificationSender(val context: Context) {
     private var lastLongitude: Double? = null
     private val RADIUS = 6371e3
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val lock = Any()
 
     fun startUpdates() {
         scope.launch {
@@ -56,35 +57,39 @@ class LocationNotificationSender(val context: Context) {
                                 firestore.collection(TaskDbSchema.TASK_TABLE)
                                     .whereIn(FieldPath.documentId(), taskRadius.keys.toList())
                                     .snapshots().collect {
-                                        val newTaskIds = it.documents.map { it.id }
-                                        for (key in tasks.keys) {
-                                            if (!newTaskIds.contains(key)) {
-                                                tasks.remove(key)
+                                        synchronized(lock) {
+                                            val newTaskIds = it.documents.map { it.id }
+                                            for (key in tasks.keys) {
+                                                if (!newTaskIds.contains(key)) {
+                                                    tasks.remove(key)
+                                                }
                                             }
-                                        }
-                                        for (doc in it.documents) {
-                                            val location = doc.getGeoPoint(TaskDbSchema.LOCATION)
-                                            if (location == null) {
-                                                tasks.remove(doc.id)
-                                                continue
+                                            for (doc in it.documents) {
+                                                val location =
+                                                    doc.getGeoPoint(TaskDbSchema.LOCATION)
+                                                if (location == null) {
+                                                    tasks.remove(doc.id)
+                                                    continue
+                                                }
+                                                if (!tasks.contains(doc.id)) {
+                                                    tasks[doc.id] = TaskLocationDto(
+                                                        doc.id,
+                                                        doc[TaskDbSchema.TITLE].toString(),
+                                                        location.latitude,
+                                                        location.longitude,
+                                                        taskRadius[doc.id]!!,
+                                                        false
+                                                    )
+                                                } else {
+                                                    val oldTask = tasks[doc.id]!!
+                                                    oldTask.title =
+                                                        doc[TaskDbSchema.TITLE].toString()
+                                                    oldTask.latitude = location.latitude
+                                                    oldTask.longitude = location.longitude
+                                                    oldTask.radius = taskRadius[doc.id]!!
+                                                }
+                                                notifyIfNeeded(tasks[doc.id]!!)
                                             }
-                                            if (!tasks.contains(doc.id)) {
-                                                tasks[doc.id] = TaskLocationDto(
-                                                    doc.id,
-                                                    doc[TaskDbSchema.TITLE].toString(),
-                                                    location.latitude,
-                                                    location.longitude,
-                                                    taskRadius[doc.id]!!,
-                                                    false
-                                                )
-                                            } else {
-                                                val oldTask = tasks[doc.id]!!
-                                                oldTask.title = doc[TaskDbSchema.TITLE].toString()
-                                                oldTask.latitude = location.latitude
-                                                oldTask.longitude = location.longitude
-                                                oldTask.radius = taskRadius[doc.id]!!
-                                            }
-                                            notifyIfNeeded(tasks[doc.id]!!)
                                         }
                                     }
                             }

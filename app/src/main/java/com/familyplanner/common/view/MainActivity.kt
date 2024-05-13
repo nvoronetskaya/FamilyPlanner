@@ -50,21 +50,42 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         val isWelcomeFragment = getCurrentDestinationId() == R.id.welcomeFragment
         binding.bottomNavigation.isVisible = !isWelcomeFragment
-        if (Firebase.auth.currentUser != null && isWelcomeFragment) {
-            navController.navigate(R.id.action_welcomeFragment_to_noFamilyFragment)
-            binding.bottomNavigation.visibility = View.VISIBLE
+        if (Firebase.auth.currentUser != null) {
+            viewModel.updateFcmToken()
+            if (isWelcomeFragment) {
+                navController.navigate(R.id.action_welcomeFragment_to_noFamilyFragment)
+                binding.bottomNavigation.visibility = View.VISIBLE
+            }
         }
+        val notChan =
+            NotificationChannel("DATA_UPDATES", "New data", NotificationManager.IMPORTANCE_DEFAULT)
+        val nManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nManager.createNotificationChannel(notChan)
+        val locationChan =
+            NotificationChannel(
+                "LOCATION",
+                "Location updates",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+        nManager.createNotificationChannel(locationChan)
+        val locationService = Intent(applicationContext, LocationService::class.java)
         lifecycleScope.launch(Dispatchers.IO) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getHasFamilyUpdates().collect {
                     runOnUiThread {
                         if (Firebase.auth.currentUser == null) {
+                            stopService(locationService)
                             navController.navigate(
                                 R.id.welcomeFragment,
                                 null,
                                 NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
                             )
                             return@runOnUiThread
+                        }
+                        if (it) {
+                            startService(locationService)
+                        } else {
+                            stopService(locationService)
                         }
                         val currentDestination = getCurrentDestinationId()
                         if (!it && currentDestination != R.id.noFamilyFragment) {
@@ -80,18 +101,6 @@ class MainActivity : AppCompatActivity() {
         }
         binding.fragmentContainerView.visibility = View.VISIBLE
         setUpBottomNavigation()
-        val notChan =
-            NotificationChannel("DATA_UPDATES", "New data", NotificationManager.IMPORTANCE_DEFAULT)
-        val nManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        nManager.createNotificationChannel(notChan)
-        val locationChan =
-            NotificationChannel(
-                "LOCATION",
-                "Location updates",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-        nManager.createNotificationChannel(locationChan)
-        startService(Intent(applicationContext, LocationService::class.java))
     }
 
     fun showBottomNavigation() {

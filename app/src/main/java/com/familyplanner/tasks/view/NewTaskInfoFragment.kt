@@ -285,7 +285,7 @@ class NewTaskInfoFragment : Fragment() {
                                 bundle.putString("taskId", viewModel.getCreatedTaskId())
                                 bundle.putString("familyId", familyId)
                                 findNavController().navigate(
-                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                    R.id.newTaskObserversFragment,
                                     bundle
                                 )
                             }
@@ -300,7 +300,7 @@ class NewTaskInfoFragment : Fragment() {
                                 bundle.putString("taskId", viewModel.getCreatedTaskId())
                                 bundle.putString("familyId", familyId)
                                 findNavController().navigate(
-                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
+                                    R.id.newTaskObserversFragment,
                                     bundle
                                 )
                             }
@@ -344,7 +344,7 @@ class NewTaskInfoFragment : Fragment() {
                     } catch (e: SizeExceededException) {
                         Toast.makeText(
                             requireContext(),
-                            "Суммарный размер файлов не может превышать 5 МБ",
+                            "Превышен лимит в 5 МБ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

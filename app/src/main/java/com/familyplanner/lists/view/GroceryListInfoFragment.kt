@@ -54,7 +54,7 @@ class GroceryListInfoFragment : Fragment() {
         val isListCreator = requireArguments().getBoolean("isCreator", false)
         viewModel = ViewModelProvider(this)[GroceryListInfoViewModel::class.java]
         viewModel.setList(listId)
-        val productsAdapter = ProductAdapter(
+        val productsAdapter = ProductAdapter(isListCreator,
             viewModel::editProduct,
             viewModel::changeProductPurchased,
             ::onProductDelete
@@ -71,6 +71,7 @@ class GroceryListInfoFragment : Fragment() {
         binding.rvObservers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProducts.adapter = productsAdapter
         binding.rvObservers.adapter = observerAdapter
+        binding.fabAdd.isVisible = isListCreator
         lifecycleScope.launch(Dispatchers.IO) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {

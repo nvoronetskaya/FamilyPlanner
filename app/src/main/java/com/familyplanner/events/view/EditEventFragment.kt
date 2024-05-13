@@ -250,7 +250,7 @@ class EditEventFragment : Fragment() {
                     } catch (e: SizeExceededException) {
                         Toast.makeText(
                             requireContext(),
-                            "Суммарный размер файлов не может превышать 5 МБ",
+                            "Превышен лимит в 5 МБ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
