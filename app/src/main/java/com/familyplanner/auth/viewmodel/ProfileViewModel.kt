@@ -23,7 +23,7 @@ class ProfileViewModel : ViewModel() {
     init {
         viewModelScope.launch(Dispatchers.IO) {
             userRepo.getUserById(FamilyPlanner.userId).collect {
-                user.emit(it)
+                it?.let { user.emit(it) }
             }
         }
     }

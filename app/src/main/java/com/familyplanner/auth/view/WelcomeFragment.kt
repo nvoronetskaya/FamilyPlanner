@@ -9,6 +9,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
+import com.familyplanner.common.view.MainActivity
 import com.familyplanner.databinding.FragmentWelcomeBinding
 
 class WelcomeFragment : Fragment() {
@@ -33,6 +34,7 @@ class WelcomeFragment : Fragment() {
                 NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
             )
         }
+        (requireActivity() as MainActivity).hideBottomNavigation()
         binding.bStart.setOnClickListener {
             findNavController().navigate(R.id.action_welcomeFragment_to_enterEmailFragment)
         }

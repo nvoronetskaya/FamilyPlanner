@@ -9,13 +9,19 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.snapshots
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class UserRepository {
     private val firestore = Firebase.firestore
     private val auth = Firebase.auth
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     fun addUser(name: String, birthday: String, email: String, uid: String) {
         val data = HashMap<String, Any>()
@@ -27,18 +33,33 @@ class UserRepository {
         firestore.collection(UserDbSchema.USER_TABLE).document(uid).set(data)
     }
 
-    fun getUserById(userId: String): Flow<User> = firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(
-        FieldPath.documentId(), userId
-    ).snapshots().map {
-        val doc = it.documents[0]
-        User(
-            doc.id,
-            doc[UserDbSchema.NAME].toString(),
-            doc[UserDbSchema.BIRTHDAY].toString(),
-            doc[UserDbSchema.FAMILY_ID].toString(),
-            auth.currentUser?.email ?: "",
-            doc.getGeoPoint(UserDbSchema.LOCATION)
-        )
+    fun getUserById(userId: String): Flow<User?> {
+        val user = MutableSharedFlow<User?>()
+        scope.launch {
+            if (auth.currentUser?.uid == null) {
+                user.emit(null)
+                return@launch
+            }
+            firestore.collection(UserDbSchema.USER_TABLE).whereEqualTo(
+                FieldPath.documentId(), auth.currentUser!!.uid
+            ).snapshots().collect {
+                if (it.documents.isEmpty()) {
+                    user.emit(null)
+                } else {
+                    val doc = it.documents[0]
+                    val dbUser = User(
+                        doc.id,
+                        doc[UserDbSchema.NAME].toString(),
+                        doc[UserDbSchema.BIRTHDAY].toString(),
+                        doc[UserDbSchema.FAMILY_ID].toString(),
+                        auth.currentUser?.email ?: "",
+                        doc.getGeoPoint(UserDbSchema.LOCATION)
+                    )
+                    user.emit(dbUser)
+                }
+            }
+        }
+        return user
     }
 
     suspend fun getUserByIdOnce(userId: String): User {
@@ -58,14 +79,21 @@ class UserRepository {
             .continueWith {
                 if (!it.result.isEmpty) {
                     for (doc in it.result) {
-                        doc.reference.update(mapOf(UserDbSchema.NAME to name, UserDbSchema.BIRTHDAY to birthday))
+                        doc.reference.update(
+                            mapOf(
+                                UserDbSchema.NAME to name,
+                                UserDbSchema.BIRTHDAY to birthday
+                            )
+                        )
                     }
                 }
             }
     }
 
     fun setFcmToken(userId: String, token: String) {
-        firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FCM_TOKEN, token)
+        val id = auth.currentUser?.uid ?: return
+        firestore.collection(UserDbSchema.USER_TABLE).document(id)
+            .update(UserDbSchema.FCM_TOKEN, token)
     }
 
     fun checkPassword(password: String): Task<Void>? {
@@ -89,6 +117,7 @@ class UserRepository {
     }
 
     fun removeFcmToken(userId: String) {
-        firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FCM_TOKEN, "")
+        firestore.collection(UserDbSchema.USER_TABLE).document(userId)
+            .update(UserDbSchema.FCM_TOKEN, "")
     }
 }

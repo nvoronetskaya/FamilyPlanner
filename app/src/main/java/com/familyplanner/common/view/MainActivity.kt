@@ -58,6 +58,14 @@ class MainActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getHasFamilyUpdates().collect {
                     runOnUiThread {
+                        if (Firebase.auth.currentUser == null) {
+                            navController.navigate(
+                                R.id.welcomeFragment,
+                                null,
+                                NavOptions.Builder().setPopUpTo(R.id.navigation, true).build()
+                            )
+                            return@runOnUiThread
+                        }
                         val currentDestination = getCurrentDestinationId()
                         if (!it && currentDestination != R.id.noFamilyFragment) {
                             navController.navigate(

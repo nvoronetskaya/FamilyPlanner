@@ -29,7 +29,7 @@ class NoFamilyViewModel : ViewModel() {
                 userRepo.setFcmToken(FamilyPlanner.userId, com.google.firebase.Firebase.messaging.token.await())
             }
             userRepo.getUserById(FamilyPlanner.userId).collect {
-                user.emit(it)
+                it?.let { user.emit(it) }
             }
         }
     }

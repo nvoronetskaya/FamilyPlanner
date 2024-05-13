@@ -49,7 +49,7 @@ class ActivityViewModel : ViewModel() {
             }
             familyFlowJob = launch(Dispatchers.IO) {
                 userRepository.getUserById(userId).collect {
-                    hasFamily = !it.familyId.isNullOrEmpty()
+                    hasFamily = !(it == null || it.familyId.isNullOrEmpty())
                     hasFamilyFlow.emit(hasFamily)
                 }
             }

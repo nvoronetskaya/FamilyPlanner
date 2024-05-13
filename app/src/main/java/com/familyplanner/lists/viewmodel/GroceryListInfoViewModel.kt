@@ -28,7 +28,7 @@ class GroceryListInfoViewModel : ViewModel() {
     init {
         viewModelScope.launch {
             userRepository.getUserById(FamilyPlanner.userId).collect {
-                familyId = it.familyId!!
+                familyId = it!!.familyId!!
             }
         }
     }
