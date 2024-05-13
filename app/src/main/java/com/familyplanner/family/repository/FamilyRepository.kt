@@ -93,19 +93,37 @@ class FamilyRepository {
                 )
             }
 
-    fun getApplicationsToFamily(familyId: String): Flow<List<Application>> =
-        firestore.collection(ApplicationDbSchema.APPLICATION_TABLE)
-            .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).snapshots()
-            .map {
-                it.documents.filter { it[ApplicationDbSchema.STATUS].toString() == ApplicationStatus.NEW.name }
-                    .map {
-                        Application(
-                            it[ApplicationDbSchema.USER_ID].toString(),
-                            it[ApplicationDbSchema.FAMILY_ID].toString(),
-                            ApplicationStatus.NEW
-                        )
+    fun getApplicationsToFamily(familyId: String): Flow<List<User>> {
+        val applications = MutableSharedFlow<List<User>>()
+        scope.launch {
+            firestore.collection(ApplicationDbSchema.APPLICATION_TABLE)
+                .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).snapshots()
+                .collect {
+                    val newApplications =
+                        it.documents.filter { it[ApplicationDbSchema.STATUS].toString() == ApplicationStatus.NEW.name }
+                            .map { it[ApplicationDbSchema.USER_ID].toString() }
+                    if (newApplications.isEmpty()) {
+                        return@collect
                     }
-            }
+                    firestore.collection(UserDbSchema.USER_TABLE)
+                        .whereIn(FieldPath.documentId(), newApplications).get().continueWith {
+                            launch {
+                                val users = it.result.documents.map {
+                                    User(
+                                        it.id,
+                                        it[UserDbSchema.NAME].toString(),
+                                        it[UserDbSchema.BIRTHDAY].toString(),
+                                        it[UserDbSchema.FAMILY_ID].toString(),
+                                        it[UserDbSchema.EMAIL].toString()
+                                    )
+                                }
+                                applications.emit(users)
+                            }
+                        }
+                }
+        }
+        return applications
+    }
 
     fun getApplicants(ids: List<String>): Flow<List<User>> {
         val newIds = mutableListOf("1")
@@ -135,7 +153,7 @@ class FamilyRepository {
             .continueWith {
                 if (it.result.documents.isNotEmpty()) {
                     for (doc in it.result.documents) {
-                        doc.reference.update(mapOf(ApplicationDbSchema.STATUS to ApplicationStatus.APPROVED))
+                        doc.reference.update(ApplicationDbSchema.STATUS, ApplicationStatus.APPROVED)
                     }
                 }
 
@@ -161,7 +179,7 @@ class FamilyRepository {
             .whereEqualTo(ApplicationDbSchema.FAMILY_ID, familyId).get().addOnCompleteListener {
                 if (!it.result.isEmpty) {
                     for (doc in it.result) {
-                        doc.reference.update(mapOf(ApplicationDbSchema.STATUS to ApplicationStatus.REJECTED))
+                        doc.reference.update(ApplicationDbSchema.STATUS, ApplicationStatus.REJECTED)
                     }
                 }
             }

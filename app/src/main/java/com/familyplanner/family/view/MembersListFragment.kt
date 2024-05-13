@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputFilter
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -103,26 +104,26 @@ class MembersListFragment : Fragment() {
                             }
                         }
                     }
+                }
 
-                    launch {
-                        viewModel.getMembers().collect {
-                            requireActivity().runOnUiThread {
-                                if (_binding == null) {
-                                    return@runOnUiThread
-                                }
-                                adapter.setData(it)
+                launch {
+                    viewModel.getMembers().collect {
+                        requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
                             }
+                            adapter.setData(it)
                         }
                     }
+                }
 
-                    launch {
-                        viewModel.getApplicants().collect {
-                            requireActivity().runOnUiThread {
-                                if (_binding == null) {
-                                    return@runOnUiThread
-                                }
-                                applicationsAdapter.setData(it)
+                launch {
+                    viewModel.getApplicants().collect {
+                        requireActivity().runOnUiThread {
+                            if (_binding == null) {
+                                return@runOnUiThread
                             }
+                            applicationsAdapter.setData(it)
                         }
                     }
                 }

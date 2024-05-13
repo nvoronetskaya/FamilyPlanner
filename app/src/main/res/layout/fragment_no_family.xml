@@ -31,15 +31,6 @@
             android:layout_marginStart="30dp"
             android:gravity="center_vertical"
             android:text="@string/family" />
-
-        <ImageView
-            android:id="@+id/iv_applications"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
-            app:srcCompat="@drawable/ic_applications"
-            app:tint="@color/white" />
     </androidx.appcompat.widget.Toolbar>
 
     <com.airbnb.lottie.LottieAnimationView

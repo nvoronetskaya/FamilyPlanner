@@ -28,7 +28,7 @@ class MembersListViewModel : ViewModel() {
             repository.getUserById(userId).collect { user ->
                 this@MembersListViewModel.familyId = user.familyId ?: ""
 
-                if (familyId.isNullOrBlank()) {
+                if (familyId.isBlank()) {
                     family.emit(null)
                 } else {
                     launch {
@@ -43,12 +43,7 @@ class MembersListViewModel : ViewModel() {
                     }
                     launch {
                         repository.getApplicationsToFamily(familyId).collect {
-                            launch {
-                                repository.getApplicants(it.map { application -> application.userId })
-                                    .collect { users ->
-                                        applicants.emit(users)
-                                    }
-                            }
+                            applicants.emit(it)
                         }
                     }
                 }
