@@ -1,6 +1,187 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- Base application theme. -->
-    <style name="Theme.FamilyPlanner" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="Theme.FamilyPlanner" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:actionOverflowButtonStyle">@style/overflow</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="colorSecondary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/light_orange</item>
+        <item name="colorOnTertiary">@color/dark_orange_text</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOutline">@color/dark_orange</item>
+        <item name="colorError">@color/red</item>
+        <item name="cursorErrorColor">@color/orange</item>
+        <item name="cursorColor">@color/orange</item>
+        <item name="colorControlActivated">@color/orange</item>
+    </style>
+
+    <style name="button" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">100dp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="filledButton" parent="button">
+        <item name="android:backgroundTint">?attr/colorPrimary</item>
+        <item name="android:color">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="outlinedButton" parent="button">
+        <item name="android:backgroundTint">?attr/colorSecondary</item>
+        <item name="android:color">?attr/colorOutline</item>
+        <item name="android:textColor">?attr/colorOnTertiary</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+    </style>
+
+    <style name="textTitle">
+        <item name="android:fontFamily">@font/tenor_sans</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="textBar">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="textBody">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="tabText" parent="textBody">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnSurface">@color/white</item>
+    </style>
+
+    <style name="subText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="commentName">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="commentTime">
+        <item name="android:textSize">8sp</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="commentText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="inputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/edit_text</item>
+        <item name="hintTextColor">?attr/colorOutline</item>
+    </style>
+
+    <style name="editText" parent="textBody">
+        <item name="android:layout_width">300dp</item>
+    </style>
+
+    <style name="editTextDisabled" parent="inputLayout">
+        <item name="boxStrokeColor">#C38052</item>
+        <item name="hintTextColor">#1D1B20</item>
+        <item name="android:textColor">#1D1B20</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="switchButton" parent="textBody">
+        <item name="thumbTint">@color/thumb</item>
+        <item name="trackTint">@color/track</item>
+    </style>
+
+    <style name="fab_round" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">90dp</item>
+    </style>
+
+    <style name="chip">
+        <item name="textStartPadding">0dp</item>
+        <item name="textEndPadding">0dp</item>
+        <item name="chipCornerRadius">20dp</item>
+        <item name="android:checkable">true</item>
+        <item name="chipBackgroundColor">#F1D9C8</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="android:textAppearance">@style/chipText</item>
+    </style>
+
+    <style name="chipText">
+        <item name="fontWeight">400</item>
+        <item name="android:textSize">14sp</item>
+        <item name="fontStyle">normal</item>
+        <item name="fontFamily">@font/roboto_serif</item>
+    </style>
+
+    <style name="progressBar" parent="@style/Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateTint">?attr/colorPrimary</item>
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
+
+    <style name="datePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/dark_orange</item>
+        <item name="colorControlActivated">@color/orange</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:buttonBarButtonStyle">
+            @style/DatePickerTheme.ButtonBarPositiveButtonStyle
+        </item>
+    </style>
+
+    <style name="DatePickerTheme.ButtonBarPositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/dark_orange_text</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="overflow">
+        <item name="android:src">@drawable/ic_more_options</item>
+    </style>
+
+    <style name="alertDialogShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">15dp</item>
+    </style>
+
+    <style name="alertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/DatePickerTheme.ButtonBarPositiveButtonStyle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/textBody</item>
+        <item name="shapeAppearanceOverlay">@style/alertDialogShape</item>
+        <item name="android:fontFamily">@font/roboto_serif</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="bottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemIconTint">@color/dark_orange</item>
+        <item name="backgroundTint">@color/black</item>
+        <item name="itemTextColor">@color/white</item>
     </style>
 </resources>

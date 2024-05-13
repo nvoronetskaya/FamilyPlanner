@@ -17,15 +17,5 @@ class FamilyPlanner : Application() {
         fun updateUserId() {
             userId = Firebase.auth.currentUser?.uid ?: ""
         }
-        fun isConnectedToInternet(context: Context): Boolean {
-            val connectivityManager =
-                getSystemService(context, ConnectivityManager::class.java)
-            val network = connectivityManager?.activeNetworkInfo
-            return network != null && network.isConnected
-        }
-    }
-
-    override fun onCreate() {
-        super.onCreate()
     }
 }

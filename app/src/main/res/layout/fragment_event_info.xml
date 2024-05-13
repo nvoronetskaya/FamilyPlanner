@@ -80,7 +80,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_name"
                         style="@style/editText"
-                        android:inputType="textCapSentences"
+                        android:inputType="textCapSentences|textMultiLine"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:enabled="false" />
@@ -101,7 +101,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_description"
-                        android:inputType="textCapSentences"
+                        android:inputType="textCapSentences|textMultiLine"
                         style="@style/editText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -166,7 +166,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/attached_files"
-                    android:textColor="@color/black" />
+                    android:textColor="?attr/colorOnSecondary" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_files"
@@ -194,7 +194,7 @@
                     android:layout_marginEnd="15dp"
                     android:maxLines="1"
                     android:text="@string/who_sees_event"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnSecondary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

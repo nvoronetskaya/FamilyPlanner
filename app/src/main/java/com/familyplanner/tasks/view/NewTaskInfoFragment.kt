@@ -463,16 +463,22 @@ class NewTaskInfoFragment : Fragment() {
         var weekDays = 0
         var type: RepeatType
         var eachNDays = 0
+        binding.etNumberOfDays.error = null
         if (binding.rbOnce.isChecked) {
             type = RepeatType.ONCE
         } else if (binding.rbEveryDay.isChecked) {
             type = RepeatType.EVERY_DAY
         } else if (binding.rbEachNDays.isChecked) {
             if (binding.etNumberOfDays.text.isNullOrBlank()) {
+                binding.etNumberOfDays.error = "Введите число дней"
                 return
             }
             type = RepeatType.EACH_N_DAYS
             eachNDays = binding.etNumberOfDays.text.toString().toInt()
+            if (eachNDays < 2 || eachNDays > 30) {
+                binding.etNumberOfDays.error = "Введите число от 2 до 30"
+                return
+            }
         } else if (binding.rbDaysOfWeek.isChecked) {
             val iterator = binding.llWeekdays.children.iterator()
             var power = 1

@@ -69,7 +69,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
-                    android:inputType="textCapSentences"
+                    android:inputType="textCapSentences|textMultiLine"
                     android:maxLength="30"
                     style="@style/editText"
                     android:layout_width="350dp"
@@ -93,7 +93,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_description"
                     style="@style/editText"
-                    android:inputType="textCapSentences"
+                    android:inputType="textCapSentences|textMultiLine"
                     android:maxLength="100"
                     android:layout_width="350dp"
                     android:layout_height="wrap_content" />
@@ -155,7 +155,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
                 android:text="@string/who_sees_event"
-                android:textColor="@color/black"
+                android:textColor="?attr/colorOnSecondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title_divider" />

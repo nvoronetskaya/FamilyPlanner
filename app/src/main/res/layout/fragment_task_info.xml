@@ -187,7 +187,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/subtasks"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnSecondary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -238,7 +238,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/attached_files"
-                    android:textColor="@color/black" />
+                    android:textColor="?attr/colorOnSecondary" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_files"
@@ -264,7 +264,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/who_sees_task"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnSecondary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -329,7 +329,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/comments"
-                    android:textColor="@color/black"
+                    android:textColor="?attr/colorOnSecondary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

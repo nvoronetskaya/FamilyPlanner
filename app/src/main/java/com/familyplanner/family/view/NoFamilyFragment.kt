@@ -2,6 +2,7 @@ package com.familyplanner.family.view
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputFilter
 import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
@@ -86,6 +87,7 @@ class NoFamilyFragment : Fragment() {
             name.textSize = 17f
             name.typeface =
                 Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            name.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(15))
             MaterialAlertDialogBuilder(
                 activity as MainActivity,
                 R.style.alertDialog

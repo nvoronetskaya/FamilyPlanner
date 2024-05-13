@@ -73,7 +73,7 @@
                     android:maxLength="30"
                     android:layout_width="350dp"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapSentences" />
+                    android:inputType="textCapSentences|textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -216,7 +216,7 @@
                         android:layout_height="45dp"
                         android:enabled="false"
                         android:inputType="number"
-                        android:text="2" />
+                        android:hint="2" />
 
                     <TextView
                         android:id="@+id/tv_days"

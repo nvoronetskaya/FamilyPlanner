@@ -178,4 +178,10 @@
         <item name="android:fontFamily">@font/roboto_serif</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="bottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemIconTint">@color/dark_orange</item>
+        <item name="backgroundTint">@color/white</item>
+        <item name="itemTextColor">@color/black</item>
+    </style>
 </resources>

@@ -434,7 +434,7 @@ class ShowTaskInfoFragment : Fragment() {
                 sb.append("${day}, ")
             }
         }
-        return sb.substring(0, sb.length - 2)
+        return sb.substring(0, maxOf(0, sb.length - 2))
     }
 
     private fun downloadTaskFile(path: String) {

@@ -3,6 +3,7 @@ package com.familyplanner.lists.view
 import android.app.DatePickerDialog
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputFilter
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
@@ -55,7 +56,7 @@ class ListBudgetFragment : Fragment() {
                 if (_binding == null) {
                     return@runOnUiThread
                 }
-                budgetAdapter.setData(spendings)
+                budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
                 binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
                 binding.tvDateStart.text =
                     viewModel.getStartDate().format(FamilyPlanner.uiDateFormatter)
@@ -71,7 +72,7 @@ class ListBudgetFragment : Fragment() {
                 Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
             moneySpent.hint = "Введите сумму"
             moneySpent.textSize = 17F
-            moneySpent.inputType = InputType.TYPE_CLASS_NUMBER
+            moneySpent.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             MaterialAlertDialogBuilder(
                 activity as MainActivity,
                 R.style.alertDialog
@@ -80,7 +81,16 @@ class ListBudgetFragment : Fragment() {
                     if (moneySpent.text.isNullOrBlank()) {
                         moneySpent.error = "Введите сумму"
                     } else {
-                        viewModel.addSpending(moneySpent.text.trim().toString().toDouble(), listId)
+                        try {
+                            val moneySpentDouble = moneySpent.text.trim().toString().toDouble()
+                            if (moneySpentDouble < 1 || moneySpentDouble > 1_000_000) {
+                                moneySpent.error = "Введите значение от 1 до 1 000 000"
+                            } else {
+                                viewModel.addSpending(moneySpent.text.trim().toString().toDouble(), listId)
+                            }
+                        } catch (e: Exception) {
+                            moneySpent.error = "Некорректное значение"
+                        }
                     }
                 }
                 .setNegativeButton("Отмена") { dialog, _ ->
