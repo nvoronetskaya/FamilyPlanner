@@ -1,10 +1,11 @@
-package com.familyplanner.events.data
+package com.familyplanner.events.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderEventBinding
+import com.familyplanner.events.data.Event
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId

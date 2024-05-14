@@ -18,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
@@ -551,8 +552,9 @@ class NewTaskInfoFragment : Fragment() {
                                 bundle.putString("taskId", viewModel.getCreatedTaskId())
                                 bundle.putString("familyId", familyId)
                                 findNavController().navigate(
-                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
-                                    bundle
+                                    R.id.newTaskObserversFragment,
+                                    bundle,
+                                    NavOptions.Builder().setPopUpTo(R.id.tasksListFragment, true).build()
                                 )
                             }
 

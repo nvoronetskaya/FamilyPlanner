@@ -213,7 +213,10 @@ class TaskRepository {
         var isSuccessful = true
         val filesRef = storage.reference.child("$prefix-$taskId")
         for (file in files) {
-            val metadata = storageMetadata { setCustomMetadata("name", file.name) }
+            val metadata = storageMetadata {
+                setCustomMetadata("name", file.name)
+                setCustomMetadata("size", file.size.toString())
+            }
             if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
                 isSuccessful = false
             }
@@ -373,7 +376,10 @@ class TaskRepository {
 
     suspend fun addFile(taskId: String, file: UserFile): Boolean {
         val filesRef = storage.reference.child("task-$taskId")
-        val metadata = storageMetadata { setCustomMetadata("name", file.name) }
+        val metadata = storageMetadata {
+            setCustomMetadata("name", file.name)
+            setCustomMetadata("size", file.size.toString())
+        }
         if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
             return false
         }
@@ -467,6 +473,12 @@ class TaskRepository {
             RepeatType.EACH_N_DAYS -> {
                 task.lastCompletionDate == null || task.lastCompletionDate!! + task.nDays <= today
             }
+        }
+    }
+
+    fun updateObserverRadius(taskId: String, userId: String, radius: Double) {
+        firestore.collection(ObserverDbSchema.OBSERVER_TABLE).whereEqualTo(ObserverDbSchema.TASK_ID, taskId).whereEqualTo(ObserverDbSchema.USER_ID, userId).get().continueWith {
+            it.result.documents.forEach { doc -> doc.reference.update(ObserverDbSchema.RADIUS, radius) }
         }
     }
 }

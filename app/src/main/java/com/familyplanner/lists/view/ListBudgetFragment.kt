@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -84,12 +85,12 @@ class ListBudgetFragment : Fragment() {
                         try {
                             val moneySpentDouble = moneySpent.text.trim().toString().toDouble()
                             if (moneySpentDouble < 1 || moneySpentDouble > 1_000_000) {
-                                moneySpent.error = "Введите значение от 1 до 1 000 000"
+                                Toast.makeText(requireContext(), "Введите значение от 1 до 1 000 000", Toast.LENGTH_SHORT).show()
                             } else {
-                                viewModel.addSpending(moneySpent.text.trim().toString().toDouble(), listId)
+                                viewModel.addSpending(moneySpentDouble, listId)
                             }
                         } catch (e: Exception) {
-                            moneySpent.error = "Некорректное значение"
+                            Toast.makeText(requireContext(), "Некорректное значение", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

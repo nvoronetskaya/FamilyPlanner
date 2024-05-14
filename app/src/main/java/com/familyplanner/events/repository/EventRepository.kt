@@ -53,7 +53,10 @@ class EventRepository {
         var isSuccessful = true
         val filesRef = storage.reference.child("event-$eventId")
         for (file in files) {
-            val metadata = storageMetadata { setCustomMetadata("name", file.name) }
+            val metadata = storageMetadata {
+                setCustomMetadata("name", file.name)
+                setCustomMetadata("size", file.size.toString())
+            }
             if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
                 isSuccessful = false
             }
@@ -143,7 +146,10 @@ class EventRepository {
 
     suspend fun addFile(eventId: String, file: UserFile): Boolean {
         val filesRef = storage.reference.child("event-$eventId")
-        val metadata = storageMetadata { setCustomMetadata("name", file.name) }
+        val metadata = storageMetadata {
+            setCustomMetadata("name", file.name)
+            setCustomMetadata("size", file.size.toString())
+        }
         if (filesRef.child(file.name).putFile(file.uri, metadata).await().error != null) {
             return false
         }

@@ -52,7 +52,7 @@ class EditEventViewModel : ViewModel() {
             UserFile(
                 Uri.EMPTY,
                 it.name,
-                0.0
+                it.metadata.await().getCustomMetadata("size")?.toDouble() ?: 0.0
             )
         })
     }

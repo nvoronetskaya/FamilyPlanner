@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.familyplanner.R
 import com.familyplanner.events.data.Event
-import com.familyplanner.events.data.EventAdapter
+import com.familyplanner.events.adapters.EventAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.time.Instant
 import java.time.LocalDate

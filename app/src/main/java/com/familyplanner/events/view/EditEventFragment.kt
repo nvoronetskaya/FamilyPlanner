@@ -61,6 +61,7 @@ class EditEventFragment : Fragment() {
         binding.rvFiles.layoutManager =
             LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
         binding.rvFiles.adapter = filesAdapter
+        binding.ivBack.setOnClickListener { findNavController().popBackStack() }
 
         attendeesAdapter = InvitationAdapter()
         binding.rvObservers.layoutManager =

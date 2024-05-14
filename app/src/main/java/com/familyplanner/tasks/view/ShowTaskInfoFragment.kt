@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.DownloadManager
 import android.app.Service
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
@@ -229,6 +230,38 @@ class ShowTaskInfoFragment : Fragment() {
                 }
             }
         }
+        binding.ivNotification.setOnClickListener {
+            val radius = EditText(activity)
+            radius.typeface =
+                Typeface.createFromAsset(requireContext().assets, "roboto_serif.ttf")
+            radius.hint = "Введите радиус"
+            viewModel.getCurObserverRadius()?.let { radius.setText(it.toString()) }
+            radius.textSize = 17F
+            radius.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            MaterialAlertDialogBuilder(
+                activity as MainActivity,
+                R.style.alertDialog
+            ).setTitle("Установка радиуса").setView(radius, 40, 0, 40, 0)
+                .setPositiveButton("Готово") { _, _ ->
+                    if (radius.text.isNullOrBlank()) {
+                        radius.error = "Введите радиус уведомления в метрах"
+                    } else {
+                        try {
+                            val radiusDouble = radius.text.trim().toString().toDouble()
+                            if (radiusDouble < 50 || radiusDouble > 1_000_000) {
+                                Toast.makeText(requireContext(), "Радиус должен быть от 50 до 2000 метров", Toast.LENGTH_SHORT).show()
+                            } else {
+                                viewModel.updateObserverRadius(radiusDouble)
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(requireContext(), "Некорректное значение", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .setNegativeButton("Отмена") { dialog, _ ->
+                    dialog.cancel()
+                }.show()
+        }
         binding.ivAddSubtask.setOnClickListener {
             val bundle = Bundle()
             bundle.putString("parentId", taskId)
@@ -365,6 +398,7 @@ class ShowTaskInfoFragment : Fragment() {
     }
 
     private fun bindTask(task: Task) {
+        binding.ivNotification.isVisible = task.location != null
         binding.etName.setText(task.title)
         if (task.deadline != null) {
             binding.tvDeadline.visibility = View.VISIBLE

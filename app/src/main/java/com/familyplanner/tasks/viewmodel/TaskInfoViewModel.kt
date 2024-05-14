@@ -33,7 +33,7 @@ class TaskInfoViewModel : ViewModel() {
     private var taskId: String = ""
     private val addComment = MutableSharedFlow<TaskCreationStatus>()
     private val curObserver = MutableSharedFlow<Observer?>(replay = 1)
-
+    private var curObserverRadius: Double? = null
     fun setTask(taskId: String) {
         if (taskId == this.taskId) {
             return
@@ -75,6 +75,7 @@ class TaskInfoViewModel : ViewModel() {
             launch {
                 repo.getObserver(taskId, FamilyPlanner.userId).collect {
                     curObserver.emit(it)
+                    it?.let { curObserverRadius = it.radius }
                 }
             }
         }
@@ -166,5 +167,11 @@ class TaskInfoViewModel : ViewModel() {
 
     fun deleteTask(taskId: String) {
         repo.deleteTask(taskId)
+    }
+
+    fun getCurObserverRadius(): Double? = curObserverRadius
+
+    fun updateObserverRadius(radius: Double) {
+        repo.updateObserverRadius(taskId, FamilyPlanner.userId, radius)
     }
 }

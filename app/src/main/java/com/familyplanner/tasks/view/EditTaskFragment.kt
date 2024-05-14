@@ -103,7 +103,6 @@ class EditTaskFragment : Fragment() {
         binding.rvFiles.adapter = filesAdapter
         lifecycleScope.launch(Dispatchers.IO) {
             val task = viewModel.getTask(taskId)
-            filesAdapter.setData(viewModel.getFiles())
             requireActivity().runOnUiThread {
                 if (_binding == null) {
                     return@runOnUiThread
@@ -114,6 +113,7 @@ class EditTaskFragment : Fragment() {
                     findNavController().popBackStack()
                     return@runOnUiThread
                 }
+                filesAdapter.setData(viewModel.getFiles())
                 binding.etName.setText(task.title)
                 if (task.deadline != null) {
                     binding.swDeadline.isChecked = true
