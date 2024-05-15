@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class FamilyRepository {
     private val eventRepo = EventRepository()
@@ -226,11 +227,13 @@ class FamilyRepository {
         firestore.collection(ApplicationDbSchema.APPLICATION_TABLE).add(data)
     }
 
-    fun createFamily(name: String, userId: String): Task<DocumentReference> {
+    fun createFamily(name: String, userId: String) {
         val data = HashMap<String, Any>()
         data[FamilyDbSchema.NAME] = name
         data[FamilyDbSchema.CREATED_BY] = userId
-        return firestore.collection(FamilyDbSchema.FAMILY_TABLE).add(data)
+        val familyId = UUID.randomUUID().toString()
+        firestore.collection(FamilyDbSchema.FAMILY_TABLE).document(familyId).set(data)
+        firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FAMILY_ID, familyId)
     }
 
     fun deleteFamily(familyId: String): Task<Void> {

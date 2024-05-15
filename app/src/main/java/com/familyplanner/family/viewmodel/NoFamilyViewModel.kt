@@ -40,15 +40,12 @@ class NoFamilyViewModel : ViewModel() {
 
     fun createFamily(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val userDoc = user.replayCache[0]
-            val userId = userDoc.id
-            familyRepo.createFamily(name, userId).continueWith {
-                if (!it.isSuccessful) {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        errors.emit("Не удалось создать семью, попробуйте позднее")
-                    }
-                }
+            val userId = auth.currentUser?.uid
+            if (userId == null) {
+                errors.emit("Не удалось создать семью, попробуйте позднее")
+                return@launch
             }
+            familyRepo.createFamily(name, userId)
         }
     }
 
