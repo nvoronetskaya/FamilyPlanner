@@ -95,6 +95,12 @@ class NoFamilyFragment : Fragment() {
                 .setPositiveButton("Готово") { _, _ ->
                     if (name.text.isNullOrBlank()) {
                         name.error = "Введите название"
+                    } else if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Нет сети. Проверьте подключение и попробуйте позднее",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         viewModel.createFamily(name.text.trim().toString())
                     }

@@ -231,9 +231,9 @@ class FamilyRepository {
         val data = HashMap<String, Any>()
         data[FamilyDbSchema.NAME] = name
         data[FamilyDbSchema.CREATED_BY] = userId
-        val familyId = UUID.randomUUID().toString()
-        firestore.collection(FamilyDbSchema.FAMILY_TABLE).document(familyId).set(data)
-        firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FAMILY_ID, familyId)
+        firestore.collection(FamilyDbSchema.FAMILY_TABLE).add(data).continueWith {
+            firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FAMILY_ID, it.result.id)
+        }
     }
 
     fun deleteFamily(familyId: String): Task<Void> {
