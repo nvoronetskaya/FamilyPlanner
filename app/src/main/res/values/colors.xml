@@ -13,4 +13,5 @@
     <color name="gray">#F2F2F2</color>
     <color name="gray_medium">#B2B2B2</color>
     <color name="dark_gray">#929292</color>
+    <color name="darkest_gray">#363636</color>
 </resources>

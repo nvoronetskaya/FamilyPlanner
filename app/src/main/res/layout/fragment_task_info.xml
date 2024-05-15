@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray"
+    android:background="?attr/colorSecondaryVariant"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
@@ -63,6 +63,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:backgroundTint="?attr/colorSecondary"
         android:background="@drawable/rounded_rectangle"
         android:paddingVertical="10dp">
 
@@ -177,6 +178,7 @@
                 android:id="@+id/layout_subtasks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorSecondary"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/rounded_rectangle">
 
@@ -254,6 +256,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="?attr/colorSecondary"
                 android:background="@drawable/rounded_rectangle"
                 android:padding="10dp">
 
@@ -319,6 +322,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:backgroundTint="?attr/colorSecondary"
                 android:background="@drawable/rounded_rectangle"
                 android:padding="10dp">
 

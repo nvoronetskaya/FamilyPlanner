@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray"
+    android:background="?attr/colorSecondaryVariant"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
@@ -63,6 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_rectangle"
+                android:backgroundTint="?attr/colorSecondary"
                 android:padding="10dp">
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -80,10 +81,10 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_name"
                         style="@style/editText"
-                        android:inputType="textCapSentences|textMultiLine"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:enabled="false" />
+                        android:enabled="false"
+                        android:inputType="textCapSentences|textMultiLine" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -101,11 +102,11 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/et_description"
-                        android:inputType="textCapSentences|textMultiLine"
                         style="@style/editText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:enabled="false" />
+                        android:enabled="false"
+                        android:inputType="textCapSentences|textMultiLine" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
@@ -183,6 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/rounded_rectangle"
+                android:backgroundTint="?attr/colorSecondary"
                 android:padding="10dp">
 
                 <TextView

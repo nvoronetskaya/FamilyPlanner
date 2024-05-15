@@ -4,6 +4,7 @@
         <item name="android:actionOverflowButtonStyle">@style/overflow</item>
         <item name="alertDialogTheme">@style/AlertDialogTheme</item>
         <item name="colorSecondary">@color/black</item>
+        <item name="colorSecondaryVariant">@color/darkest_gray</item>
         <item name="colorPrimaryVariant">@color/light_orange</item>
         <item name="colorOnTertiary">@color/dark_orange_text</item>
         <item name="colorOnSecondary">@color/white</item>
@@ -124,13 +125,14 @@
         <item name="textEndPadding">0dp</item>
         <item name="chipCornerRadius">20dp</item>
         <item name="android:checkable">true</item>
-        <item name="chipBackgroundColor">#F1D9C8</item>
+        <item name="chipBackgroundColor">#A36131</item>
         <item name="chipStrokeWidth">0dp</item>
         <item name="android:textAppearance">@style/chipText</item>
     </style>
 
     <style name="chipText">
         <item name="fontWeight">400</item>
+        <item name="textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">14sp</item>
         <item name="fontStyle">normal</item>
         <item name="fontFamily">@font/roboto_serif</item>
