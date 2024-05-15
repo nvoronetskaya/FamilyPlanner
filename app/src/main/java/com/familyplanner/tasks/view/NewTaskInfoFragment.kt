@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -179,6 +180,8 @@ class NewTaskInfoFragment : Fragment() {
             setTime(isStartTime = false, calledByCheckbox = false)
         }
 
+        binding.ivBack.isVisible = false
+
         binding.rbOnce.setOnClickListener {
             binding.tvRepeatFrom.visibility = View.GONE
             binding.rbEachNDays.isChecked = false
@@ -263,6 +266,7 @@ class NewTaskInfoFragment : Fragment() {
         }
 
         binding.ivNext.setOnClickListener {
+            binding.pbLoading.isVisible = true
             createTask()
         }
         val options = listOf("Низкая", "Средняя", "Высокая")
@@ -278,6 +282,7 @@ class NewTaskInfoFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 creationResult.collect {
                     requireActivity().runOnUiThread {
+                        binding.pbLoading.isVisible = false
                         when (it) {
                             TaskCreationStatus.SUCCESS -> if (parentId != null) {
                                 findNavController().popBackStack()
@@ -287,7 +292,8 @@ class NewTaskInfoFragment : Fragment() {
                                 bundle.putString("familyId", familyId)
                                 findNavController().navigate(
                                     R.id.newTaskObserversFragment,
-                                    bundle
+                                    bundle,
+                                    NavOptions.Builder().setPopUpTo(R.id.tasksListFragment, true).build()
                                 )
                             }
 
@@ -301,7 +307,7 @@ class NewTaskInfoFragment : Fragment() {
                                 bundle.putString("taskId", viewModel.getCreatedTaskId())
                                 bundle.putString("familyId", familyId)
                                 findNavController().navigate(
-                                    R.id.newTaskObserversFragment,
+                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
                                     bundle
                                 )
                             }
@@ -490,11 +496,13 @@ class NewTaskInfoFragment : Fragment() {
                 power *= 2
             }
             if (weekDays == 0) {
+                binding.tvRepeat.requestFocus()
                 binding.tvRepeat.error = "Выберите хотя бы один день недели"
                 return
             }
             type = RepeatType.DAYS_OF_WEEK
         } else {
+            binding.tvRepeat.requestFocus()
             binding.tvRepeat.error = "Выберите тип повтора задачи"
             return
         }
@@ -539,50 +547,6 @@ class NewTaskInfoFragment : Fragment() {
             parentId,
             (requireActivity() as MainActivity).isConnectedToInternet()
         )
-        lifecycleScope.launch(Dispatchers.IO) {
-            val creationResult = viewModel.getCreationStatus()
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                creationResult.collect {
-                    requireActivity().runOnUiThread {
-                        when (it) {
-                            TaskCreationStatus.SUCCESS -> if (parentId != null) {
-                                findNavController().popBackStack()
-                            } else {
-                                val bundle = Bundle()
-                                bundle.putString("taskId", viewModel.getCreatedTaskId())
-                                bundle.putString("familyId", familyId)
-                                findNavController().navigate(
-                                    R.id.newTaskObserversFragment,
-                                    bundle,
-                                    NavOptions.Builder().setPopUpTo(R.id.tasksListFragment, true).build()
-                                )
-                            }
-
-                            TaskCreationStatus.FILE_UPLOAD_FAILED -> {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Не удалось прикрепить некоторые файлы. Вы можете отредактировать задачу позднее",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                val bundle = Bundle()
-                                bundle.putString("taskId", viewModel.getCreatedTaskId())
-                                bundle.putString("familyId", familyId)
-                                findNavController().navigate(
-                                    R.id.action_newTaskInfoFragment_to_newTaskObserversFragment,
-                                    bundle
-                                )
-                            }
-
-                            TaskCreationStatus.FAILED -> Toast.makeText(
-                                requireContext(),
-                                "Ошибка. Проверьте подключение к сети и повторите позднее",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
-                }
-            }
-        }
     }
 
     override fun onDestroyView() {

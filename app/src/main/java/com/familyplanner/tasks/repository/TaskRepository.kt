@@ -428,17 +428,7 @@ class TaskRepository {
     fun removeTasksForFamily(familyId: String) {
         firestore.collection(TaskDbSchema.TASK_TABLE)
             .whereEqualTo(TaskDbSchema.FAMILY_ID, familyId).get().continueWith {
-                val taskIds = it.result.documents.map { it.id }
-                var i = 0
-                while (i < taskIds.size) {
-                    firestore.collection(ObserverDbSchema.OBSERVER_TABLE)
-                        .whereIn(ObserverDbSchema.TASK_ID, taskIds.subList(i, i + 30)).get()
-                        .continueWith {
-                            it.result.documents.forEach { it.reference.delete() }
-                        }
-                    i += 30
-                }
-                taskIds.forEach { deleteTask(it) }
+                it.result.documents.map { it.id }.forEach { deleteTask(it) }
             }
     }
 

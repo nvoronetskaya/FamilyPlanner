@@ -287,17 +287,7 @@ class EventRepository {
     fun removeEventsForFamily(familyId: String) {
         firestore.collection(EventDbSchema.EVENT_TABLE)
             .whereEqualTo(EventDbSchema.FAMILY_ID, familyId).get().continueWith {
-                val eventsId = it.result.documents.map { it.id }
-                var i = 0
-                while (i < eventsId.size) {
-                    firestore.collection(EventAttendeeDbSchema.EVENT_ATTENDEE_TABLE)
-                        .whereIn(EventAttendeeDbSchema.EVENT_ID, eventsId.subList(i, i + 30)).get()
-                        .continueWith {
-                            it.result.documents.forEach { it.reference.delete() }
-                        }
-                    i += 30
-                }
-                eventsId.forEach { deleteEvent(it) }
+                it.result.documents.map { it.id }.forEach { deleteEvent(it) }
             }
     }
 }

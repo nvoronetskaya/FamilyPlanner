@@ -11,4 +11,6 @@
         <attr name="eventsGap" format="dimension" />
         <attr name="boundsWidth" format="dimension" />
     </declare-styleable>
+    <attr name="chipBackgroundSelected" format="color|reference"/>
+    <attr name="chipBackgrounBase" format="color|reference"/>
 </resources>

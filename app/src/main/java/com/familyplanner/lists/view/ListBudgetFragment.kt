@@ -13,8 +13,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.familyplanner.FamilyPlanner
@@ -25,6 +27,7 @@ import com.familyplanner.lists.adapters.ListBudgetAdapter
 import com.familyplanner.lists.viewmodel.ListBudgetViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Calendar
@@ -52,17 +55,20 @@ class ListBudgetFragment : Fragment() {
         binding.rvBudget.layoutManager = LinearLayoutManager(requireContext())
         binding.rvBudget.adapter = budgetAdapter
         lifecycleScope.launch(Dispatchers.IO) {
-            val spendings = viewModel.getSpendings(listId)
-            requireActivity().runOnUiThread {
-                if (_binding == null) {
-                    return@runOnUiThread
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.getListSpendings(listId).collect {
+                    requireActivity().runOnUiThread {
+                        if (_binding == null) {
+                            return@runOnUiThread
+                        }
+                        budgetAdapter.setData(it.sortedByDescending { it.addedAt })
+                        binding.tvSumValue.text = it.sumOf { it.sumSpent }.toString()
+                        binding.tvDateStart.text =
+                            viewModel.getStartDate().format(FamilyPlanner.uiDateFormatter)
+                        binding.tvDateFinish.text =
+                            viewModel.getFinishDate().format(FamilyPlanner.uiDateFormatter)
+                    }
                 }
-                budgetAdapter.setData(spendings.sortedByDescending { it.addedAt })
-                binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
-                binding.tvDateStart.text =
-                    viewModel.getStartDate().format(FamilyPlanner.uiDateFormatter)
-                binding.tvDateFinish.text =
-                    viewModel.getFinishDate().format(FamilyPlanner.uiDateFormatter)
             }
         }
         binding.tabs.isVisible = false
@@ -85,12 +91,20 @@ class ListBudgetFragment : Fragment() {
                         try {
                             val moneySpentDouble = moneySpent.text.trim().toString().toDouble()
                             if (moneySpentDouble < 1 || moneySpentDouble > 1_000_000) {
-                                Toast.makeText(requireContext(), "Введите значение от 1 до 1 000 000", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Введите значение от 1 до 1 000 000",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
                                 viewModel.addSpending(moneySpentDouble, listId)
                             }
                         } catch (e: Exception) {
-                            Toast.makeText(requireContext(), "Некорректное значение", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Некорректное значение",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -100,16 +114,12 @@ class ListBudgetFragment : Fragment() {
         }
         binding.tvDateStart.setOnClickListener {
             setDate(it as TextView) {
-                val spendings = viewModel.updateStartDate(it)
-                budgetAdapter.setData(spendings)
-                binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
+                viewModel.updateStartDate(it)
             }
         }
         binding.tvDateFinish.setOnClickListener {
             setDate(it as TextView) {
-                val spendings = viewModel.updateFinishDate(it)
-                budgetAdapter.setData(spendings)
-                binding.tvSumValue.text = spendings.sumOf { it.sumSpent }.toString()
+                viewModel.updateFinishDate(it)
             }
         }
     }

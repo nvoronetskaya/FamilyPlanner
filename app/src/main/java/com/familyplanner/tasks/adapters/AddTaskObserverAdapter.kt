@@ -64,4 +64,6 @@ class AddTaskObserverAdapter(val createdBy: String) :
     }
 
     fun getMembers(): List<AddObserverDto> = members
+
+    fun hasExecutor(): Boolean = members.any { it.isExecutor }
 }

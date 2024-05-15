@@ -39,7 +39,10 @@ class GroceryListRepository {
                 .whereEqualTo(UserListDbSchema.USER_ID, userId).snapshots().collect {
                     val listIds =
                         it.documents.map { it[UserListDbSchema.LIST_ID].toString() }.toMutableList()
-                    listIds.add("1")
+                    if (listIds.isEmpty()) {
+                        userLists.emit(listOf())
+                        return@collect
+                    }
                     launch {
                         firestore.collection(ListDbSchema.LIST_TABLE)
                             .whereIn(FieldPath.documentId(), listIds)
@@ -51,6 +54,41 @@ class GroceryListRepository {
                                         doc.id,
                                         doc[ListDbSchema.NAME].toString(),
                                         doc.getBoolean(ListDbSchema.IS_COMPLETED) ?: false,
+                                        doc[ListDbSchema.CREATED_BY].toString()
+                                    )
+                                    lists.add(list)
+                                }
+                                userLists.emit(lists)
+                            }
+                    }
+                }
+        }
+        return userLists
+    }
+
+    fun getNotCompletedListsForUser(userId: String): Flow<List<GroceryList>> {
+        scope.launch {
+            firestore.collection(UserListDbSchema.USER_LIST_TABLE)
+                .whereEqualTo(UserListDbSchema.USER_ID, userId).snapshots().collect {
+                    val listIds =
+                        it.documents.map { it[UserListDbSchema.LIST_ID].toString() }.toMutableList()
+                    if (listIds.isEmpty()) {
+                        userLists.emit(listOf())
+                        return@collect
+                    }
+                    launch {
+                        firestore.collection(ListDbSchema.LIST_TABLE)
+                            .whereIn(FieldPath.documentId(), listIds)
+                            .snapshots()
+                            .collect { result ->
+                                val lists = mutableListOf<GroceryList>()
+                                val filteredDocs =
+                                    result.documents.filter { it.getBoolean(ListDbSchema.IS_COMPLETED) == false }
+                                for (doc in filteredDocs) {
+                                    val list = GroceryList(
+                                        doc.id,
+                                        doc[ListDbSchema.NAME].toString(),
+                                        false,
                                         doc[ListDbSchema.CREATED_BY].toString()
                                     )
                                     lists.add(list)
@@ -180,7 +218,12 @@ class GroceryListRepository {
         firestore.collection(ListDbSchema.LIST_TABLE).document(listId).set(listData)
         members.forEach {
             firestore.collection(UserListDbSchema.USER_LIST_TABLE)
-                .add(mapOf(UserListDbSchema.USER_ID to it.userId, UserListDbSchema.LIST_ID to listId))
+                .add(
+                    mapOf(
+                        UserListDbSchema.USER_ID to it.userId,
+                        UserListDbSchema.LIST_ID to listId
+                    )
+                )
         }
     }
 
@@ -219,9 +262,10 @@ class GroceryListRepository {
                 .whereEqualTo(UserListDbSchema.LIST_ID, listId).get().continueWith {
                     it.result.documents.forEach { it.reference.delete() }
                 }
-            firestore.collection(SpendingDbSchema.SPENDING_TABLE).whereEqualTo(SpendingDbSchema.LIST_ID, listId).get().continueWith {
-                it.result.documents.forEach { it.reference.delete() }
-            }
+            firestore.collection(SpendingDbSchema.SPENDING_TABLE)
+                .whereEqualTo(SpendingDbSchema.LIST_ID, listId).get().continueWith {
+                    it.result.documents.forEach { it.reference.delete() }
+                }
         }
     }
 
@@ -337,30 +381,46 @@ class GroceryListRepository {
         return result
     }
 
-    suspend fun getListSpending(listId: String): List<BudgetDto> {
-        val result = mutableListOf<BudgetDto>()
-        val documents =
+    suspend fun getListSpendingUpdates(
+        listId: String,
+        start: Long,
+        finish: Long
+    ): Flow<List<BudgetDto>> {
+        val result = MutableSharedFlow<List<BudgetDto>>()
+        scope.launch {
             firestore.collection(SpendingDbSchema.SPENDING_TABLE)
-                .whereEqualTo(SpendingDbSchema.LIST_ID, listId).get().await()
-        for (spending in documents) {
-            val userId = spending[SpendingDbSchema.USER_ID].toString()
-            val userName =
-                firestore.collection(UserDbSchema.USER_TABLE).document(userId).get().await()
-                    .get(UserDbSchema.NAME)?.toString()
-                    ?: ""
-            val addedAt = LocalDateTime.ofInstant(
-                Instant.ofEpochSecond(spending.getLong(SpendingDbSchema.ADDED_AT) ?: 0),
-                ZoneId.systemDefault()
-            )
-            result.add(
-                BudgetDto(
-                    addedAt,
-                    null,
-                    listId,
-                    userName,
-                    spending.getDouble(SpendingDbSchema.SUM_SPENT) ?: 0.0
-                )
-            )
+                .whereEqualTo(SpendingDbSchema.LIST_ID, listId).snapshots().collect {
+                    val spendings = mutableListOf<BudgetDto>()
+                    for (spending in it.documents) {
+                        val userId = spending[SpendingDbSchema.USER_ID].toString()
+                        val userName =
+                            firestore.collection(UserDbSchema.USER_TABLE).document(userId).get()
+                                .await()
+                                .get(UserDbSchema.NAME)?.toString()
+                                ?: ""
+                        val addedAt = LocalDateTime.ofInstant(
+                            Instant.ofEpochSecond(
+                                spending.getLong(SpendingDbSchema.ADDED_AT) ?: 0
+                            ),
+                            ZoneId.systemDefault()
+                        )
+                        if (!(addedAt.toLocalDate()
+                                .toEpochDay() in start..finish)
+                        ) {
+                            continue
+                        }
+                        spendings.add(
+                            BudgetDto(
+                                addedAt,
+                                null,
+                                listId,
+                                userName,
+                                spending.getDouble(SpendingDbSchema.SUM_SPENT) ?: 0.0
+                            )
+                        )
+                    }
+                    result.emit(spendings)
+                }
         }
         return result
     }
@@ -379,17 +439,7 @@ class GroceryListRepository {
     fun removeListsForFamily(familyId: String) {
         firestore.collection(ListDbSchema.LIST_TABLE)
             .whereEqualTo(ListDbSchema.FAMILY_ID, familyId).get().continueWith {
-                val listIds = it.result.documents.map { it.id }
-                var i = 0
-                while (i < listIds.size) {
-                    firestore.collection(UserListDbSchema.USER_LIST_TABLE)
-                        .whereIn(UserListDbSchema.LIST_ID, listIds.subList(i, i + 30)).get()
-                        .continueWith {
-                            it.result.documents.forEach { it.reference.delete() }
-                        }
-                    i += 30
-                }
-                listIds.forEach { deleteList(it) }
+                it.result.documents.map { it.id }.forEach { deleteList(it) }
             }
     }
 }

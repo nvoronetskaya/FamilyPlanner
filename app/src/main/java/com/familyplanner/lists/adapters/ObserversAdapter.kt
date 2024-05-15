@@ -3,7 +3,9 @@ package com.familyplanner.lists.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.familyplanner.FamilyPlanner
 import com.familyplanner.databinding.ViewholderMemberBinding
 import com.familyplanner.lists.data.ListObserver
 
@@ -14,8 +16,10 @@ class ObserversAdapter(val canDeleteObservers: Boolean, val onDelete: (ListObser
     inner class ObserverViewHolder(val binding: ViewholderMemberBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun onBind(observer: ListObserver) {
-            binding.tvName.text = observer.userName
+            val isCurUser = FamilyPlanner.userId == observer.userId
+            binding.tvName.text = if (isCurUser) "(Вы) ${observer.userName}" else observer.userName
             binding.tvBirthday.visibility = View.GONE
+            binding.ivRemove.isVisible = canDeleteObservers && !isCurUser
             if (canDeleteObservers) {
                 binding.ivRemove.setOnClickListener { onDelete(observer) }
             }

@@ -51,7 +51,7 @@ class GroceryListInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val listId = requireArguments().getString("listId", "")
-        val isListCreator = requireArguments().getBoolean("isCreator", false)
+        val isListCreator = requireArguments().getBoolean("isListCreator", false)
         viewModel = ViewModelProvider(this)[GroceryListInfoViewModel::class.java]
         viewModel.setList(listId)
         val productsAdapter = ProductAdapter(isListCreator,
@@ -130,7 +130,7 @@ class GroceryListInfoFragment : Fragment() {
         })
         binding.ivBack.setOnClickListener { findNavController().popBackStack() }
         binding.fabAdd.setOnClickListener {
-            if (binding.tabs[0].isVisible) {
+            if (binding.rvProducts.isVisible) {
                 createAddProductDialog()
             } else {
                 createAddObserversDialog()
@@ -193,12 +193,17 @@ class GroceryListInfoFragment : Fragment() {
 
     private fun createAddObserversDialog() {
         val curActivity = requireActivity()
-        val builder = MaterialAlertDialogBuilder(curActivity, R.style.alertDialog)
+        val builder = MaterialAlertDialogBuilder(curActivity, R.style.alertDialog).setTitle("Добавление членов семьи")
         val view = curActivity.layoutInflater.inflate(R.layout.dialog_add_list_observers, null)
         val nonObserversList = view.findViewById<RecyclerView>(R.id.rv_observers)
         nonObserversList.layoutManager = LinearLayoutManager(requireContext())
         val nonObserversAdapter = NonObserverAdapter()
-        nonObserversAdapter.updateData(viewModel.getNonObservers())
+        val nonObservers = viewModel.getNonObservers()
+        if (nonObservers.isEmpty()) {
+            Toast.makeText(requireContext(), "Список доступен всем членам семьи", Toast.LENGTH_SHORT).show()
+            return
+        }
+        nonObserversAdapter.updateData(nonObservers)
 
         builder.setView(view, 40, 0, 40, 0)
         builder.setPositiveButton("Готово") { dialog, _ ->

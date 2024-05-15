@@ -36,16 +36,20 @@ class FamilyRepository {
     private val firestore = Firebase.firestore
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun getFamilyById(familyId: String): Flow<Family> =
+    fun getFamilyById(familyId: String): Flow<Family?> =
         firestore.collection(FamilyDbSchema.FAMILY_TABLE)
             .whereEqualTo(FieldPath.documentId(), familyId).snapshots()
             .map {
-                val doc = it.documents[0]
-                Family(
-                    doc.id,
-                    doc[FamilyDbSchema.NAME].toString(),
-                    doc[FamilyDbSchema.CREATED_BY].toString()
-                )
+                if (it.documents.isEmpty()) {
+                    null
+                } else {
+                    val doc = it.documents[0]
+                    Family(
+                        doc.id,
+                        doc[FamilyDbSchema.NAME].toString(),
+                        doc[FamilyDbSchema.CREATED_BY].toString()
+                    )
+                }
             }
 
     suspend fun getFamilyByIdOnce(familyId: String): Family? =
@@ -232,7 +236,8 @@ class FamilyRepository {
         data[FamilyDbSchema.NAME] = name
         data[FamilyDbSchema.CREATED_BY] = userId
         firestore.collection(FamilyDbSchema.FAMILY_TABLE).add(data).continueWith {
-            firestore.collection(UserDbSchema.USER_TABLE).document(userId).update(UserDbSchema.FAMILY_ID, it.result.id)
+            firestore.collection(UserDbSchema.USER_TABLE).document(userId)
+                .update(UserDbSchema.FAMILY_ID, it.result.id)
         }
     }
 

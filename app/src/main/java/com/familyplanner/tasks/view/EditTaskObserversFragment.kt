@@ -50,8 +50,5 @@ class EditTaskObserversFragment : Fragment() {
             viewModel.updateObservers(taskId)
             findNavController().popBackStack()
         }
-        binding.ivClose.setOnClickListener {
-            findNavController().popBackStack()
-        }
     }
 }

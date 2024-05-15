@@ -191,6 +191,14 @@ class MembersListFragment : Fragment() {
             ).setTitle("Удаление семьи")
                 .setMessage("Вы уверены, что хотите удалить семью?")
                 .setPositiveButton("Да") { _, _ ->
+                    if (!(requireActivity() as MainActivity).isConnectedToInternet()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Нет сети. Проверьте подключение и попробуйте позднее",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@setPositiveButton
+                    }
                     lifecycleScope.launch(Dispatchers.IO) {
                         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                             viewModel.deleteFamily().collect {

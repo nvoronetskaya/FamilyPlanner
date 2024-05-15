@@ -7,9 +7,13 @@ import com.familyplanner.common.repository.UserRepository
 import com.familyplanner.lists.data.GroceryList
 import com.familyplanner.lists.repository.GroceryListRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.time.ZoneId
 
 class GroceryListsViewModel : ViewModel() {
     private var userId = FamilyPlanner.userId
@@ -17,6 +21,7 @@ class GroceryListsViewModel : ViewModel() {
     private val listsRepository = GroceryListRepository()
     private val userRepository = UserRepository()
     private val groceryLists = MutableSharedFlow<List<GroceryList>>(replay = 1)
+    private var collectLists: Job? = null
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -24,9 +29,13 @@ class GroceryListsViewModel : ViewModel() {
                 familyId = userRepository.getUserByIdOnce(userId).familyId ?: ""
             }
             launch {
-                listsRepository.getListsForUser(userId).collect {
-                    groceryLists.emit(it)
+                collectLists?.cancelAndJoin()
+                collectLists = launch(Dispatchers.IO) {
+                    listsRepository.getListsForUser(FamilyPlanner.userId).collect {
+                        groceryLists.emit(it)
+                    }
                 }
+                collectLists?.start()
             }
         }
     }
@@ -46,4 +55,28 @@ class GroceryListsViewModel : ViewModel() {
     }
 
     fun getFamilyId() = familyId
+
+    fun hideCompleted() {
+        viewModelScope.launch(Dispatchers.IO) {
+            collectLists?.cancelAndJoin()
+            collectLists = launch(Dispatchers.IO) {
+                listsRepository.getNotCompletedListsForUser(FamilyPlanner.userId).collect {
+                    groceryLists.emit(it)
+                }
+            }
+            collectLists?.start()
+        }
+    }
+
+    fun showAll() {
+        viewModelScope.launch(Dispatchers.IO) {
+            collectLists?.cancelAndJoin()
+            collectLists = launch(Dispatchers.IO) {
+                listsRepository.getListsForUser(FamilyPlanner.userId).collect {
+                    groceryLists.emit(it)
+                }
+            }
+            collectLists?.start()
+        }
+    }
 }

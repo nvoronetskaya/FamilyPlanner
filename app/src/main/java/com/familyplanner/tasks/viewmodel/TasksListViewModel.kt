@@ -188,8 +188,10 @@ class TasksListViewModel : ViewModel() {
     fun getSortingType(): SortingType = sortingType
 
     private fun applyFilters(): List<TaskWithDate> {
+        val list = mutableListOf<TaskWithDate>()
+        allTasks.forEach { list.add(it) }
         val result =
-            List(allTasks.size) { i -> allTasks[i] }.filter { if (hasLocationFilter != null) (it.task.location != null) == hasLocationFilter else true }
+            list.filter { if (hasLocationFilter != null) (it.task.location != null) == hasLocationFilter else true }
                 .filter { if (hasDeadlineFilter != null) (it.task.deadline != null) == hasDeadlineFilter else true }
                 .filter { if (importanceFilter != null) it.task.importance == importanceFilter else true }
         return when (sortingType) {

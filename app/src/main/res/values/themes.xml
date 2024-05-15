@@ -15,6 +15,8 @@
         <item name="cursorErrorColor">@color/orange</item>
         <item name="cursorColor">@color/orange</item>
         <item name="colorControlActivated">@color/orange</item>
+        <item name="chipBackgroundSelected">#DBAC8B</item>
+        <item name="chipBackgrounBase">#F1D9C8</item>
     </style>
 
     <style name="button" parent="Widget.MaterialComponents.Button.OutlinedButton">
@@ -125,9 +127,11 @@
         <item name="textEndPadding">0dp</item>
         <item name="chipCornerRadius">20dp</item>
         <item name="android:checkable">true</item>
-        <item name="chipBackgroundColor">#F1D9C8</item>
+        <item name="chipBackgroundColor">@color/chip</item>
         <item name="chipStrokeWidth">0dp</item>
         <item name="android:textAppearance">@style/chipText</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
     </style>
 
     <style name="chipText">
@@ -185,5 +189,9 @@
         <item name="itemIconTint">@color/dark_orange</item>
         <item name="backgroundTint">@color/white</item>
         <item name="itemTextColor">@color/black</item>
+    </style>
+
+    <style name="toolbarDialog" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

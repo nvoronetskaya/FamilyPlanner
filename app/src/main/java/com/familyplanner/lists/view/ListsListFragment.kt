@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -78,6 +79,16 @@ class ListsListFragment : Fragment() {
                 R.id.action_listsListFragment_to_allListsBudgetFragment,
                 bundleOf("familyId" to viewModel.getFamilyId())
             )
+        }
+        binding.ivEye.setOnClickListener {
+            viewModel.hideCompleted()
+            binding.ivEye.isVisible = false
+            binding.ivEyeClosed.isVisible = true
+        }
+        binding.ivEyeClosed.setOnClickListener {
+            viewModel.showAll()
+            binding.ivEye.isVisible = true
+            binding.ivEyeClosed.isVisible = false
         }
     }
 

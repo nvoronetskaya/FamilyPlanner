@@ -80,7 +80,7 @@ class MembersListViewModel : ViewModel() {
         val isSuccessful = MutableSharedFlow<Boolean>()
 
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteFamily(family.last()!!.id).addOnCompleteListener {
+            repository.deleteFamily(familyId).continueWith {
                 viewModelScope.launch (Dispatchers.IO) {
                     if (it.isSuccessful) {
                         isSuccessful.emit(true)

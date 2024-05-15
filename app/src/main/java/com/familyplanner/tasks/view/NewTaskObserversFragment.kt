@@ -53,14 +53,13 @@ class NewTaskObserversFragment : Fragment() {
             }
         }
 
-        binding.ivClose.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_newTaskObserversFragment_to_tasksListFragment,
-                bundleOf("familyId" to familyId)
-            )
-        }
-
         binding.ivDone.setOnClickListener {
+            if (!adapter.hasExecutor()) {
+                binding.tvObservers.requestFocus()
+                binding.tvObservers.error = "Выберите хотя бы одного исполнителя"
+                return@setOnClickListener
+            }
+            binding.tvObservers.error = null
             viewModel.setObserversAndExecutors(taskId)
             findNavController().navigate(
                 R.id.action_newTaskObserversFragment_to_tasksListFragment,

@@ -69,12 +69,11 @@ class NoFamilyFragment : Fragment() {
                             }
                         }
                     }
-
-                    launch {
-                        viewModel.getErrors().collect {
-                            activity?.runOnUiThread {
-                                Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
-                            }
+                }
+                launch {
+                    viewModel.getErrors().collect {
+                        activity?.runOnUiThread {
+                            Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -126,6 +125,7 @@ class NoFamilyFragment : Fragment() {
                         code.error = "Введите код"
                     } else {
                         viewModel.joinFamily(code.text.trim().toString())
+                        Toast.makeText(requireContext(), "Заявка отправлена", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .setNegativeButton("Отмена") { dialog, _ ->

@@ -299,6 +299,10 @@ class EditTaskFragment : Fragment() {
             )
         }
 
+        binding.ivBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.swHasLocation.setOnClickListener {
             if (binding.swHasLocation.isChecked) {
                 binding.tvAddress.visibility = View.VISIBLE

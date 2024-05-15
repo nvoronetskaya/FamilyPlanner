@@ -70,10 +70,10 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_name"
                     style="@style/editText"
-                    android:maxLength="30"
                     android:layout_width="350dp"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapSentences|textMultiLine" />
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="30" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -171,6 +171,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:text="@string/repeat_task"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/title_divider" />
@@ -215,8 +217,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"
                         android:enabled="false"
-                        android:inputType="number"
-                        android:hint="2" />
+                        android:hint="2"
+                        android:inputType="number" />
 
                     <TextView
                         android:id="@+id/tv_days"
@@ -398,4 +400,14 @@
                 tools:listitem="@layout/viewholder_file" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="@style/progressBar"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
