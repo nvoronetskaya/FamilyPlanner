@@ -1,6 +1,8 @@
 package com.familyplanner.family.view
 
 import android.app.DatePickerDialog
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +29,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +42,12 @@ class CompletionHistoryFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var viewModel: CompletionHistoryViewModel
     private val calendar: Calendar = Calendar.getInstance()
-    private val graphFormatter = XAxisDateFormatter()
+    private val graphXFormatter = XAxisDateFormatter()
+    private val graphYFormatter = object : IndexAxisValueFormatter() {
+        override fun getFormattedValue(value: Float): String {
+            return value.toInt().toString()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -158,12 +166,27 @@ class CompletionHistoryFragment : Fragment() {
             datasets.add(LineDataSet(userLine, completionByUser[userId]!!.get(0).userName))
         }
         val chart = binding.chart
+        datasets.forEach { it.setDrawValues(false) }
         chart.data = LineData(datasets)
+        val textColor = when (requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> Color.WHITE
+            else -> Color.BLACK
+        }
+        binding.chart.apply {
+            axisLeft.granularity = 1f
+            axisLeft.valueFormatter = graphYFormatter
+            axisRight.granularity = 1f
+            axisRight.valueFormatter = graphYFormatter
+            legend.textColor = textColor
+            axisLeft.textColor = textColor
+            xAxis.textColor = textColor
+        }
         val xAxis = chart.xAxis
         xAxis.labelCount = (finishDate - startDate + 1).toInt()
-        xAxis.valueFormatter = graphFormatter
+        xAxis.valueFormatter = graphXFormatter
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.labelRotationAngle = 315f
+        xAxis.setLabelCount((finishDate - startDate + 1).toInt(), true)
         chart.invalidate()
     }
 

@@ -1,6 +1,8 @@
 package com.familyplanner.lists.view
 
 import android.app.DatePickerDialog
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -132,14 +134,22 @@ class AllListsBudgetFragment : Fragment() {
         val startDate = viewModel.getStartDate().toEpochDay()
         val finishDate = viewModel.getFinishDate().toEpochDay()
         val spendingsLine = arrayListOf<Entry>()
-        spendingsByDate.keys.sorted().forEach {
-            spendingsLine.add(Entry(it.toFloat(), spendingsByDate[it]!!.sumOf { budget -> budget.sumSpent }.toFloat()))
+        (startDate..finishDate).forEach {
+            spendingsLine.add(Entry(it.toInt().toFloat(), spendingsByDate[it]?.sumOf { budget -> budget.sumSpent }?.toFloat() ?: 0f))
         }
         val chart = binding.chart
+        val textColor = when (requireContext().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> Color.WHITE
+            else -> Color.BLACK
+        }
+        binding.chart.xAxis.textColor = textColor
+        binding.chart.axisLeft.textColor = textColor
+        binding.chart.legend.textColor = textColor
         chart.data = LineData(LineDataSet(spendingsLine, "Сумма расходов"))
         val xAxis = chart.xAxis
         xAxis.labelCount = (finishDate - startDate + 1).toInt()
         xAxis.valueFormatter = graphFormatter
+        xAxis.setLabelCount(spendingsLine.size, true)
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.labelRotationAngle = 315f
         chart.invalidate()

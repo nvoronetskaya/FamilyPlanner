@@ -43,5 +43,6 @@ class CompletionAdapter(val onClick: (String) -> Unit) :
     fun setData(completion: List<CompletionDto>) {
         completionHistory.clear()
         completionHistory.addAll(completion)
+        notifyDataSetChanged()
     }
 }
