@@ -159,7 +159,7 @@ class ProfileFragment : Fragment() {
                         dialog.cancel()
                     }.show()
             dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                if (password.text.isNullOrBlank()) {
+                if (password.text.isNullOrEmpty()) {
                     password.error = resources.getString(R.string.enter_password)
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
@@ -187,7 +187,7 @@ class ProfileFragment : Fragment() {
                                     } else {
                                         Toast.makeText(
                                             requireContext(),
-                                            resources.getString(R.string.error_check_data),
+                                            resources.getString(R.string.error_check_data_internet),
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }

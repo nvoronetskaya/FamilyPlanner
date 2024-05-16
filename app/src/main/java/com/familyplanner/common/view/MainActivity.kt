@@ -32,6 +32,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: ActivityViewModel
     private lateinit var navController: NavController
+    private val allowedNoFamilyDestinations = setOf(
+        R.id.noFamilyFragment,
+        R.id.profileFragment,
+        R.id.enterEmailFragment,
+        R.id.confirmEmailFragment,
+        R.id.enterInfoFragment
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                             stopService(locationService)
                         }
                         val currentDestination = getCurrentDestinationId()
-                        if (!it && currentDestination != R.id.noFamilyFragment) {
+                        if (!it && !allowedNoFamilyDestinations.contains(currentDestination)) {
                             navController.navigate(
                                 R.id.noFamilyFragment,
                                 null,
@@ -110,7 +117,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener {
-            if (viewModel.getHasFamily() != true) {
+            if (!viewModel.getHasFamily()) {
                 if (it.itemId == R.id.home) {
                     navController.navigate(
                         R.id.noFamilyFragment,

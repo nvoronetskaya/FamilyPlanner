@@ -69,7 +69,7 @@ class SignInFragment : Fragment() {
                 return@setOnClickListener
             }
             binding.tfEmail.isErrorEnabled = false
-            if (binding.etPassword.text.isNullOrBlank()) {
+            if (binding.etPassword.text.isNullOrEmpty()) {
                 binding.tfPassword.error = "Введите пароль"
                 binding.bEnter.isEnabled = true
                 return@setOnClickListener
@@ -77,7 +77,7 @@ class SignInFragment : Fragment() {
             binding.tfPassword.isErrorEnabled = false
             viewModel.signIn(
                 binding.etEmail.text!!.trim().toString(),
-                binding.etPassword.text!!.trim().toString()
+                binding.etPassword.text!!.toString()
             )
         }
 

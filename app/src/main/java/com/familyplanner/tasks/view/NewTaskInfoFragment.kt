@@ -464,6 +464,7 @@ class NewTaskInfoFragment : Fragment() {
     private fun createTask() {
         if (binding.etName.text.isNullOrBlank()) {
             binding.etName.error = "Текст задачи не может быть пустым"
+            binding.pbLoading.isVisible = false
             return
         }
         binding.etName.error = null
@@ -478,12 +479,14 @@ class NewTaskInfoFragment : Fragment() {
         } else if (binding.rbEachNDays.isChecked) {
             if (binding.etNumberOfDays.text.isNullOrBlank()) {
                 binding.etNumberOfDays.error = "Введите число дней"
+                binding.pbLoading.isVisible = false
                 return
             }
             type = RepeatType.EACH_N_DAYS
             eachNDays = binding.etNumberOfDays.text.toString().toInt()
             if (eachNDays < 2 || eachNDays > 30) {
                 binding.etNumberOfDays.error = "Введите число от 2 до 30"
+                binding.pbLoading.isVisible = false
                 return
             }
         } else if (binding.rbDaysOfWeek.isChecked) {
@@ -498,12 +501,14 @@ class NewTaskInfoFragment : Fragment() {
             if (weekDays == 0) {
                 binding.tvRepeat.requestFocus()
                 binding.tvRepeat.error = "Выберите хотя бы один день недели"
+                binding.pbLoading.isVisible = false
                 return
             }
             type = RepeatType.DAYS_OF_WEEK
         } else {
             binding.tvRepeat.requestFocus()
             binding.tvRepeat.error = "Выберите тип повтора задачи"
+            binding.pbLoading.isVisible = false
             return
         }
         binding.tvRepeat.error = null

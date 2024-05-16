@@ -12,4 +12,5 @@
     <string name="wanna_leave">Вы уверены, что хотите выйти?</string>
     <string name="password_reset_email_sent">Письмо направлено на почту</string>
     <string name="error_check_data">Ошибка. Проверьте данные и попробуйте позднее</string>
+    <string name="error_check_data_internet">Ошибка. Проверьте данные и подключение к сети и попробуйте позднее</string>
 </resources>

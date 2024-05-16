@@ -83,11 +83,10 @@ class EnterEmailFragment : Fragment() {
                 it.isEnabled = true
                 return@setOnClickListener
             }
-
             val emailAddress = email.trim().toString()
-
+            binding.tfEmail.error = null
             lifecycleScope.launch(Dispatchers.IO) {
-                viewModel.sendConfirmationLetter(emailAddress)
+                viewModel.sendConfirmationLetter(emailAddress, isChangeEmail)
             }
         }
 

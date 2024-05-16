@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -73,6 +74,7 @@ class TasksListFragment : Fragment(), MenuProvider {
             ::onTaskClicked,
             LocalDate.now().toEpochDay()
         )
+        binding.pbLoading.isVisible = true
         binding.rvTasks.layoutManager = LinearLayoutManager(activity)
         binding.rvTasks.adapter = tasksAdapter
         viewModel.setUser(userId)
@@ -83,6 +85,7 @@ class TasksListFragment : Fragment(), MenuProvider {
                         if (_binding == null) {
                             return@runOnUiThread
                         }
+                        binding.pbLoading.isVisible = false
                         if (it.isEmpty()) {
                             binding.rvTasks.visibility = View.GONE
                             binding.ivNoTasks.visibility = View.VISIBLE

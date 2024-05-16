@@ -12,6 +12,8 @@ import androidx.navigation.fragment.findNavController
 import com.familyplanner.R
 import com.familyplanner.auth.viewmodel.ConfirmEmailViewModel
 import com.familyplanner.databinding.FragmentSignUpConfirmationBinding
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -49,7 +51,7 @@ class ConfirmEmailFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            if (inputCode.trim().toString() != code) {
+            if (inputCode.toString() != code) {
                 binding.tfCode.error = resources.getString(R.string.wrong_code)
                 it.isEnabled = true
                 return@setOnClickListener
@@ -59,16 +61,27 @@ class ConfirmEmailFragment : Fragment() {
             bundle.putString("email", email)
             if (isChangeEmail) {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val changeTask = viewModel.changeEmail(password, email)
-                    changeTask?.await()
+                    var errorMessage: String = ""
+                    try {
+                        val changeTask = viewModel.changeEmail(password, email)
+                        changeTask?.await()
+                    } catch (e: FirebaseNetworkException) {
+                        errorMessage = "Нет сети. Проверьте подключение и повторите позднее"
+                    } catch (e: FirebaseAuthInvalidCredentialsException) {
+                        errorMessage = "Ошибка. Проверьте данные и попробуйте позднее"
+                    } catch (e: Exception) {
+                        errorMessage = "Ошибка. Попробуйте позднее"
+                    }
+
                     requireActivity().runOnUiThread {
                         if (_binding == null) {
                             return@runOnUiThread
                         }
-                        if (changeTask == null || !changeTask.isSuccessful) {
+                        if (errorMessage.isNotEmpty()) {
+                            binding.bNext.isEnabled = true
                             Toast.makeText(
                                 requireContext(),
-                                resources.getString(R.string.try_later),
+                                errorMessage,
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
