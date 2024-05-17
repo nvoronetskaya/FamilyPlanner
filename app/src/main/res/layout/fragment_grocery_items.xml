@@ -33,14 +33,6 @@
             android:text="@string/lists" />
 
         <ImageView
-            android:id="@+id/iv_eye"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            app:srcCompat="@drawable/ic_show_done" />
-
-        <ImageView
             android:id="@+id/iv_spendings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

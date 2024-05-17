@@ -12,6 +12,8 @@ import com.familyplanner.tasks.data.SortingType
 import com.familyplanner.tasks.data.Task
 import com.familyplanner.tasks.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -35,6 +37,7 @@ class TasksListViewModel : ViewModel() {
     private var curDate: LocalDate = LocalDate.now()
     private var familyId: String? = null
     private var adminId: String? = null
+    private var tasksCollector: Job? = null
 
     fun setUser(userId: String) {
         if (userId == this.userId) {
@@ -53,13 +56,15 @@ class TasksListViewModel : ViewModel() {
             }
             launch {
                 userFilter.collect {
-                    launch {
+                    tasksCollector?.cancelAndJoin()
+                    tasksCollector = launch {
                         taskRepo.getSharedTasks(userId, it).collect { tasks ->
                             allTasks.clear()
                             allTasks.addAll(tasks.map { task -> TaskWithDate(task, null) })
                             filteredTasks.emit(getTasksForDate(curDate, applyFilters()))
                         }
                     }
+                    tasksCollector?.start()
                 }
             }
         }
@@ -75,8 +80,8 @@ class TasksListViewModel : ViewModel() {
         importanceFilter = importance
     }
 
-    fun setLocationFilter(hasDeadline: Boolean?) {
-        hasDeadlineFilter = hasDeadline
+    fun setLocationFilter(hasLocation: Boolean?) {
+        hasLocationFilter = hasLocation
     }
 
     fun setDeadlineFilter(hasDeadline: Boolean?) {
@@ -189,7 +194,7 @@ class TasksListViewModel : ViewModel() {
 
     private fun applyFilters(): List<TaskWithDate> {
         val list = mutableListOf<TaskWithDate>()
-        allTasks.forEach { list.add(it) }
+        list.addAll(allTasks)
         val result =
             list.filter { if (hasLocationFilter != null) (it.task.location != null) == hasLocationFilter else true }
                 .filter { if (hasDeadlineFilter != null) (it.task.deadline != null) == hasDeadlineFilter else true }

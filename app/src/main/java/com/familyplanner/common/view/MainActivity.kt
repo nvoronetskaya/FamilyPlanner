@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -17,9 +18,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import com.familyplanner.common.viewmodel.ActivityViewModel
 import com.familyplanner.FamilyPlanner
 import com.familyplanner.R
+import com.familyplanner.common.viewmodel.ActivityViewModel
 import com.familyplanner.databinding.ActivityMainBinding
 import com.familyplanner.location.service.LocationService
 import com.google.firebase.Firebase
@@ -27,6 +28,7 @@ import com.google.firebase.auth.auth
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -55,6 +57,15 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
         navController = navHostFragment.navController
+        Thread.setDefaultUncaughtExceptionHandler { paramThread, paramThrowable ->
+            runOnUiThread {
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+//                android.os.Process.killProcess(android.os.Process.myPid())
+//                exitProcess(2)
+            }
+        }
         val isWelcomeFragment = getCurrentDestinationId() == R.id.welcomeFragment
         binding.bottomNavigation.isVisible = !isWelcomeFragment
         if (Firebase.auth.currentUser != null) {

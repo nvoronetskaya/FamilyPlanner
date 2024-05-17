@@ -30,10 +30,10 @@ import java.util.UUID
 
 class GroceryListRepository {
     private val firestore = Firebase.firestore
-    private val userLists = MutableSharedFlow<List<GroceryList>>()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     fun getListsForUser(userId: String): Flow<List<GroceryList>> {
+        val userLists = MutableSharedFlow<List<GroceryList>>()
         scope.launch {
             firestore.collection(UserListDbSchema.USER_LIST_TABLE)
                 .whereEqualTo(UserListDbSchema.USER_ID, userId).snapshots().collect {
@@ -67,6 +67,7 @@ class GroceryListRepository {
     }
 
     fun getNotCompletedListsForUser(userId: String): Flow<List<GroceryList>> {
+        val userLists = MutableSharedFlow<List<GroceryList>>()
         scope.launch {
             firestore.collection(UserListDbSchema.USER_LIST_TABLE)
                 .whereEqualTo(UserListDbSchema.USER_ID, userId).snapshots().collect {

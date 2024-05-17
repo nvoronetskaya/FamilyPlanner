@@ -27,8 +27,6 @@ class GroceryListsViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             launch {
                 familyId = userRepository.getUserByIdOnce(userId).familyId ?: ""
-            }
-            launch {
                 collectLists?.cancelAndJoin()
                 collectLists = launch(Dispatchers.IO) {
                     listsRepository.getListsForUser(FamilyPlanner.userId).collect {
