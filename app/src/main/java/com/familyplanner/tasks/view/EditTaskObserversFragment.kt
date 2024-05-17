@@ -47,6 +47,12 @@ class EditTaskObserversFragment : Fragment() {
             }
         }
         binding.ivDone.setOnClickListener {
+            if (!observersAdapter.hasExecutor()) {
+                binding.tvObservers.requestFocus()
+                binding.tvObservers.error = "Выберите хотя бы одного исполнителя"
+                return@setOnClickListener
+            }
+            binding.tvObservers.error = null
             viewModel.updateObservers(taskId)
             findNavController().popBackStack()
         }

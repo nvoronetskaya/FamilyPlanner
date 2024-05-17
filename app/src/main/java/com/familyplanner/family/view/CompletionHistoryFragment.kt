@@ -81,7 +81,7 @@ class CompletionHistoryFragment : Fragment() {
                             return@runOnUiThread
                         }
                         if (binding.rvHistory.isVisible) {
-                            adapter.setData(it)
+                            adapter.setData(it.sortedByDescending { completion -> completion.completionDate })
                         } else {
                             updateGraph(it)
                         }
