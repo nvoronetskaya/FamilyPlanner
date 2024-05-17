@@ -23,7 +23,6 @@ class GroceryListInfoViewModel : ViewModel() {
     private val listObservers = MutableSharedFlow<List<ListObserver>>(replay = 1)
     private val list = MutableSharedFlow<GroceryList?>(replay = 1)
     private val listProducts = MutableStateFlow(listOf<Product>())
-    private val nonObservers = mutableListOf<NonObserver>()
 
     init {
         viewModelScope.launch {
@@ -54,17 +53,11 @@ class GroceryListInfoViewModel : ViewModel() {
                     listProducts.emit(it)
                 }
             }
-            launch {
-                listsRepository.getNonObservers(listId, familyId).collect {
-                    nonObservers.clear()
-                    nonObservers.addAll(it)
-                }
-            }
         }
     }
 
     fun editProduct(product: Product, newName: String) {
-
+        listsRepository.changeProductName(product.id, newName)
     }
 
     fun getListInfo(): Flow<GroceryList?> = list
@@ -99,5 +92,7 @@ class GroceryListInfoViewModel : ViewModel() {
         listsRepository.deleteObserver(observer.userId, listId)
     }
 
-    fun getNonObservers(): List<NonObserver> = nonObservers
+    suspend fun getNonObservers(): List<NonObserver> {
+        return listsRepository.getNonObserversOnce(listId, familyId)
+    }
 }

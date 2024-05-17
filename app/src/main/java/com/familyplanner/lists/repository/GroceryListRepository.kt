@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -135,35 +136,44 @@ class GroceryListRepository {
             }
     }
 
-    suspend fun getObserversForList(listId: String): Flow<List<ListObserver>> {
-        val usersId =
+    fun getObserversForList(listId: String): Flow<List<ListObserver>> {
+        val observers = MutableSharedFlow<List<ListObserver>>()
+        scope.launch {
             firestore.collection(UserListDbSchema.USER_LIST_TABLE)
-                .whereEqualTo(UserListDbSchema.LIST_ID, listId).get().await()
-                .map { it[UserListDbSchema.USER_ID].toString() }.toMutableList()
-        usersId.add("1")
-        return firestore.collection(UserDbSchema.USER_TABLE)
-            .whereIn(FieldPath.documentId(), usersId)
-            .snapshots().map { users ->
-                val dbObservers = mutableListOf<ListObserver>()
-                for (user in users.documents) {
-                    dbObservers.add(ListObserver(user.id, user[UserDbSchema.NAME].toString()))
+                .whereEqualTo(UserListDbSchema.LIST_ID, listId).snapshots().collect {
+                    val usersId = it.documents.map { it[UserListDbSchema.USER_ID].toString() }
+                    if (usersId.isEmpty()) {
+                        return@collect
+                    }
+                    launch {
+                        firestore.collection(UserDbSchema.USER_TABLE)
+                            .whereIn(FieldPath.documentId(), usersId)
+                            .snapshots().collect {
+                                val dbObservers = mutableListOf<ListObserver>()
+                                for (user in it.documents) {
+                                    dbObservers.add(
+                                        ListObserver(
+                                            user.id,
+                                            user[UserDbSchema.NAME].toString()
+                                        )
+                                    )
+                                }
+                                observers.emit(dbObservers)
+                            }
+                    }
                 }
-                dbObservers
-            }
+        }
+        return observers
     }
 
-    suspend fun getNonObservers(listId: String, familyId: String): Flow<List<NonObserver>> {
-        val observersId =
-            firestore.collection(UserListDbSchema.USER_LIST_TABLE)
-                .whereEqualTo(UserListDbSchema.LIST_ID, listId).get().await()
-                .map { it.id }
+    suspend fun getNonObserversOnce(listId: String, familyId: String): List<NonObserver> {
+        val observersId = firestore.collection(UserListDbSchema.USER_LIST_TABLE)
+            .whereEqualTo(UserListDbSchema.LIST_ID, listId).get().await()
+            .map { it[UserListDbSchema.USER_ID].toString() }
         return firestore.collection(UserDbSchema.USER_TABLE)
-            .whereEqualTo(UserDbSchema.FAMILY_ID, familyId)
-            .whereNotIn(FieldPath.documentId(), observersId).snapshots().map {
-                val nonObservers = it.documents.map { doc ->
-                    NonObserver(doc.id, doc[UserDbSchema.NAME].toString(), false)
-                }
-                nonObservers
+            .whereNotIn(FieldPath.documentId(), observersId)
+            .whereEqualTo(UserDbSchema.FAMILY_ID, familyId).get().await().documents.map { doc ->
+                NonObserver(doc.id, doc[UserDbSchema.NAME].toString(), false)
             }
     }
 
@@ -273,6 +283,11 @@ class GroceryListRepository {
     fun changeListName(listId: String, newName: String) {
         firestore.collection(ListDbSchema.LIST_TABLE).document(listId)
             .update(ListDbSchema.NAME, newName)
+    }
+
+    fun changeProductName(productId: String, newName: String) {
+        firestore.collection(ProductDbSchema.PRODUCT_TABLE).document(productId)
+            .update(ProductDbSchema.NAME, newName)
     }
 
     fun addSpending(userId: String, listId: String, value: Double) {

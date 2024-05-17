@@ -192,24 +192,32 @@ class GroceryListInfoFragment : Fragment() {
     }
 
     private fun createAddObserversDialog() {
-        val curActivity = requireActivity()
-        val builder = MaterialAlertDialogBuilder(curActivity, R.style.alertDialog).setTitle("Добавление членов семьи")
-        val view = curActivity.layoutInflater.inflate(R.layout.dialog_add_list_observers, null)
-        val nonObserversList = view.findViewById<RecyclerView>(R.id.rv_observers)
-        nonObserversList.layoutManager = LinearLayoutManager(requireContext())
-        val nonObserversAdapter = NonObserverAdapter()
-        val nonObservers = viewModel.getNonObservers()
-        if (nonObservers.isEmpty()) {
-            Toast.makeText(requireContext(), "Список доступен всем членам семьи", Toast.LENGTH_SHORT).show()
-            return
-        }
-        nonObserversAdapter.updateData(nonObservers)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val nonObservers = viewModel.getNonObservers()
+            val curActivity = requireActivity()
+            curActivity.runOnUiThread {
+                if (_binding == null) {
+                    return@runOnUiThread
+                }
+                val builder = MaterialAlertDialogBuilder(curActivity, R.style.alertDialog).setTitle("Добавление членов семьи")
+                val view = curActivity.layoutInflater.inflate(R.layout.dialog_add_list_observers, null)
+                val nonObserversList = view.findViewById<RecyclerView>(R.id.rv_observers)
+                nonObserversList.layoutManager = LinearLayoutManager(requireContext())
+                val nonObserversAdapter = NonObserverAdapter()
+                nonObserversList.adapter = nonObserversAdapter
+                if (nonObservers.isEmpty()) {
+                    Toast.makeText(requireContext(), "Список доступен всем членам семьи", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+                nonObserversAdapter.updateData(nonObservers)
 
-        builder.setView(view, 40, 0, 40, 0)
-        builder.setPositiveButton("Готово") { dialog, _ ->
-            viewModel.addObservers(nonObserversAdapter.getObservers())
-            dialog.dismiss()
-        }.setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
-        builder.create().show()
+                builder.setView(view, 40, 0, 40, 0)
+                builder.setPositiveButton("Готово") { dialog, _ ->
+                    viewModel.addObservers(nonObserversAdapter.getObservers())
+                    dialog.dismiss()
+                }.setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+                builder.create().show()
+            }
+        }
     }
 }
