@@ -50,7 +50,7 @@ class SignInViewModel : ViewModel() {
             } catch (e: FirebaseNetworkException) {
                 loggedIn.emit("Проверьте подключение к сети и попробуйте позднее")
             } catch (e: Exception) {
-                loggedIn.emit("Ошибка. Попробуйте позднее")
+                loggedIn.emit("Ошибка. Проверьте данные и попробуйте снова")
             }
         }
     }
